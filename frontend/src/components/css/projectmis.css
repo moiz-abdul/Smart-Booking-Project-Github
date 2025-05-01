@@ -1,0 +1,88 @@
+/* Hero Section */
+.mis-hero {
+    background: linear-gradient(135deg, #4a90e2, #9013fe);
+    padding: 60px 20px;
+  }
+  
+  .mis-hero h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .mis-hero p {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  
+  /* MIS Content */
+  .mis-content {
+    background-color: #f5f5f5;
+    padding: 60px 15px;
+  }
+  
+  .mis-card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .mis-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .mis-card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4a90e2;
+  }
+  
+  .mis-card-text {
+    font-size: 1rem;
+    margin-top: 10px;
+    color: #555;
+  }
+  
+  /* Call to Action Section */
+  .mis-cta {
+    background-color: #4a90e2;
+    color: white;
+  }
+  
+  .mis-cta h2 {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  .mis-cta button {
+    background-color: #9013fe;
+    border: none;
+    padding: 10px 20px;
+    color: #fff;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .mis-cta button:hover {
+    background-color: #6f0ccd;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .mis-hero h1 {
+      font-size: 2.5rem;
+    }
+  
+    .mis-card {
+      padding: 15px;
+    }
+  
+    .mis-cta h2 {
+      font-size: 1.8rem;
+    }
+  }
+  

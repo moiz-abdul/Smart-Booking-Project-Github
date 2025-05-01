@@ -1,0 +1,35 @@
+Requirements to Deploy a Docker Container Website on a Linux Server:
+
+Linux Server (Ubuntu, CentOS, etc.)
+
+Domain & Hosting (VPS, Cloud Server, or Dedicated Server)
+
+SSH Access (To connect to the server)
+
+Docker Installed (Run docker --version to verify)
+
+Docker Compose Installed (Optional but useful)
+
+Firewall & Security Configuration (UFW, IPTables)
+
+Web Server (Optional, if using Reverse Proxy)
+
+NGINX / Apache (For managing domain & SSL)
+
+SSL Certificate (Let's Encrypt for HTTPS)
+
+Environment Variables (.env) & Configuration Files
+
+Persistent Storage & Volumes (For database or files)
+
+Database Setup (If needed, e.g., MySQL, PostgreSQL)
+
+CI/CD Pipeline (Optional, for automated deployment)
+
+Monitoring & Logs (Docker logs, Prometheus, Grafana)
+
+
+
+
+
+

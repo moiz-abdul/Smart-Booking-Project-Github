@@ -1,0 +1,57 @@
+
+.top-ribbon {
+  background-color: #f8f9fa; /* Light grey background */
+  border-bottom: 2px solid #dcdcdc;
+}
+
+.logo {
+  max-width: 60%; /* Adjust logo size */
+  height: auto;
+}
+
+.org-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.org-subtitle {
+  font-size: 1rem;
+  color: #555;
+}
+
+.text-start{
+  margin-top: 20px;
+}
+
+/* Contact Details Section */
+.contact-details {
+  margin: 0;
+  padding: 0;
+}
+
+.contact-details li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.contact-details .material-icons {
+  font-size: 20px;
+  margin-right: 10px;
+  color: #007bff;
+}
+
+
+.org-picture {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px; /* Slight rounding for better appearance */
+}
+
+.ribbon-align
+{
+  text-align: center;
+}

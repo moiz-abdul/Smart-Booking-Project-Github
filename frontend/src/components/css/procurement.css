@@ -1,0 +1,86 @@
+/* Reset margins and paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Procurement Section Container */
+  .procurement-section {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .procurement-hero {
+    background: linear-gradient(135deg, #1e88e5, #43a047);
+    color: #fff;
+    text-align: center;
+    padding: 50px 20px;
+  }
+  
+  .procurement-hero .title {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .procurement-hero .subtitle {
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+  
+  .procurement-content {
+    background-color: #f9f9f9;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  
+  .procurement-content h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .features-list {
+    list-style: none;
+    margin: 20px 0;
+    padding: 0;
+  }
+  
+  .features-list li {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    color: #555;
+  }
+  
+  .cta-button {
+    background: #1e88e5;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .cta-button:hover {
+    background: #1565c0;
+  }
+  
+  /* Container fluid (No spaces on sides) */
+  .procurement-section {
+    padding: 0;
+  }
+  
+  .procurement-hero,
+  .procurement-content {
+    margin: 0 auto;
+    width: 100%;
+  }
+  

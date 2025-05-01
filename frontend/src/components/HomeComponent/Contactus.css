@@ -1,0 +1,44 @@
+.heading
+{
+    background-color:rgb(190, 216, 190);
+    font-family: Poppins, sans-serif;
+    font-weight: bold;
+}
+
+.contact-details {
+    font-size: 18px;
+    line-height: 1.8; /* Spacing between contact items */
+  }
+  
+  .contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px; /* Space between each contact item */
+  }
+  
+  .contact-icon {
+    font-size: 24px; /* Icon size */
+    color: #007b5e; /* Green color for icon */
+    border: 2px solid #007b5e; /* Green border for icon */
+    border-radius: 50%; /* Circular icon */
+    padding: 6px; /* Space inside the icon */
+    margin-right: 10px; /* Space between icon and text */
+  }
+  
+  .map-container {
+    border: 2px solid #007b5e; /* Green border around the map */
+    border-radius: 10px; /* Rounded edges for the map container */
+    overflow: hidden; /* Ensure proper alignment */
+  }
+  
+  @media (max-width: 768px) {
+    .contact-item {
+      flex-direction: column; /* Stack icon and text vertically on small screens */
+      align-items: flex-start;
+    }
+  
+    .contact-icon {
+      margin-bottom: 5px; /* Add spacing between icon and text on smaller screens */
+    }
+  }
+  

@@ -1,0 +1,49 @@
+.bottomRibbon {
+    background-color: #1b6e1b; /* Green background */
+    color: white;
+  }
+  
+  .bottomRibbon h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .bottomRibbon p, 
+  .bottomRibbon a {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .bottomRibbon a {
+    text-decoration: none;
+    color: white;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .bottomRibbon a:hover {
+    color: #d4edda; /* Light green */
+  }
+  
+  .visitor-details {
+    border-radius: 10px;
+    font-weight: bold;
+  }
+  
+  .visitor-count {
+    font-size: 20px;
+    font-weight: bold;
+    width: 100px;
+    padding: 4px 4px;
+  }
+  
+  .visitor-today {
+    font-size: 20px;
+    color: #fff;
+  }
+  
+  .material-symbols-outlined {
+    vertical-align: middle;
+    font-size: 1.2rem;
+    margin-right: 8px;
+  }
+  
