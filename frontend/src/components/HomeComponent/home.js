@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { FaCalendarAlt, FaUserMd, FaSearch, FaCreditCard, FaRegStar, FaSignInAlt, FaUserPlus } from 'react-icons/fa';
 import { MdCategory, MdNotifications } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import "bootstrap/dist/css/bootstrap.min.css";
+
 // import Header from '../../Layouts/UserLayout/UserNavbar';
 
 
@@ -11,7 +13,40 @@ const HomePage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSlideCategory, setSelectedSlideCategory] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
-  const navigate = useNavigate();
+
+  const [services, setServices] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/homepagecardservices/all');
+                const data = await response.json();
+                if (data.success) {
+                    setServices(data.data);
+                }
+            } catch (error) {
+                console.error("Error fetching services:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+  
+        fetchServices();
+    }, []);
+  
+    const formatTime = (timeString) => {
+        if (!timeString) return '';
+        const time = new Date(`1970-01-01T${timeString}`);
+        return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+  
+    const handleBookNow = (serviceId) => {
+        navigate(`/procurement/${serviceId}`);
+    };
+  
+    if (loading) return <div className="text-center py-5">Loading services...</div>;
 
   // Categories data
   const categories = [
@@ -149,32 +184,51 @@ const HomePage = () => {
           <div className="section-heading">
             <h2>{selectedCategory === 'all' ? 'All Service Providers' : `${categories.find(c => c.id === selectedCategory)?.name} Providers`}</h2>
           </div>
-          
-          <div className="providers-grid">
-            {filteredProviders.length > 0 ? (
-              filteredProviders.map(provider => (
-                <div key={provider.id} className="provider-card">
-                  <div className="provider-avatar">
-                    {provider.name.charAt(0)}
+              
+          <div className="row">
+              {services.length > 0 ? (
+                  services.map((service) => (
+                      <div key={service.id} className="col-md-4 mb-4">
+                          <div className="service-card p-3 h-100">
+                              <h4>{service.serviceTitle}</h4>
+                              <span className="category-badge">{service.category}</span>
+                              
+                              <div className="my-2">
+                                  <strong>Available Days:</strong> {service.availableDays.join(', ')}
+                              </div>
+                              
+                              <div className="my-2">
+                                  <strong>Duration:</strong> {service.duration} mins | 
+                                  <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
+                              </div>
+                              
+                              <div className="my-2">
+                                  <strong>Price:</strong> ${service.regularPrice} 
+                                  {service.memberPrice && (
+                                      <span className="text-success"> (${service.memberPrice} for members)</span>
+                                  )}
+                              </div>
+                              
+                              <div className="my-2">
+                                  <strong>Location:</strong> {service.location}
+                              </div>
+                              
+                              <button 
+                                  className="btn btn-primary mt-2 w-100"
+                                  onClick={() => handleBookNow(service.id)}
+                              >
+                                  Book Now
+                              </button>
+                          </div>
+                      </div>
+                  ))
+              ) : (
+                  <div className="col-12 text-center py-5">
+                      No services available at the moment.
                   </div>
-                  <h3>{provider.name}</h3>
-                  <p className="provider-specialty">{provider.specialty}</p>
-                  <div className="provider-rating">
-                    <span className="stars">{'★'.repeat(Math.floor(provider.rating))}{'☆'.repeat(5 - Math.floor(provider.rating))}</span>
-                    <span className="rating-value">{provider.rating}</span>
-                  </div>
-                  <div className="available-slots">
-                    <FaCalendarAlt /> {provider.availableSlots} slots available
-                  </div>
-                  <button className="book-now-btn">Book Now</button>
-                </div>
-              ))
-            ) : (
-              <div className="no-results">
-                <p>No providers found in this category.</p>
-              </div>
-            )}
+              )}
           </div>
+
         </section>
 
         {/* Role-specific features section */}

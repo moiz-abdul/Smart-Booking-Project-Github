@@ -1,0 +1,8 @@
+.status-cancel {
+    color: #dc3545;
+    font-weight: bold;
+  }
+  
+  .booking-row .status-cancel {
+    text-transform: capitalize;
+  }

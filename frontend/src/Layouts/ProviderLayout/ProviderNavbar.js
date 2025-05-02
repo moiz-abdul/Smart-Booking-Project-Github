@@ -126,6 +126,12 @@ const ProviderNavbar = ({ username }) => {
                         <Link className="nav-link" to="/provider/receivedbookings">
                             Received Bookings
                         </Link>
+                        <Link className="nav-link" to="/provider/confirmbookings">
+                            Confirm Bookings
+                        </Link>
+                        <Link className="nav-link" to="/provider/cancelbookings">
+                            Cancel Bookings
+                        </Link>
                     </div>
                     <div className="navbar-buttons d-flex">
                         <div className="dropdown">

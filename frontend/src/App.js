@@ -3,9 +3,7 @@ import './App.css';
 import { Routes, Route, Link } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-import CustomerDashboard from './Layouts/CustomerLayout/CustomerMainLayoutfile';
-import CusDashboard from './Layouts/CustomerLayout/Dashboard'
-import ConfirmedBookings from './Layouts/CustomerLayout/ConfirmedBookings'
+
 
 // COMMON LINKS 
 import RoleBasedLogin from './CommonComponents/LoginComponent/login';
@@ -29,15 +27,21 @@ import Careers from './components/careers';
 //  CUSTOMER SIDE LINKS
 
 import CustomerLayout from './Layouts/CustomerLayout/CustomerMainLayoutfile';
-import Dashboard from './CustomerComponents/DashboardComponent/userdashboard';
+// import Dashboard from './CustomerComponents/DashboardComponent/userdashboard';
 import BookingForm from './CustomerComponents/BookingFormComponent/bookingformcomponent';
 import PaymentFormPage from './CustomerComponents/PaymentFormComponent/paymentform';
+import CustomerDashboard from './Layouts/CustomerLayout/CustomerMainLayoutfile';
+import CusDashboard from './Layouts/CustomerLayout/Dashboard'
+import ConfirmedBookings from './Layouts/CustomerLayout/ConfirmedBookings'
+import CancelBookingCustomerDashboard from './Layouts/CustomerLayout/CancelBookings';
 
 // ----------------  SERVICE PROVIDER SIDE LINKS --------------------
 
 import ServiceProviderLayout from './Layouts/ProviderLayout/ProviderMainLayoutfile';
 import ServiceDashboard from './ServiceProviderComponents/ProviderDashboardComponent/ProviderDashboard';
-import ServiceProviderBookings from './ServiceProviderComponents/ReceivedBookingsComponent/receivedbookings';
+import ProviderReceivedBookings  from './ServiceProviderComponents/ReceivedBookingsComponent/receivedbookings';
+import ProviderCancelBookings from './ServiceProviderComponents/CancelBookingsComponent/providercancelbookings';
+
 
 
 // ---------------- ADMIN SIDE LINKS --------------------
@@ -84,17 +88,28 @@ function App() {
 
       {/* Customer Side Routing Links  */}
       <Routes>
-        <Route path='/customer/dashboard' element={<CustomerProtectedRoute><CustomerLayout><Dashboard /></CustomerLayout></CustomerProtectedRoute>} />   {/* Customer Dashboard Link  */}
+        {/* <Route path='/customer/dashboard' element={<CustomerProtectedRoute><CustomerLayout><Dashboard /></CustomerLayout></CustomerProtectedRoute>} /> */}   {/* Customer Dashboard Link  */}
         <Route path='/booking-form' element={<BookingForm />} />
         <Route path='/payment' element={<PaymentFormPage />} />
         <Route path='/registerstaff/documentspage' element={<CustomerLayout> <DocumentPage /> </CustomerLayout>} />
         <Route path='/registerstaff/careerspage' element={<CustomerLayout> <AdminCareersPage /> </CustomerLayout>} />
       </Routes>
 
+      <Routes>
+          <Route path="/CustomerDashboard" element={<CustomerProtectedRoute><CustomerDashboard /></CustomerProtectedRoute>} >
+          <Route index path="/CustomerDashboard/Dashboard" element={<CustomerProtectedRoute><CusDashboard /></CustomerProtectedRoute>} />
+          <Route path="/CustomerDashboard/ConfirmedBookings" element={<ConfirmedBookings />} />
+          <Route index path="/CustomerDashboard/CancelBookings" element={<CustomerProtectedRoute><CancelBookingCustomerDashboard /></CustomerProtectedRoute>} />
+          
+        </Route>
+      </Routes>
+
+
       {/* Service Provider Side Routing Links  */}
       <Routes>
         <Route path='/provider/dashboard' element={<ServiceProviderLayout> <ServiceDashboard /> </ServiceProviderLayout>} />
-        <Route path='/provider/receivedbookings' element={<ServiceProviderLayout> <ServiceProviderBookings /> </ServiceProviderLayout>} />
+        <Route path='/provider/receivedbookings' element={<ServiceProviderLayout> <ProviderReceivedBookings /> </ServiceProviderLayout>} />
+        <Route path='/provider/cancelbookings' element={<ServiceProviderLayout> <ProviderCancelBookings /> </ServiceProviderLayout>} />
       </Routes>
 
       {/* Admin Side Routing Links */}
@@ -106,13 +121,6 @@ function App() {
         <Route path='/registeradmins/careerspage' element={<AdminLayout> <AdminCareersPage /> </AdminLayout>} />
       </Routes>
 
-      <Routes>
-        <Route path="/CustomerDashboard" element={<CustomerProtectedRoute><CustomerDashboard />  </CustomerProtectedRoute>} >
-          <Route index path="/CustomerDashboard/Dashboard" element={<CusDashboard />} />
-          <Route path="/CustomerDashboard/ConfirmedBookings" element={<ConfirmedBookings />} />
-
-        </Route>
-      </Routes>
     </div>
   );
 }

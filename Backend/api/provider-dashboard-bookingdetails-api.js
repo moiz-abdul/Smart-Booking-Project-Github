@@ -1,0 +1,154 @@
+const express = require('express');
+const mysql = require('mysql2/promise');
+const ProviderDashboardBookingsDetailsApi = express.Router();
+
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'smart_booking_system',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+// Get pending bookings for provider's services
+ProviderDashboardBookingsDetailsApi.get('/pending', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Provider user_id is required'
+      });
+    }
+
+    // First get all service_ids for this provider
+    const [services] = await pool.query(
+      'SELECT id FROM add_services WHERE user_id = ?',
+      [user_id]
+    );
+
+    if (services.length === 0) {
+      return res.json({
+        success: true,
+        data: []
+      });
+    }
+
+    const serviceIds = services.map(s => s.id);
+    
+    // Then get pending bookings for these services
+    const [bookings] = await pool.query(`
+      SELECT * FROM bookingform 
+      WHERE service_id IN (?) 
+      AND is_status = 'pending'
+      ORDER BY selected_available_day, start_time
+    `, [serviceIds]);
+
+    res.json({
+      success: true,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error fetching provider bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch bookings',
+      error: error.message
+    });
+  }
+});
+
+
+// Get Cancel bookings for provider's services
+ProviderDashboardBookingsDetailsApi.get('/cancel', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Provider user_id is required'
+      });
+    }
+
+    // First get all service_ids for this provider
+    const [services] = await pool.query(
+      'SELECT id FROM add_services WHERE user_id = ?',
+      [user_id]
+    );
+
+    if (services.length === 0) {
+      return res.json({
+        success: true,
+        data: []
+      });
+    }
+
+    const serviceIds = services.map(s => s.id);
+    
+    // Then get CANCELED bookings for these services
+    const [bookings] = await pool.query(`
+      SELECT * FROM bookingform 
+      WHERE service_id IN (?) 
+      AND is_status = 'cancel'
+      ORDER BY selected_available_day DESC, start_time DESC
+    `, [serviceIds]);
+
+    res.json({
+      success: true,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error fetching canceled bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch canceled bookings',
+      error: error.message
+    });
+  }
+});
+
+
+// Update booking status
+ProviderDashboardBookingsDetailsApi.put('/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!['confirm', 'cancel'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status value'
+      });
+    }
+
+    const [result] = await pool.query(
+      'UPDATE bookingform SET is_status = ? WHERE id = ?',
+      [status, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Booking ${status}ed successfully`
+    });
+  } catch (error) {
+    console.error('Error updating booking status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update booking status',
+      error: error.message
+    });
+  }
+});
+
+module.exports = ProviderDashboardBookingsDetailsApi;

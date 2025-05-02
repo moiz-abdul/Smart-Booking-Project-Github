@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './receivedbookings.css';
+import './providercancelbookings.css';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -15,7 +15,7 @@ axios.interceptors.response.use(
   }
 );
 
-const ProviderReceivedBookings  = () => {
+const ProviderCancelBookings = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ const ProviderReceivedBookings  = () => {
       const userId = parsedUserData.id;
       
       if (userId) {
-        fetchPendingBookings(userId);
+        fetchCancelBookings(userId);
       }
     } catch (err) {
       setError('Failed to load user data');
@@ -45,12 +45,12 @@ const ProviderReceivedBookings  = () => {
     }
   }, [navigate]);
 
-  const fetchPendingBookings = async (userId) => {
+  const fetchCancelBookings = async (userId) => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get(`http://localhost:5000/api/providerbookingdetails/pending`, {
+      const response = await axios.get(`http://localhost:5000/api/providerbookingdetails/cancel`, {
         params: { user_id: userId }
       });
 
@@ -60,20 +60,14 @@ const ProviderReceivedBookings  = () => {
         throw new Error(response.data?.message || 'Failed to load bookings');
       }
     } catch (err) {
+      console.error('API Error:', {
+        message: err.message,
+        response: err.response?.data,
+        config: err.config
+      });
       setError(err.response?.data?.message || err.message || 'Failed to fetch bookings');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleStatusUpdate = async (bookingId, newStatus) => {
-    try {
-      await axios.put(`http://localhost:5000/api/providerbookingdetails/${bookingId}/status`, {
-        status: newStatus
-      });
-      setBookings(prev => prev.filter(b => b.id !== bookingId));
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update status');
     }
   };
 
@@ -83,7 +77,7 @@ const ProviderReceivedBookings  = () => {
     return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  if (loading) return <div className="dashboard-loading">Loading pending bookings...</div>;
+  if (loading) return <div className="dashboard-loading">Loading canceled bookings...</div>;
   if (error) return (
     <div className="dashboard-error">
       <p>{error}</p>
@@ -93,7 +87,7 @@ const ProviderReceivedBookings  = () => {
 
   return (
     <div className="customer-dashboard">
-      <h2>Pending Bookings</h2>
+      <h2>Canceled Bookings</h2>
       <div className="bookings-container">
         {bookings.length > 0 ? (
           <ul className="booking-list">
@@ -119,8 +113,10 @@ const ProviderReceivedBookings  = () => {
                     <span className="booking-value">{booking.customer_phone}</span>
                   </div>
                   <div className="booking-row">
-                    <span className="booking-label">Day:</span>
-                    <span className="booking-value">{booking.selected_available_day}</span>
+                    <span className="booking-label">Date:</span>
+                    <span className="booking-value">
+                      {booking.selected_available_day}
+                    </span>
                   </div>
                   <div className="booking-row">
                     <span className="booking-label">Time:</span>
@@ -129,34 +125,21 @@ const ProviderReceivedBookings  = () => {
                     </span>
                   </div>
                   <div className="booking-row">
-                    <span className="booking-label">Payment:</span>
-                    <span className="booking-value">{booking.payment_type}</span>
+                    <span className="booking-label">Status:</span>
+                    <span className="booking-value status-cancel">
+                      {booking.is_status}
+                    </span>
                   </div>
-                </div>
-
-                <div className="booking-actions">
-                  <button 
-                    className="accept-btn"
-                    onClick={() => handleStatusUpdate(booking.id, 'confirm')}
-                  >
-                    Accept
-                  </button>
-                  <button 
-                    className="delete-btn"
-                    onClick={() => handleStatusUpdate(booking.id, 'cancel')}
-                  >
-                    Delete
-                  </button>
                 </div>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="no-bookings">No pending bookings found</p>
+          <p className="no-bookings">No canceled bookings found</p>
         )}
       </div>
     </div>
   );
 };
 
-export default ProviderReceivedBookings 
+export default ProviderCancelBookings;

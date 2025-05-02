@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Dashboard.css';
+import './CancelBookings.css';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -16,7 +16,7 @@ axios.interceptors.response.use(
   }
 );
 
-const CusDashboard = () => {
+const CancelBookingCustomerDashboard = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,10 +54,10 @@ const CusDashboard = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get(`http://localhost:5000/api/customerbookingdetails/pending`, {
+      const response = await axios.get(`http://localhost:5000/api/customerbookingdetails/cancel`, {
         params: { 
           user_id: userId,
-          status: 'pending'
+          status: 'cancel'
         }
       });
 
@@ -147,18 +147,18 @@ const CusDashboard = () => {
 
   return (
     <div className="customer-dashboard">
-      <h2>Your Pending Bookings</h2>
+      <h2>Your Cancel Bookings</h2>
       <div className="bookings-container">
         {bookings.length > 0 ? (
           <ul className="booking-list">
             {bookings.map(renderBookingItem)}
           </ul>
         ) : (
-          <p className="no-bookings">No pending bookings found.</p>
+          <p className="no-bookings">No Cancel bookings found.</p>
         )}
       </div>
     </div>
   );
 };
 
-export default CusDashboard;
+export default CancelBookingCustomerDashboard;

@@ -41,7 +41,7 @@ export default function RoleBasedLogin() {
                     if (bookingServiceId) {
                         navigate(`/booking-form`);
                     } else {
-                        navigate("/CustomerDashboard");
+                        navigate("/CustomerDashboard/Dashboard");
                     }
                 } else if (userRole === "provider") {
                     navigate("/provider/dashboard");
