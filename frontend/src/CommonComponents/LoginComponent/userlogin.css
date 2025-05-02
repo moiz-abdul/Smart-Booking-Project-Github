@@ -1,187 +1,123 @@
+/* Updated Login Styles */
+
 /* General Wrapper */
 .signupwrapper {
-    display: flex;
-    height: 93vh;
-    align-items: center;
-    justify-content: center;
-    background-image: url('../../../public/assets/images/loginbackground.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    font-family: "Segoe UI", sans-serif;
-    padding: 20px;
-  }
-  
-  /* Card Style */
-  .signupcard {
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-    padding: 30px;
-    border-radius: 20px;
-    background: rgba(224, 229, 236, 0.85);
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  /* Heading Style */
-  .signupheading {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 26px;
-    color: #333;
-    font-weight: bold;
-  }
-  
-  /* Form Style */
-  .signupform {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  /* Row Style for Input Grouping */
-  .signuprow {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    gap: 15px;
-    margin-bottom: 15px;
-  }
-  
-  /* Ensure all items in a row take equal space */
-  .signuprow > * {
-    flex: 1;
-  }
-  
-  /* Password container to hold input and feedback */
-  .password-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-  
-  /* Input Fields Style */
-  .signupinput {
-    width: 100%;
-    padding: 12px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    background-color: #f7f7f7;
-    transition: border-color 0.3s ease;
-    box-sizing: border-box;
-  }
-  
-  .signupinput:focus {
-    border-color: #ff9800;
-    outline: none;
-  }
-  
-  /* Button Style */
-  .signupbutton {
-    width: 100%;
-    padding: 14px;
-    border-radius: 5px;
-    border: none;
-    background-color: orange;
-    color: #fff;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 20px;
-  }
-  
-  .signupbutton:hover {
-    background-color: #e68900;
-  }
-  
-  .signupbutton:active {
-    background-color: #d47d00;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Adjustments for responsiveness */
-  @media (max-width: 768px) {
-    .signupcard {
-      padding: 20px;
-      width: 90%;
-    }
-    
-    .signuprow {
-      flex-direction: column;
-      gap: 10px;
-    }
-  }
-  
-  /* Password wrapper styling */
-  .password-wrapper {
-    position: relative;
-    width: 100%;
-  }
-  
-  /* Eye icon styling */
-  .eye-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #999;
-    font-size: 18px;
-  }
-  
-  /* Role toggle styles */
-  .role-toggle {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    gap: 10px;
-  }
-  
-  .role-button {
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    background-color: #f5f5f5;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-  }
-  
-  .role-button.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #0056b3;
-  }
-  
-  /* Sign up link styles */
-  .signup-link {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 14px;
-  }
-  
-  .signup-link a {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .signup-link a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Error message styling */
-  .alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    padding: 10px;
-    border-radius: 4px;
-    width: 100%;
-    text-align: center;
-  }
+  display: flex;
+  min-height: 100vh;
+  /* Use min-height instead of height */
+  align-items: center;
+  justify-content: center;
+  background-image: url('./loginbackground.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: "Segoe UI", sans-serif;
+  padding: 30px;
+}
+
+/* Login Form Specific Styles */
+.login-form {
+  width: 100%;
+  max-width: 500px;
+  height: 530px;
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  /* More visible white background */
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  margin: 0 auto;
+}
+
+.login-form h4 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+/* Input Fields Style */
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  background-color: #f7f7f7;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  border-color: #ff9800;
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgba(255, 152, 0, 0.25);
+}
+
+/* Button Style */
+.btn-success {
+  background-color: orange;
+  border-color: orange;
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 10px 20px;
+}
+
+.btn-success:hover {
+  background-color: #e68900;
+  border-color: #e68900;
+}
+
+/* Row Style for Form Layout */
+.row.justify-content-center {
+  width: 100%;
+  margin: 0;
+}
+
+/* Other Bootstrap Adjustments */
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+.mt-2 {
+  margin-top: 0.5rem !important;
+}
+
+/* Error message styling */
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Links styling */
+a {
+  color: #ff9800;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #e68900;
+  text-decoration: underline;
+}
+
+/* Forgot password button */
+.btn-outline-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+  margin-top: 10px;
+}
+
+.btn-outline-secondary:hover {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}

@@ -3,6 +3,9 @@ import './App.css';
 import { Routes, Route, Link } from 'react-router-dom';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+import CustomerDashboard from './Layouts/CustomerLayout/CustomerMainLayoutfile';
+import CusDashboard from './Layouts/CustomerLayout/Dashboard'
+import ConfirmedBookings from './Layouts/CustomerLayout/ConfirmedBookings'
 
 // COMMON LINKS 
 import RoleBasedLogin from './CommonComponents/LoginComponent/login';
@@ -60,48 +63,56 @@ function App() {
   return (
     <div >
 
-{/* Common Routing Links  */}
-<Routes>
-<Route path="/register" element={<RoleBaseRegister />} />   {/* Role Based Register Link */}
-<Route path="/login" element={<RoleBasedLogin />} />   {/* Role Based  Login Link */}
-</Routes>
+      {/* Common Routing Links  */}
+      <Routes>
+        <Route path="/register" element={<RoleBaseRegister />} />   {/* Role Based Register Link */}
+        <Route path="/login" element={<RoleBasedLogin />} />   {/* Role Based  Login Link */}
+      </Routes>
 
 
- {/* Main (HOME PAGE) Side Routing Links  */}
-  <Routes>
-  <Route path='/' element={<UserLayout><Home/></UserLayout>}/>
-  <Route path='/projectstatus' element={<UserLayout> <ProjectStatusPage/> </UserLayout>}/>
-  <Route path='/aboutus' element={<UserLayout> <AboutUsPage/> </UserLayout>} />
-  <Route path='/procurement/:serviceId' element={<UserLayout> <ProcurementSection/> </UserLayout>} />
-  <Route path='/public-documents' element={<UserLayout><Public_Documents/></UserLayout>} /> 
-  <Route path="/complaints" element={<UserLayout> <Complaints /> </UserLayout> } />
-  <Route path="/projectmis" element={<UserLayout>  <ProjectMis/> </UserLayout>} />
-  <Route path="/careers" element={<UserLayout> <Careers/> </UserLayout> } />
-  </Routes>
+      {/* Main (HOME PAGE) Side Routing Links  */}
+      <Routes>
+        <Route path='/' element={<UserLayout><Home /></UserLayout>} />
+        <Route path='/projectstatus' element={<UserLayout> <ProjectStatusPage /> </UserLayout>} />
+        <Route path='/aboutus' element={<UserLayout> <AboutUsPage /> </UserLayout>} />
+        <Route path='/procurement/:serviceId' element={<UserLayout> <ProcurementSection /> </UserLayout>} />
+        <Route path='/public-documents' element={<UserLayout><Public_Documents /></UserLayout>} />
+        <Route path="/complaints" element={<UserLayout> <Complaints /> </UserLayout>} />
+        <Route path="/projectmis" element={<UserLayout>  <ProjectMis /> </UserLayout>} />
+        <Route path="/careers" element={<UserLayout> <Careers /> </UserLayout>} />
+      </Routes>
 
- {/* Customer Side Routing Links  */}
-  <Routes> 
-  <Route path='/customer/dashboard' element={<CustomerProtectedRoute><CustomerLayout><Dashboard/></CustomerLayout></CustomerProtectedRoute>}/>   {/* Customer Dashboard Link  */}
-  <Route path='/booking-form' element={<BookingForm/>}/>
-  <Route path='/payment' element={<PaymentFormPage/>}/>
-  <Route path='/registerstaff/documentspage' element={<CustomerLayout> <DocumentPage/> </CustomerLayout>}/>
-  <Route path='/registerstaff/careerspage' element={<CustomerLayout> <AdminCareersPage/> </CustomerLayout>}/>
-  </Routes>
+      {/* Customer Side Routing Links  */}
+      <Routes>
+        <Route path='/customer/dashboard' element={<CustomerProtectedRoute><CustomerLayout><Dashboard /></CustomerLayout></CustomerProtectedRoute>} />   {/* Customer Dashboard Link  */}
+        <Route path='/booking-form' element={<BookingForm />} />
+        <Route path='/payment' element={<PaymentFormPage />} />
+        <Route path='/registerstaff/documentspage' element={<CustomerLayout> <DocumentPage /> </CustomerLayout>} />
+        <Route path='/registerstaff/careerspage' element={<CustomerLayout> <AdminCareersPage /> </CustomerLayout>} />
+      </Routes>
 
-{/* Service Provider Side Routing Links  */}
-<Routes>
-<Route path='/provider/dashboard' element={<ServiceProviderLayout> <ServiceDashboard/> </ServiceProviderLayout>}/>
-<Route path='/provider/receivedbookings' element={<ServiceProviderLayout> <ServiceProviderBookings/> </ServiceProviderLayout>}/>
-</Routes>
+      {/* Service Provider Side Routing Links  */}
+      <Routes>
+        <Route path='/provider/dashboard' element={<ServiceProviderLayout> <ServiceDashboard /> </ServiceProviderLayout>} />
+        <Route path='/provider/receivedbookings' element={<ServiceProviderLayout> <ServiceProviderBookings /> </ServiceProviderLayout>} />
+      </Routes>
 
- {/* Admin Side Routing Links */}
+      {/* Admin Side Routing Links */}
 
-  <Routes>
-  <Route path='/admin/login' element={<AdminLogin/>}/>
-  <Route path='/registeradmins/users' element={<AdminProtectedRoute><AdminLayout> <AdminDashboard/> </AdminLayout></AdminProtectedRoute>}/>
-  <Route path='/registeradmins/documentspage' element={<AdminLayout> <DocumentPage/> </AdminLayout>}/>
-  <Route path='/registeradmins/careerspage' element={<AdminLayout> <AdminCareersPage/> </AdminLayout>}/>
- </Routes>
+      <Routes>
+        <Route path='/admin/login' element={<AdminLogin />} />
+        <Route path='/registeradmins/users' element={<AdminProtectedRoute><AdminLayout> <AdminDashboard /> </AdminLayout></AdminProtectedRoute>} />
+        <Route path='/registeradmins/documentspage' element={<AdminLayout> <DocumentPage /> </AdminLayout>} />
+        <Route path='/registeradmins/careerspage' element={<AdminLayout> <AdminCareersPage /> </AdminLayout>} />
+      </Routes>
+
+      <Routes>
+        <Route path="/CustomerDashboard" element={<CustomerProtectedRoute><CustomerDashboard />  </CustomerProtectedRoute>} >
+          <Route index path="/CustomerDashboard/Dashboard" element={<CusDashboard />} />
+          <Route path="/CustomerDashboard/ConfirmedBookings" element={<ConfirmedBookings />} />
+
+        </Route>
+      </Routes>
     </div>
   );
 }

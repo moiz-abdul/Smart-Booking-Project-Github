@@ -1,21 +1,31 @@
-import react,{ children } from 'react';
-import CustomerNavbar from './CustomerNavbar';
-import { useLocation } from 'react-router-dom';
+// CustomerDashboard.js (acts as layout now)
+import React, { useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import Header from './CustomerNavbar';
+import './CustomerMainLayoutfile.css';
 
-const CustomerLayout = ({children}) =>
-{
-    const location = useLocation(); 
-    const username = location.state?.username || 'Guest'; // If no username get then display Guest.
+const CustomerDashboard = () => {
+    const [hasProfile, setHasProfile] = useState(false);
+    const navigate = useNavigate();
 
     return (
-        <div>
-        <CustomerNavbar username ={username}/>
-        <div className='admin-middle-content'>
-                {children}
+        <div className="main-container">
+            <Header username="Tahir" hasProfile={hasProfile} setHasProfile={setHasProfile} />
+            <div className="dashboard-container">
+                <div className="sidebar">
+                    <nav className="sidebar-nav">
+                        <button className="nav-item" onClick={() => navigate('/CustomerDashboard/Dashboard')}>Dashboard</button>
+                        <button className="nav-item" onClick={() => navigate('/CustomerDashboard/ConfirmedBookings')}>My Bookings</button>
+                        <button className="nav-item" onClick={() => navigate('/ProviderDashboard/Payments')}>Paid Services</button>
+                    </nav>
+                </div>
+                <div className="content-area">
+                    {/* Outlet shows the active nested page here */}
+                    <Outlet />
+                </div>
             </div>
-        
         </div>
     );
 };
 
-export default CustomerLayout;
+export default CustomerDashboard;
