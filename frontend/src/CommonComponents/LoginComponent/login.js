@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import "./userlogin.css"; // Use the same CSS as register page
 
+
 export default function RoleBasedLogin() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -68,7 +69,10 @@ export default function RoleBasedLogin() {
 
 
     return (
+
         <div className="register-container">
+
+
             {/* Go Back Button - Positioned Absolutely */}
             <button
                 type="button"
@@ -78,7 +82,7 @@ export default function RoleBasedLogin() {
             >
                 <i className="bi bi-arrow-left me-2"></i>Go Back
             </button>
-            <div className="register-background"></div>
+
             <div className="register-wrapper">
 
 

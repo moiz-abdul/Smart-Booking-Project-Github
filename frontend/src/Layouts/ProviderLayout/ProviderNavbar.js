@@ -93,18 +93,41 @@ const ProviderNavbar = ({ username }) => {
         }
     };
 
-    const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+    const toggleDropdown = (e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        setDropdownOpen(!dropdownOpen);
+    };
+
+    const handleProfileClick = (e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        setShowProfileModal(true);
+        setDropdownOpen(false); // Close dropdown after selection
+    };
+
     const onLogout = () => {
         localStorage.removeItem("userToken");
         localStorage.removeItem("userData");
         navigate("/login");
     };
 
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = () => {
+            if (dropdownOpen) {
+                setDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [dropdownOpen]);
+
     return (
         <nav className="navbar-green">
             <span className="navbar-brand">Service Provider Panel</span>
             <div className="container-fluid">
-
 
                 <div className="navbar-collapse">
                     <div className="navbar-nav">
@@ -135,14 +158,14 @@ const ProviderNavbar = ({ username }) => {
                                     {!profileExists ? (
                                         <button
                                             className="dropdown-item"
-                                            onClick={() => setShowProfileModal(true)}
+                                            onClick={handleProfileClick}
                                         >
                                             Add Profile Info
                                         </button>
                                     ) : (
                                         <button
                                             className="dropdown-item"
-                                            onClick={() => setShowProfileModal(true)}
+                                            onClick={handleProfileClick}
                                         >
                                             Edit Profile Info
                                         </button>
@@ -158,17 +181,19 @@ const ProviderNavbar = ({ username }) => {
             </div>
 
             {/* Profile Modal */}
-            {
-                showProfileModal && (
-                    <div className="modal">
-                        <div className="modal-dialog">
+            {showProfileModal && (
+                <div className="modal" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">
                                     {profileExists ? 'Edit Profile' : 'Add Profile'}
                                 </h5>
                                 <button
+                                    type="button"
                                     className="btn-close"
                                     onClick={() => setShowProfileModal(false)}
+                                    aria-label="Close"
                                 >
                                     &times;
                                 </button>
@@ -252,9 +277,9 @@ const ProviderNavbar = ({ username }) => {
                             </div>
                         </div>
                     </div>
-                )
-            }
-        </nav >
+                </div>
+            )}
+        </nav>
     );
 };
 

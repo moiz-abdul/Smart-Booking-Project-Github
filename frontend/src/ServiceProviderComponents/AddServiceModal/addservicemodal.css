@@ -1,0 +1,170 @@
+/* addservicemodal.css */
+.modal {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1050;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+}
+
+.modal-dialog {
+    max-width: 70%;
+
+    margin: 1.75rem auto;
+}
+
+.modal-content1 {
+    border-radius: 10px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    outline: 0;
+    pointer-events: auto;
+}
+
+/* Compact form controls for reduced height */
+.form-control.compact {
+    padding: 6px 8px;
+    height: 36px;
+    font-size: 0.9rem;
+    z-index: 1055;
+    position: relative;
+    cursor: text;
+}
+
+.compact-textarea {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+}
+
+.time-slots-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+    z-index: 1055;
+}
+
+.day-checkboxes {
+    margin-top: 4px;
+}
+
+.form-check {
+    margin-right: 8px !important;
+}
+
+.form-check-label {
+    font-size: 0.85rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .time-slots-container {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 16px 16px 8px;
+}
+
+.modal-title {
+    font-weight: 700;
+    color: #333;
+    font-size: 1.15rem;
+}
+
+.close {
+    font-size: 1.75rem;
+    font-weight: 300;
+    color: #999;
+    opacity: 1;
+}
+
+.modal-body {
+    padding: 12px 16px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 3px;
+}
+
+label {
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+    display: block;
+}
+
+.input-group-text {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    background-color: #f8f9fa;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background-color: #ffc107;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+
+.btn-primary:hover {
+    background-color: #e6a800;
+}
+
+.form-check-input:checked {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.modal-footer {
+    padding: 10px 16px;
+    border-top: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: 95%;
+        margin: 1rem auto;
+    }
+
+    .row>.form-group {
+        margin-bottom: 12px;
+    }
+}
