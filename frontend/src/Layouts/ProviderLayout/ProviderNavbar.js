@@ -1,9 +1,6 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import './ProviderNavbar.css';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 
 const ProviderNavbar = ({ username }) => {
@@ -37,7 +34,7 @@ const ProviderNavbar = ({ username }) => {
     // Check profile when user_id is available
     const checkProfileExists = async () => {
         if (!profileData.user_id) return;
-        
+
         try {
             const response = await axios.get(`http://localhost:5000/api/providerprofile/${profileData.user_id}`);
             if (response.data.success) {
@@ -67,17 +64,17 @@ const ProviderNavbar = ({ username }) => {
         e.preventDefault();
         setIsSubmitting(true);
         setError(null);
-        
+
         try {
             const payload = {
                 ...profileData
             };
 
             const response = await axios.post(
-                'http://localhost:5000/api/providerprofile', 
+                'http://localhost:5000/api/providerprofile',
                 payload
             );
-            
+
             if (response.data.success) {
                 setProfileExists(true);
                 setShowProfileModal(false);
@@ -87,9 +84,9 @@ const ProviderNavbar = ({ username }) => {
             }
         } catch (error) {
             console.error("Error:", error);
-            const errorMessage = error.response?.data?.message || 
-                               error.response?.data?.error || 
-                               'Failed to save profile. Please try again.';
+            const errorMessage = error.response?.data?.message ||
+                error.response?.data?.error ||
+                'Failed to save profile. Please try again.';
             setError(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -104,22 +101,13 @@ const ProviderNavbar = ({ username }) => {
     };
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-green">
-            <span className="navbar-brand mb-0 h1 bg-warning">Service Provider Panel</span>
+        <nav className="navbar-green">
+            <span className="navbar-brand">Service Provider Panel</span>
             <div className="container-fluid">
-                <button
-                    className="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNavAltMarkup"
-                    aria-controls="navbarNavAltMarkup"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                >
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-                    <div className="navbar-nav mx-auto">
+
+
+                <div className="navbar-collapse">
+                    <div className="navbar-nav">
                         <Link className="nav-link" to="/provider/dashboard">
                             Provider Dashboard
                         </Link>
@@ -133,27 +121,27 @@ const ProviderNavbar = ({ username }) => {
                             Cancel Bookings
                         </Link>
                     </div>
-                    <div className="navbar-buttons d-flex">
+                    <div className="navbar-buttons">
                         <div className="dropdown">
                             <button
-                                className="btn btn-outline-light dropdown-toggle dropdownbutton"
+                                className="dropdownbutton"
                                 type="button"
                                 onClick={toggleDropdown}
                             >
                                 Hi Welcome, {username}
                             </button>
                             {dropdownOpen && (
-                                <div className="dropdown-menu dropdown-menu-end show">
+                                <div className="dropdown-menu">
                                     {!profileExists ? (
-                                        <button 
-                                            className="dropdown-item" 
+                                        <button
+                                            className="dropdown-item"
                                             onClick={() => setShowProfileModal(true)}
                                         >
                                             Add Profile Info
                                         </button>
                                     ) : (
-                                        <button 
-                                            className="dropdown-item" 
+                                        <button
+                                            className="dropdown-item"
                                             onClick={() => setShowProfileModal(true)}
                                         >
                                             Edit Profile Info
@@ -170,78 +158,103 @@ const ProviderNavbar = ({ username }) => {
             </div>
 
             {/* Profile Modal */}
-            <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{profileExists ? 'Edit Profile' : 'Add Profile'}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {error && <div className="alert alert-danger">{error}</div>}
-                    <Form onSubmit={handleSaveProfile}>
-                        <input type="hidden" name="user_id" value={profileData.user_id} />
-                        
-                        <Form.Group className="mb-3">
-                            <Form.Label>Business Name *</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="business_name"
-                                value={profileData.business_name}
-                                onChange={(e) => setProfileData({...profileData, business_name: e.target.value})}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Email *</Form.Label>
-                            <Form.Control
-                                type="email"
-                                name="email"
-                                value={profileData.email}
-                                onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Phone *</Form.Label>
-                            <Form.Control
-                                type="tel"
-                                name="phone"
-                                value={profileData.phone}
-                                onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Address *</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name="address"
-                                value={profileData.address}
-                                onChange={(e) => setProfileData({...profileData, address: e.target.value})}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Description</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={3}
-                                name="description"
-                                value={profileData.description}
-                                onChange={(e) => setProfileData({...profileData, description: e.target.value})}
-                            />
-                        </Form.Group>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={() => setShowProfileModal(false)}>
-                                Close
-                            </Button>
-                            <Button variant="primary" type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? 'Saving...' : 'Save Profile'}
-                            </Button>
-                        </Modal.Footer>
-                    </Form>
-                </Modal.Body>
-            </Modal>
-        </nav>
+            {
+                showProfileModal && (
+                    <div className="modal">
+                        <div className="modal-dialog">
+                            <div className="modal-header">
+                                <h5 className="modal-title">
+                                    {profileExists ? 'Edit Profile' : 'Add Profile'}
+                                </h5>
+                                <button
+                                    className="btn-close"
+                                    onClick={() => setShowProfileModal(false)}
+                                >
+                                    &times;
+                                </button>
+                            </div>
+                            <div className="modal-body">
+                                {error && <div className="alert alert-danger">{error}</div>}
+                                <form onSubmit={handleSaveProfile}>
+                                    <input type="hidden" name="user_id" value={profileData.user_id} />
+
+                                    <div className="form-group">
+                                        <label className="form-label">Business Name *</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="business_name"
+                                            value={profileData.business_name}
+                                            onChange={(e) => setProfileData({ ...profileData, business_name: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Email *</label>
+                                        <input
+                                            type="email"
+                                            className="form-control"
+                                            name="email"
+                                            value={profileData.email}
+                                            onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Phone *</label>
+                                        <input
+                                            type="tel"
+                                            className="form-control"
+                                            name="phone"
+                                            value={profileData.phone}
+                                            onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Address *</label>
+                                        <textarea
+                                            className="form-control"
+                                            name="address"
+                                            rows={2}
+                                            value={profileData.address}
+                                            onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Description</label>
+                                        <textarea
+                                            className="form-control"
+                                            name="description"
+                                            rows={3}
+                                            value={profileData.description}
+                                            onChange={(e) => setProfileData({ ...profileData, description: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            onClick={() => setShowProfileModal(false)}
+                                        >
+                                            Close
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                            disabled={isSubmitting}
+                                        >
+                                            {isSubmitting ? 'Saving...' : 'Save Profile'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+        </nav >
     );
 };
 
