@@ -34,6 +34,7 @@ import CustomerDashboard from './Layouts/CustomerLayout/CustomerMainLayoutfile';
 import CusDashboard from './Layouts/CustomerLayout/Dashboard'
 import ConfirmedBookings from './Layouts/CustomerLayout/ConfirmedBookings'
 import CancelBookingCustomerDashboard from './Layouts/CustomerLayout/CancelBookings';
+import CompletedBookings from './Layouts/CustomerLayout/CompletedBookings';
 
 // ----------------  SERVICE PROVIDER SIDE LINKS --------------------
 
@@ -86,22 +87,17 @@ function App() {
         <Route path="/careers" element={<UserLayout> <Careers /> </UserLayout>} />
       </Routes>
 
-      {/* Customer Side Routing Links  */}
-      <Routes>
-        {/* <Route path='/customer/dashboard' element={<CustomerProtectedRoute><CustomerLayout><Dashboard /></CustomerLayout></CustomerProtectedRoute>} /> */}   {/* Customer Dashboard Link  */}
-        <Route path='/booking-form' element={<BookingForm />} />
-        <Route path='/payment' element={<PaymentFormPage />} />
-        <Route path='/registerstaff/documentspage' element={<CustomerLayout> <DocumentPage /> </CustomerLayout>} />
-        <Route path='/registerstaff/careerspage' element={<CustomerLayout> <AdminCareersPage /> </CustomerLayout>} />
-      </Routes>
+            {/* Customer Side Routing Links  */}
 
       <Routes>
           <Route path="/CustomerDashboard" element={<CustomerProtectedRoute><CustomerDashboard /></CustomerProtectedRoute>} >
           <Route index path="/CustomerDashboard/Dashboard" element={<CustomerProtectedRoute><CusDashboard /></CustomerProtectedRoute>} />
-          <Route path="/CustomerDashboard/ConfirmedBookings" element={<ConfirmedBookings />} />
+          <Route path="/CustomerDashboard/ConfirmedBookings" element={<CustomerProtectedRoute><ConfirmedBookings /></CustomerProtectedRoute>} />
+          <Route index path="/CustomerDashboard/CompletedBookings" element={<CustomerProtectedRoute><CompletedBookings /></CustomerProtectedRoute>} />
           <Route index path="/CustomerDashboard/CancelBookings" element={<CustomerProtectedRoute><CancelBookingCustomerDashboard /></CustomerProtectedRoute>} />
-          
         </Route>
+        <Route path='/booking-form' element={<BookingForm />} />
+        <Route path='/payment' element={<PaymentFormPage />} /> 
       </Routes>
 
 
@@ -120,6 +116,18 @@ function App() {
         <Route path='/registeradmins/documentspage' element={<AdminLayout> <DocumentPage /> </AdminLayout>} />
         <Route path='/registeradmins/careerspage' element={<AdminLayout> <AdminCareersPage /> </AdminLayout>} />
       </Routes>
+
+
+                       {/* OTHER ROUTNG LINKS */}
+
+      {/* Customer Side Routing Links  
+      <Routes>
+        {/* <Route path='/customer/dashboard' element={<CustomerProtectedRoute><CustomerLayout><Dashboard /></CustomerLayout></CustomerProtectedRoute>} /> */}   {/* Customer Dashboard Link  */}
+        {/* <Route path='/registerstaff/documentspage' element={<CustomerLayout> <DocumentPage /> </CustomerLayout>} /> */} 
+        {/* <Route path='/registerstaff/careerspage' element={<CustomerLayout> <AdminCareersPage /> </CustomerLayout>} /> 
+      </Routes> */}
+
+
 
     </div>
   );

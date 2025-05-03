@@ -12,6 +12,7 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+// Get Pending bookings for customer
 CustomerBookingsApi.get('/pending', async (req, res) => {
   try {
     const { user_id, status } = req.query;
@@ -170,6 +171,43 @@ CustomerBookingsApi.get('/cancel', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch bookings',
+      error: error.message
+    });
+  }
+});
+
+// Get confirmed bookings for customer
+CustomerBookingsApi.get('/completed', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    const [bookings] = await pool.query(`
+      SELECT 
+        b.*,
+        s.provider_name
+      FROM bookingform b
+      JOIN add_services s ON b.service_id = s.id
+      WHERE b.user_id = ?
+      AND b.is_status = 'completed'
+      ORDER BY b.selected_available_day DESC
+    `, [user_id]);
+
+    res.json({
+      success: true,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error fetching Completed bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch Completed bookings',
       error: error.message
     });
   }

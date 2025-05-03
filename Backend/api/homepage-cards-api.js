@@ -55,4 +55,40 @@ HomepageServicesCardApi.get('/all', async (req, res) => {
     }
 });
 
+// Get average ratings for all services
+HomepageServicesCardApi.get('/ratings', async (req, res) => {
+    try {
+        const [ratings] = await pool.execute(`
+            SELECT 
+                service_id,
+                AVG(rating) as average_rating,
+                COUNT(*) as review_count
+            FROM customer_reviews
+            GROUP BY service_id
+        `);
+
+        // Convert to number and handle NULL cases
+        const processedRatings = ratings.map(r => ({
+            service_id: r.service_id,
+            average_rating: r.average_rating !== null ? 
+                          parseFloat(r.average_rating) : 
+                          0,
+            review_count: r.review_count
+        }));
+
+        res.status(200).json({ 
+            success: true, 
+            data: processedRatings
+        });
+
+    } catch (err) {
+        console.error('Database Error:', err);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch ratings',
+            error: err.message 
+        });
+    }
+});
+
 module.exports = HomepageServicesCardApi;

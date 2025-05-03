@@ -15,38 +15,76 @@ const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const [services, setServices] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [ratings, setRatings] = useState({});
+  const navigate = useNavigate();
+
+  useEffect(() => {
+      const fetchData = async () => {
+          try {
+              // Fetch services and ratings in parallel
+              const [servicesRes, ratingsRes] = await Promise.all([
+                  fetch('http://localhost:5000/api/homepagecardservices/all'),
+                  fetch('http://localhost:5000/api/homepagecardservices/ratings')
+              ]);
+
+              const servicesData = await servicesRes.json();
+              const ratingsData = await ratingsRes.json();
+
+              if (servicesData.success) {
+                  setServices(servicesData.data);
+              }
+
+              if (ratingsData.success) {
+                  const ratingsMap = {};
+                  ratingsData.data.forEach(item => {
+                      ratingsMap[item.service_id] = item;
+                  });
+                  setRatings(ratingsMap);
+              }
+          } catch (error) {
+              console.error("Error fetching data:", error);
+          } finally {
+              setLoading(false);
+          }
+      };
+
+      fetchData();
+  }, []);
+
+  const formatTime = (timeString) => {
+      if (!timeString) return '';
+      const time = new Date(`1970-01-01T${timeString}`);
+      return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const renderStars = (rating) => {
+      const numericRating = Number(rating) || 0;
+      const clampedRating = Math.min(Math.max(numericRating, 0), 5); // Ensure between 0-5
+      
+      const fullStars = Math.floor(clampedRating);
+      const hasHalfStar = clampedRating % 1 >= 0.5;
+      const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
   
-    useEffect(() => {
-        const fetchServices = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/api/homepagecardservices/all');
-                const data = await response.json();
-                if (data.success) {
-                    setServices(data.data);
-                }
-            } catch (error) {
-                console.error("Error fetching services:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+      return (
+          <div className="star-rating">
+              {[...Array(fullStars)].map((_, i) => (
+                  <i key={`full-${i}`} className="fas fa-star text-warning"></i>
+              ))}
+              {hasHalfStar && <i className="fas fa-star-half-alt text-warning"></i>}
+              {[...Array(emptyStars)].map((_, i) => (
+                  <i key={`empty-${i}`} className="far fa-star text-warning"></i>
+              ))}
+              <span className="ms-2">{rating.toFixed(1)}/5</span>
+          </div>
+      );
+  };
   
-        fetchServices();
-    }, []);
+  const handleBookNow = (serviceId) => {
+      navigate(`/procurement/${serviceId}`);
+  };
   
-    const formatTime = (timeString) => {
-        if (!timeString) return '';
-        const time = new Date(`1970-01-01T${timeString}`);
-        return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
-  
-    const handleBookNow = (serviceId) => {
-        navigate(`/procurement/${serviceId}`);
-    };
-  
-    if (loading) return <div className="text-center py-5">Loading services...</div>;
+  if (loading) return <div className="text-center py-5">Loading services...</div>;
 
   // Categories data
   const categories = [
@@ -181,55 +219,64 @@ const HomePage = () => {
 
         {/* Service Providers Section */}
         <section className="providers-section">
-          <div className="section-heading">
+        <div className="section-heading">
             <h2>{selectedCategory === 'all' ? 'All Service Providers' : `${categories.find(c => c.id === selectedCategory)?.name} Providers`}</h2>
-          </div>
-              
-          <div className="row">
-              {services.length > 0 ? (
-                  services.map((service) => (
-                      <div key={service.id} className="col-md-4 mb-4">
-                          <div className="service-card p-3 h-100">
-                              <h4>{service.serviceTitle}</h4>
-                              <span className="category-badge">{service.category}</span>
-                              
-                              <div className="my-2">
-                                  <strong>Available Days:</strong> {service.availableDays.join(', ')}
-                              </div>
-                              
-                              <div className="my-2">
-                                  <strong>Duration:</strong> {service.duration} mins | 
-                                  <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
-                              </div>
-                              
-                              <div className="my-2">
-                                  <strong>Price:</strong> ${service.regularPrice} 
-                                  {service.memberPrice && (
-                                      <span className="text-success"> (${service.memberPrice} for members)</span>
-                                  )}
-                              </div>
-                              
-                              <div className="my-2">
-                                  <strong>Location:</strong> {service.location}
-                              </div>
-                              
-                              <button 
-                                  className="btn btn-primary mt-2 w-100"
-                                  onClick={() => handleBookNow(service.id)}
-                              >
-                                  Book Now
-                              </button>
-                          </div>
-                      </div>
-                  ))
-              ) : (
-                  <div className="col-12 text-center py-5">
-                      No services available at the moment.
-                  </div>
-              )}
-          </div>
-
-        </section>
+        </div>
+            
+        <div className="row">
+            {services.length > 0 ? (
+                services.map((service) => (
+                    <div key={service.id} className="col-md-4 mb-4">
+                        <div className="service-card p-3 h-100">
+                            <h4>{service.serviceTitle}</h4>
+                            <span className="category-badge">{service.category}</span>
+                            
+                            {/* Rating Display */}
+                            <div className="my-2">
+                                    <strong>Rating:</strong>
+                                    {ratings[service.id] ? (
+                                        renderStars(ratings[service.id].average_rating)
+                                    ) : (
+                                        <span className="text-muted">No ratings yet</span>
+                                    )}
+                                </div>
+                            
+                            <div className="my-2">
+                                <strong>Available Days:</strong> {service.availableDays.join(', ')}
+                            </div>
+                            
+                            <div className="my-2">
+                                <strong>Duration:</strong> {service.duration} mins | 
+                                <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
+                            </div>
+                            
+                            <div className="my-2">
+                                <strong>Price:</strong> ${service.regularPrice} 
+                                {service.memberPrice && (
+                                    <span className="text-success"> (${service.memberPrice} for members)</span>
+                                )}
+                            </div>
+                            
+                            <div className="my-2">
+                                <strong>Location:</strong> {service.location}
+                            </div>
+                            
+                            <button 
+                                className="btn btn-primary mt-2 w-100"
+                                onClick={() => handleBookNow(service.id)}
+                            >
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
+                ))
+            ) : (
+                <div className="col-12 text-center py-5">
+                    No services available at the moment.
+                </div>
+            )}
+        </div>
+    </section>
 
         {/* Role-specific features section */}
         <section className="features-section">
@@ -468,7 +515,39 @@ const HomePage = () => {
       </footer>
 
       <style jsx>{`
-        /* Previous styles remain the same */
+  
+                /* Star Rating Styles */
+        .star-rating {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .star-rating i {
+            font-size: 1rem;
+            margin-right: 2px;
+        }
+
+        /* Service Card Enhancements */
+        .service-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .category-badge {
+            background-color: #f8f9fa;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+            
+    /* Previous styles remain the same */
 
         .providers-section {
           padding: 4rem 5%;

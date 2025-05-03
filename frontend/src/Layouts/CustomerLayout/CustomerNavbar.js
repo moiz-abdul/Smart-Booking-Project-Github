@@ -7,6 +7,8 @@ const Header = () => {
     const handleLogout = () => {
         // Your logout logic here, e.g., clear tokens, redirect, etc.
         console.log("User logged out");
+        localStorage.removeItem("userToken");
+        localStorage.removeItem("userData");
         navigate('/');  // This will now work as navigate is defined
     };
 
