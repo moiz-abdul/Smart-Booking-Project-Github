@@ -91,7 +91,7 @@ const PaymentForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Format expiry date automatically
     if (name === 'expiry_date') {
       const cleanedValue = value.replace(/\D/g, '');
@@ -103,7 +103,7 @@ const PaymentForm = () => {
       setFormData(prev => ({ ...prev, [name]: formattedValue }));
       return;
     }
-    
+
     // Format card number with spaces every 4 digits
     if (name === 'card_number') {
       const cleanedValue = value.replace(/\D/g, '');
@@ -116,7 +116,7 @@ const PaymentForm = () => {
       setFormData(prev => ({ ...prev, [name]: formattedValue }));
       return;
     }
-    
+
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -153,7 +153,7 @@ const PaymentForm = () => {
       if (response.data.success) {
         localStorage.removeItem('booking_id');
         localStorage.removeItem('booking_service_id');
-        navigate('/customer/dashboard', {
+        navigate('/CustomerDashboard', {
           state: {
             paymentId: response.data.payment_id,
             amount: formData.amount_paid,
@@ -202,12 +202,12 @@ const PaymentForm = () => {
   return (
     <div className="container py-4">
       <h2 className="mb-4">Complete Your Payment</h2>
-      
+
       <div className="card mb-4">
         <div className="card-body">
           <h5 className="card-title">Order Summary</h5>
           <p className="card-text">
-            {formData.is_subscribe ? 'Membership Subscription' : 'One-time Payment'}: 
+            {formData.is_subscribe ? 'Membership Subscription' : 'One-time Payment'}:
             <strong> ${Number(formData.amount_paid).toFixed(2)}</strong>
           </p>
         </div>

@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
-// Import your CSS file
-import "./userlogin.css"; // Make sure this path is correct
+import "./userlogin.css"; // Use the same CSS as register page
 
 export default function RoleBasedLogin() {
     const [username, setUsername] = useState("");
@@ -11,7 +10,8 @@ export default function RoleBasedLogin() {
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
-    const submitForm = async () => {
+    const submitForm = async (e) => {
+        e.preventDefault(); // Add preventDefault
         if (!role) {
             setErrorMessage("Please select a role");
             return;
@@ -58,71 +58,90 @@ export default function RoleBasedLogin() {
     };
 
     return (
-        <div className="signupwrapper">
-            <div className="login-form">
-                {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
-                <h4>Secure Login</h4>
-                <div className="mb-3">
-                    <label htmlFor="username" className="form-label">Username</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        onChange={(e) => setUsername(e.target.value)}
-                        id="username"
-                        placeholder="Enter your Username"
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Password</label>
-                    <input
-                        type="password"
-                        className="form-control"
-                        onChange={(e) => setPassword(e.target.value)}
-                        id="password"
-                        placeholder="Enter your password"
-                    />
-                </div>
-                {/* Role Selection */}
-                <div className="mb-3">
-                    <label className="form-label">Role</label>
-                    <div className="role-toggle">
-                        <div className="form-check form-check-inline">
-                            <input
-                                className="form-check-input"
-                                type="radio"
-                                name="role"
-                                id="customer"
-                                value="customer"
-                                onChange={(e) => setRole(e.target.value)}
-                            />
-                            <label className="form-check-label" htmlFor="customer">Customer</label>
-                        </div>
-                        <div className="form-check form-check-inline">
-                            <input
-                                className="form-check-input"
-                                type="radio"
-                                name="role"
-                                id="provider"
-                                value="provider"
-                                onChange={(e) => setRole(e.target.value)}
-                            />
-                            <label className="form-check-label" htmlFor="provider">Service Provider</label>
-                        </div>
-                    </div>
-                </div>
+        <div className="register-container">
+            <div className="register-background"></div>
+            <div className="register-wrapper">
+                <div className="register-form-container">
+                    <form onSubmit={submitForm} className="register-form">
+                        <h4 className="text-center mb-4">Secure Login</h4>
 
-                <button
-                    type="button"
-                    onClick={submitForm}
-                    className="btn btn-success btn-md me-3 mb-4"
-                >
-                    Login
-                </button>
-                <p className="mt-2">
-                    Don't Have an Account? <a href="/register">Register</a>
-                </p>
+                        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
-                <button className="btn btn-outline-secondary w-100">Forgot Password</button>
+                        <div className="row">
+                            <div className="col-md-12 mb-3">
+                                <label htmlFor="username" className="form-label">Username</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    value={username}
+                                    id="username"
+                                    placeholder="Enter your Username"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="col-md-12 mb-3">
+                                <label htmlFor="password" className="form-label">Password</label>
+                                <input
+                                    type="password"
+                                    className="form-control"
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={password}
+                                    id="password"
+                                    placeholder="Enter your password"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="col-md-12 mb-3">
+                                <label className="form-label">Role</label>
+                                <div className="d-flex gap-3">
+                                    <div className="form-check">
+                                        <input
+                                            className="form-check-input"
+                                            type="radio"
+                                            name="role"
+                                            id="customer"
+                                            value="customer"
+                                            checked={role === "customer"}
+                                            onChange={(e) => setRole(e.target.value)}
+                                            required
+                                        />
+                                        <label className="form-check-label" htmlFor="customer">Customer</label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input
+                                            className="form-check-input"
+                                            type="radio"
+                                            name="role"
+                                            id="provider"
+                                            value="provider"
+                                            checked={role === "provider"}
+                                            onChange={(e) => setRole(e.target.value)}
+                                        />
+                                        <label className="form-check-label" htmlFor="provider">Service Provider</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" className="btn btn-primary w-100 mt-3">Login</button>
+
+                        <div className="text-center mt-3">
+                            <p className="mb-2">Don't Have an Account?</p>
+                            <a href="/register" className="btn btn-outline-primary w-100">Register</a>
+                        </div>
+
+                        <button type="button" className="btn btn-outline-secondary w-100 mt-3">
+                            Forgot Password
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );

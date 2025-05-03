@@ -1,123 +1,77 @@
-/* Updated Login Styles */
-
-/* General Wrapper */
-.signupwrapper {
+.register-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
-  min-height: 100vh;
-  /* Use min-height instead of height */
-  align-items: center;
   justify-content: center;
+  align-items: center;
+}
+
+.password-strength-container {
+  position: relative;
+}
+
+.password-strength-bar {
+  width: 0;
+  border-radius: 4px;
+}
+
+.register-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-image: url('./loginbackground.png');
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  font-family: "Segoe UI", sans-serif;
+  filter: blur(3px);
+  z-index: -1;
+}
+
+.register-wrapper {
+  width: 100%;
+  max-width: 700px;
+  padding: 20px;
+}
+
+.register-form-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
   padding: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Login Form Specific Styles */
-.login-form {
-  width: 100%;
-  max-width: 500px;
-  height: 530px;
-  padding: 30px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  /* More visible white background */
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
-  margin: 0 auto;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .register-wrapper {
+    max-width: 500px;
+  }
+
+  .row>div {
+    margin-bottom: 15px;
+  }
+
+  .row>div:last-child {
+    margin-bottom: 0;
+  }
 }
 
-.login-form h4 {
-  color: #333;
-  text-align: center;
-  margin-bottom: 25px;
-  font-weight: 600;
-}
+@media (max-width: 576px) {
+  .register-wrapper {
+    padding: 10px;
+  }
 
-/* Input Fields Style */
-.form-control {
-  width: 100%;
-  padding: 12px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  background-color: #f7f7f7;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-}
+  .register-form-container {
+    padding: 20px;
+  }
 
-.form-control:focus {
-  border-color: #ff9800;
-  outline: none;
-  box-shadow: 0 0 0 0.25rem rgba(255, 152, 0, 0.25);
-}
+  .row {
+    display: block;
+  }
 
-/* Button Style */
-.btn-success {
-  background-color: orange;
-  border-color: orange;
-  color: #fff;
-  font-weight: bold;
-  font-size: 16px;
-  padding: 10px 20px;
-}
-
-.btn-success:hover {
-  background-color: #e68900;
-  border-color: #e68900;
-}
-
-/* Row Style for Form Layout */
-.row.justify-content-center {
-  width: 100%;
-  margin: 0;
-}
-
-/* Other Bootstrap Adjustments */
-.mb-3 {
-  margin-bottom: 1rem !important;
-}
-
-.mb-4 {
-  margin-bottom: 1.5rem !important;
-}
-
-.mt-2 {
-  margin-top: 0.5rem !important;
-}
-
-/* Error message styling */
-.alert-danger {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-/* Links styling */
-a {
-  color: #ff9800;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #e68900;
-  text-decoration: underline;
-}
-
-/* Forgot password button */
-.btn-outline-secondary {
-  color: #6c757d;
-  border-color: #6c757d;
-  margin-top: 10px;
-}
-
-.btn-outline-secondary:hover {
-  color: #fff;
-  background-color: #6c757d;
-  border-color: #6c757d;
+  .row>div {
+    width: 100%;
+  }
 }

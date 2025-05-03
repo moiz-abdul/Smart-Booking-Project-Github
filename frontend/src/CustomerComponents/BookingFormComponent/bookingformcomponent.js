@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './booking.css'
 
 // Utility function to format time to AM/PM
 const formatTimeToAMPM = (timeString) => {
   if (!timeString) return '';
-  
+
   const timePart = timeString.split(':').slice(0, 2).join(':');
   const [hours, minutes] = timePart.split(':').map(Number);
-  
+
   const period = hours >= 12 ? 'PM' : 'AM';
   const hours12 = hours % 12 || 12;
-  
+
   return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
 };
 
@@ -84,7 +85,7 @@ const BookingForm = () => {
           serviceData.slot_3_time
         ].filter(slot => slot);
 
-        const days = serviceData.available_days ? 
+        const days = serviceData.available_days ?
           serviceData.available_days.split(',') : [];
 
         setFormData({
@@ -117,7 +118,7 @@ const BookingForm = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -131,15 +132,15 @@ const BookingForm = () => {
     if (name === 'selected_available_time_slot') {
       const startTime = value;
       const duration = formData.duration_minutes;
-      
+
       if (startTime && duration) {
         const [hours, minutes] = startTime.split(':').map(Number);
         const startDate = new Date();
         startDate.setHours(hours, minutes, 0, 0);
-        
+
         const endDate = new Date(startDate.getTime() + duration * 60000);
         const endTime = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
-        
+
         setFormData(prev => ({
           ...prev,
           start_time: startTime.includes(':') ? startTime.split(':').slice(0, 2).join(':') : startTime,
@@ -176,8 +177,8 @@ const BookingForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (!formData.customer_name || !formData.selected_available_day || 
-          !formData.selected_available_time_slot || !formData.payment_type) {
+      if (!formData.customer_name || !formData.selected_available_day ||
+        !formData.selected_available_time_slot || !formData.payment_type) {
         throw new Error('Please fill all required fields');
       }
 
@@ -230,8 +231,8 @@ const BookingForm = () => {
             else if (error.includes('service')) navigate('/services');
             else window.location.reload();
           }}>
-            {error.includes('login') ? 'Go to Login' : 
-             error.includes('service') ? 'Browse Services' : 'Try Again'}
+            {error.includes('login') ? 'Go to Login' :
+              error.includes('service') ? 'Browse Services' : 'Try Again'}
           </button>
         </div>
       </div>
@@ -241,7 +242,7 @@ const BookingForm = () => {
   return (
     <div className="container py-4">
       <h2 className="mb-4">Complete Your Booking</h2>
-      
+
       <form onSubmit={handleSubmit}>
         <input type="hidden" name="user_id" value={formData.user_id} />
         <input type="hidden" name="service_id" value={formData.service_id} />
@@ -433,28 +434,28 @@ const BookingForm = () => {
         </div>
 
         <div className="d-flex justify-content-between">
-        <button 
-          type="button" 
-          className="btn btn-secondary"
-          onClick={() => navigate(-1)}
-        >
-          Back
-        </button>
-        <button 
-          type="submit" 
-          className="btn btn-primary"
-          disabled={checkingAvailability}
-        >
-          {checkingAvailability ? (
-            <>
-              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              Checking Availability...
-            </>
-          ) : (
-            'Proceed to Pay'
-          )}
-        </button>
-      </div>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => navigate(-1)}
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={checkingAvailability}
+          >
+            {checkingAvailability ? (
+              <>
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Checking Availability...
+              </>
+            ) : (
+              'Proceed to Pay'
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );

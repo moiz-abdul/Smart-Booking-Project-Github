@@ -1,26 +1,7 @@
-import { useNavigate, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import './ProviderNavbar.css';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import axios from 'axios';
+import { useNavigate, Link } from "react-router-dom"; import { useState, useEffect } from "react"; import './ProviderNavbar.css'; import Modal from 'react-bootstrap/Modal'; import Button from 'react-bootstrap/Button'; import Form from 'react-bootstrap/Form'; import axios from 'axios';
 
 const ProviderNavbar = ({ username }) => {
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [showProfileModal, setShowProfileModal] = useState(false);
-    const [profileExists, setProfileExists] = useState(false);
-    const [profileData, setProfileData] = useState({
-        business_name: '',
-        email: '',
-        phone: '',
-        address: '',
-        description: '',
-        user_id: ''
-    });
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+    const [dropdownOpen, setDropdownOpen] = useState(false); const [showProfileModal, setShowProfileModal] = useState(false); const [profileExists, setProfileExists] = useState(false); const [profileData, setProfileData] = useState({ business_name: '', email: '', phone: '', address: '', description: '', user_id: '' }); const [isSubmitting, setIsSubmitting] = useState(false); const [error, setError] = useState(null); const navigate = useNavigate();
 
     // Fetch user data from localStorage
     const fetchUserData = () => {
@@ -37,7 +18,7 @@ const ProviderNavbar = ({ username }) => {
     // Check profile when user_id is available
     const checkProfileExists = async () => {
         if (!profileData.user_id) return;
-        
+
         try {
             const response = await axios.get(`http://localhost:5000/api/providerprofile/${profileData.user_id}`);
             if (response.data.success) {
@@ -67,17 +48,17 @@ const ProviderNavbar = ({ username }) => {
         e.preventDefault();
         setIsSubmitting(true);
         setError(null);
-        
+
         try {
             const payload = {
                 ...profileData
             };
 
             const response = await axios.post(
-                'http://localhost:5000/api/providerprofile', 
+                'http://localhost:5000/api/providerprofile',
                 payload
             );
-            
+
             if (response.data.success) {
                 setProfileExists(true);
                 setShowProfileModal(false);
@@ -87,9 +68,9 @@ const ProviderNavbar = ({ username }) => {
             }
         } catch (error) {
             console.error("Error:", error);
-            const errorMessage = error.response?.data?.message || 
-                               error.response?.data?.error || 
-                               'Failed to save profile. Please try again.';
+            const errorMessage = error.response?.data?.message ||
+                error.response?.data?.error ||
+                'Failed to save profile. Please try again.';
             setError(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -145,15 +126,15 @@ const ProviderNavbar = ({ username }) => {
                             {dropdownOpen && (
                                 <div className="dropdown-menu dropdown-menu-end show">
                                     {!profileExists ? (
-                                        <button 
-                                            className="dropdown-item" 
+                                        <button
+                                            className="dropdown-item"
                                             onClick={() => setShowProfileModal(true)}
                                         >
                                             Add Profile Info
                                         </button>
                                     ) : (
-                                        <button 
-                                            className="dropdown-item" 
+                                        <button
+                                            className="dropdown-item"
                                             onClick={() => setShowProfileModal(true)}
                                         >
                                             Edit Profile Info
@@ -178,14 +159,14 @@ const ProviderNavbar = ({ username }) => {
                     {error && <div className="alert alert-danger">{error}</div>}
                     <Form onSubmit={handleSaveProfile}>
                         <input type="hidden" name="user_id" value={profileData.user_id} />
-                        
+
                         <Form.Group className="mb-3">
                             <Form.Label>Business Name *</Form.Label>
                             <Form.Control
                                 type="text"
                                 name="business_name"
                                 value={profileData.business_name}
-                                onChange={(e) => setProfileData({...profileData, business_name: e.target.value})}
+                                onChange={(e) => setProfileData({ ...profileData, business_name: e.target.value })}
                                 required
                             />
                         </Form.Group>
@@ -195,7 +176,7 @@ const ProviderNavbar = ({ username }) => {
                                 type="email"
                                 name="email"
                                 value={profileData.email}
-                                onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                                 required
                             />
                         </Form.Group>
@@ -205,7 +186,7 @@ const ProviderNavbar = ({ username }) => {
                                 type="tel"
                                 name="phone"
                                 value={profileData.phone}
-                                onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                                onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
                                 required
                             />
                         </Form.Group>
@@ -216,7 +197,7 @@ const ProviderNavbar = ({ username }) => {
                                 rows={2}
                                 name="address"
                                 value={profileData.address}
-                                onChange={(e) => setProfileData({...profileData, address: e.target.value})}
+                                onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
                                 required
                             />
                         </Form.Group>
@@ -227,7 +208,7 @@ const ProviderNavbar = ({ username }) => {
                                 rows={3}
                                 name="description"
                                 value={profileData.description}
-                                onChange={(e) => setProfileData({...profileData, description: e.target.value})}
+                                onChange={(e) => setProfileData({ ...profileData, description: e.target.value })}
                             />
                         </Form.Group>
                         <Modal.Footer>
