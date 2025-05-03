@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Card, Badge, Spinner, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import AddServiceModal from '../AddServiceModal/addservicemodal';
@@ -16,7 +16,7 @@ const ServiceDashboard = () => {
     const [retryCount, setRetryCount] = useState(0);
 
     // Get user ID with validation
-    const getUserId = () => {
+    const getUserId = useCallback(() => {
         try {
             const userData = localStorage.getItem('userData');
             if (!userData) {
@@ -34,13 +34,14 @@ const ServiceDashboard = () => {
             setError(err.message);
             return null;
         }
-    };
+    }, []);
 
-    const fetchServices = async () => {
+    // Fetch services with useCallback
+    const fetchServices = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
-            
+
             const userId = getUserId();
             if (!userId) return;
 
@@ -56,17 +57,18 @@ const ServiceDashboard = () => {
             setServices(response.data.data);
         } catch (err) {
             console.error('Fetch services error:', err);
-            setError(err.response?.data?.message || 
-                    err.message || 
-                    'Failed to load services. Please try again.');
+            setError(err.response?.data?.message ||
+                err.message ||
+                'Failed to load services. Please try again.');
         } finally {
             setLoading(false);
         }
-    };
+    }, [getUserId]);
 
+    // Effect for fetching services
     useEffect(() => {
         fetchServices();
-    }, [retryCount]); // Retry when retryCount changes
+    }, [fetchServices, retryCount]);
 
     const handleAddService = () => {
         setCurrentService(null);
@@ -120,6 +122,7 @@ const ServiceDashboard = () => {
         setRetryCount(prev => prev + 1); // Trigger refetch
     };
 
+    // Loading state
     if (loading) {
         return (
             <div className="container py-4 text-center">
@@ -131,6 +134,7 @@ const ServiceDashboard = () => {
         );
     }
 
+    // Error state
     if (error) {
         return (
             <div className="container py-4">
@@ -138,8 +142,8 @@ const ServiceDashboard = () => {
                     <Alert.Heading>Error Loading Services</Alert.Heading>
                     <p>{error}</p>
                     <div className="d-flex justify-content-end">
-                        <Button 
-                            variant="outline-danger" 
+                        <Button
+                            variant="outline-danger"
                             onClick={() => setRetryCount(prev => prev + 1)}
                         >
                             Retry
@@ -149,23 +153,24 @@ const ServiceDashboard = () => {
             </div>
         );
     }
-    
+
+    // Time formatting utility
     const formatTimeString = (timeString) => {
-      if (!timeString) return '';
-      
-      try {
-        // Extract hours, minutes, seconds
-        const [hours, minutes] = timeString.split(':');
-        
-        // Convert to 12-hour format
-        const period = hours >= 12 ? 'PM' : 'AM';
-        const hours12 = hours % 12 || 12; // Convert 0 to 12 for 12 AM
-        
-        return `${hours12}:${minutes} ${period}`;
-      } catch (e) {
-        console.error('Error formatting time:', e);
-        return timeString; // Return original if formatting fails
-      }
+        if (!timeString) return '';
+
+        try {
+            // Extract hours, minutes, seconds
+            const [hours, minutes] = timeString.split(':');
+
+            // Convert to 12-hour format
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const hours12 = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+
+            return `${hours12}:${minutes} ${period}`;
+        } catch (e) {
+            console.error('Error formatting time:', e);
+            return timeString; // Return original if formatting fails
+        }
     };
 
     return (
@@ -194,16 +199,16 @@ const ServiceDashboard = () => {
                                         </Badge>
                                     </div>
                                     <div className="d-flex gap-2">
-                                        <Button 
-                                            variant="outline-secondary" 
-                                            size="sm" 
+                                        <Button
+                                            variant="outline-secondary"
+                                            size="sm"
                                             onClick={() => handleEdit(service)}
                                         >
                                             Modify
                                         </Button>
-                                        <Button 
-                                            variant="outline-danger" 
-                                            size="sm" 
+                                        <Button
+                                            variant="outline-danger"
+                                            size="sm"
                                             onClick={() => handleDelete(service.id)}
                                         >
                                             Delete
@@ -228,7 +233,7 @@ const ServiceDashboard = () => {
                                     <div className="col-md-6">
                                         <p>
                                             <strong>Available:</strong> {service.availableDays.join(', ')}<br />
-                                            <strong>Times:</strong> {service.timeSlots.map(slot => formatTimeString(slot)).join(', ')}<br/>
+                                            <strong>Times:</strong> {service.timeSlots.map(slot => formatTimeString(slot)).join(', ')}<br />
                                             {service.location && <span><strong>Location:</strong> {service.location}</span>}
                                         </p>
                                     </div>
@@ -239,7 +244,7 @@ const ServiceDashboard = () => {
                 ) : (
                     <div className="text-center py-5 text-muted">
                         <h4>No services found</h4>
-                        <p>Add your first service using the button above</p>
+                        <p>Click "Add New Service" to get started</p>
                     </div>
                 )}
             </div>

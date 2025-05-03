@@ -57,10 +57,31 @@ export default function RoleBasedLogin() {
         }
     };
 
+    // New function to handle going back two pages
+    const handleGoBack = () => {
+        if (window.history.length > 2) {
+            navigate(-2);
+        } else {
+            navigate('/'); // Fallback to home page
+        }
+    };
+
+
     return (
         <div className="register-container">
+            {/* Go Back Button - Positioned Absolutely */}
+            <button
+                type="button"
+                className="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+                onClick={handleGoBack}
+                style={{ zIndex: 1000 }} // Ensure it's above other elements
+            >
+                <i className="bi bi-arrow-left me-2"></i>Go Back
+            </button>
             <div className="register-background"></div>
             <div className="register-wrapper">
+
+
                 <div className="register-form-container">
                     <form onSubmit={submitForm} className="register-form">
                         <h4 className="text-center mb-4">Secure Login</h4>
@@ -137,9 +158,7 @@ export default function RoleBasedLogin() {
                             <a href="/register" className="btn btn-outline-primary w-100">Register</a>
                         </div>
 
-                        <button type="button" className="btn btn-outline-secondary w-100 mt-3">
-                            Forgot Password
-                        </button>
+
                     </form>
                 </div>
             </div>
