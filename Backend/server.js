@@ -19,6 +19,7 @@ const BookingFormApi = require('./api/booking-form-api');
 const PaymentFormApi = require('./api/payment-form-api');
 const CustomerBookingsApi = require('./api/customerbookingapi');
 const ProviderDashboardBookingsDetailsApi = require('./api/provider-dashboard-bookingdetails-api');
+const CustomerReviewsAPI = require('./api/customer-reviews-api');
 
 
 // Load environment variables
@@ -56,6 +57,7 @@ app.use('/api/bookform/',BookingFormApi);
 app.use('/api/paymentform/',PaymentFormApi);
 app.use('/api/customerbookingdetails',CustomerBookingsApi);
 app.use('/api/providerbookingdetails',ProviderDashboardBookingsDetailsApi);
+app.use('/api/customerreviews',CustomerReviewsAPI);
 
 
 // Base Route
