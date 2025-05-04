@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ConfirmedBookings.css';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import AddReviewModal from './customer-reviews-modal';
+import UpdateBookingModal from './ModifyBookingModal';
 
 axios.interceptors.response.use(
   response => response,
@@ -21,8 +21,9 @@ const ConfirmBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [serviceDetails, setServiceDetails] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("userToken");
@@ -69,23 +70,59 @@ const ConfirmBookings = () => {
     }
   };
 
-  const handleAddReview = (booking) => {
-    setSelectedBooking(booking);
-    setShowReviewModal(true);
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      await axios.put(
+        `http://localhost:5000/api/customerbookingdetails/${bookingId}/cancel`,
+        null, // No body needed
+        { params: { user_id: userData.id } } // Pass user_id as query param
+      );
+      fetchConfirmedBookings(userData.id);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to cancel booking');
+    }
   };
 
-  const handleReviewSubmit = async (reviewData) => {
+  const handleModifyBooking = async (booking) => {
     try {
-      await axios.post('http://localhost:5000/api/customerreviews', {
-        ...reviewData,
-        service_id: selectedBooking.service_id,
-        booking_id: selectedBooking.id,
-        user_id: selectedBooking.user_id
-      });
-      setShowReviewModal(false);
-      fetchConfirmedBookings(selectedBooking.user_id);
+      if (!booking?.service_id) {
+        throw new Error('Service information missing');
+      }
+      
+      const response = await axios.get(
+        `http://localhost:5000/api/bookform/updateform/bookingdetails/${booking.service_id}`
+      );
+      
+      if (response.data.success) {
+        console.log('Service Details Received:', response.data.data); // Add this line for debugging
+        setServiceDetails(response.data.data);
+        setSelectedBooking(booking);
+        setShowUpdateModal(true);
+      } else {
+        throw new Error(response.data.message || 'Failed to load service details');
+      }
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to submit review');
+      alert(err.message || 'Failed to fetch service details for modification');
+      console.error('Modify Error:', err);
+    }
+  };
+  
+  const handleUpdateBooking = async (updatedData) => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      await axios.put(
+        `http://localhost:5000/api/customerbookingdetails/${selectedBooking.id}/update`,
+        {
+          selected_available_day: updatedData.day,
+          selected_available_time_slot: updatedData.timeSlot
+        },
+        { params: { user_id: userData.id } }
+      );
+      setShowUpdateModal(false);
+      fetchConfirmedBookings(userData.id);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update booking');
     }
   };
 
@@ -113,7 +150,7 @@ const ConfirmBookings = () => {
 
                 <div className="booking-details">
                   <div className="booking-row">
-                    <span className="booking-label">Date:</span>
+                    <span className="booking-label">Day:</span>
                     <span className="booking-value">{booking.selected_available_day}</span>
                   </div>
                   <div className="booking-row">
@@ -128,14 +165,24 @@ const ConfirmBookings = () => {
                     <span className="booking-label">Provider:</span>
                     <span className="booking-value">{booking.provider_name}</span>
                   </div>
+                  <div className="booking-row">
+                    <span className="booking-label">Payment Type:</span>
+                    <span className="booking-value">{booking.payment_type}</span>
+                  </div>
                 </div>
 
                 <div className="booking-actions">
                   <button 
-                    className="add-review-btn"
-                    onClick={() => handleAddReview(booking)}
+                    className="modify-btn"
+                    onClick={() => handleModifyBooking(booking)}
                   >
-                    Add Review
+                    Modify
+                  </button>
+                  <button 
+                    className="cancel-btn"
+                    onClick={() => handleCancelBooking(booking.id)}
+                  >
+                    Cancel
                   </button>
                 </div>
               </li>
@@ -146,12 +193,13 @@ const ConfirmBookings = () => {
         )}
       </div>
 
-      {showReviewModal && selectedBooking && (
-        <AddReviewModal
-          show={showReviewModal}
-          onClose={() => setShowReviewModal(false)}
-          onSubmit={handleReviewSubmit}
+      {showUpdateModal && selectedBooking && serviceDetails && (
+        <UpdateBookingModal
+          show={showUpdateModal}
+          onClose={() => setShowUpdateModal(false)}
+          onSubmit={handleUpdateBooking}
           booking={selectedBooking}
+          service={serviceDetails}
         />
       )}
     </div>

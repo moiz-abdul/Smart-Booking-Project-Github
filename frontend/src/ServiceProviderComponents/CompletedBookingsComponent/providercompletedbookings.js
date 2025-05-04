@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './providerconfirmbookings.css';
+import './providercompletedbookings.css';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -15,7 +15,7 @@ axios.interceptors.response.use(
   }
 );
 
-const ProviderConfirmedBookings  = () => {
+const ProviderCompletedBookings = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ const ProviderConfirmedBookings  = () => {
       const userId = parsedUserData.id;
       
       if (userId) {
-        fetchConfirmedBookings(userId);
+        fetchCompletedBookings(userId);
       }
     } catch (err) {
       setError('Failed to load user data');
@@ -45,12 +45,12 @@ const ProviderConfirmedBookings  = () => {
     }
   }, [navigate]);
 
-  const fetchConfirmedBookings = async (userId) => {
+  const fetchCompletedBookings = async (userId) => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get(`http://localhost:5000/api/providerbookingdetails/confirm`, {
+      const response = await axios.get(`http://localhost:5000/api/providerbookingdetails/completed`, {
         params: { user_id: userId }
       });
 
@@ -60,20 +60,14 @@ const ProviderConfirmedBookings  = () => {
         throw new Error(response.data?.message || 'Failed to load bookings');
       }
     } catch (err) {
+      console.error('API Error:', {
+        message: err.message,
+        response: err.response?.data,
+        config: err.config
+      });
       setError(err.response?.data?.message || err.message || 'Failed to fetch bookings');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleStatusUpdate = async (bookingId, newStatus) => {
-    try {
-      await axios.put(`http://localhost:5000/api/providerbookingdetails/${bookingId}/status`, {
-        status: newStatus
-      });
-      setBookings(prev => prev.filter(b => b.id !== bookingId));
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update status');
     }
   };
 
@@ -83,7 +77,7 @@ const ProviderConfirmedBookings  = () => {
     return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  if (loading) return <div className="dashboard-loading">Loading Confirmed bookings...</div>;
+  if (loading) return <div className="dashboard-loading">Loading Completed bookings...</div>;
   if (error) return (
     <div className="dashboard-error">
       <p>{error}</p>
@@ -93,7 +87,7 @@ const ProviderConfirmedBookings  = () => {
 
   return (
     <div className="customer-dashboard">
-      <h2>Confirmed Bookings</h2>
+      <h2>Completed Bookings</h2>
       <div className="bookings-container">
         {bookings.length > 0 ? (
           <ul className="booking-list">
@@ -119,8 +113,10 @@ const ProviderConfirmedBookings  = () => {
                     <span className="booking-value">{booking.customer_phone}</span>
                   </div>
                   <div className="booking-row">
-                    <span className="booking-label">Day:</span>
-                    <span className="booking-value">{booking.selected_available_day}</span>
+                    <span className="booking-label">Date:</span>
+                    <span className="booking-value">
+                      {booking.selected_available_day}
+                    </span>
                   </div>
                   <div className="booking-row">
                     <span className="booking-label">Time:</span>
@@ -129,29 +125,21 @@ const ProviderConfirmedBookings  = () => {
                     </span>
                   </div>
                   <div className="booking-row">
-                    <span className="booking-label">Payment:</span>
-                    <span className="booking-value">{booking.payment_type}</span>
+                    <span className="booking-label">Status:</span>
+                    <span className="booking-value status-completed">
+                      {booking.is_status}
+                    </span>
                   </div>
-                </div>
-
-                <div className="booking-actions">
-                  <button 
-                    className="complete-btn"
-                    onClick={() => handleStatusUpdate(booking.id, 'completed')}
-                  >
-                    Completed
-                  </button>
-
                 </div>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="no-bookings">No Confirmed bookings found</p>
+          <p className="no-bookings">No Completed bookings found</p>
         )}
       </div>
     </div>
   );
 };
 
-export default ProviderConfirmedBookings;
+export default ProviderCompletedBookings;

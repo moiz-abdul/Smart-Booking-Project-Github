@@ -217,4 +217,74 @@ BookingFormApi.post('/bookingdetails', async (req, res) => {
   }
 });
 
+// GET booking details for Updating Booking Form on Customer Dashboard 
+
+BookingFormApi.get('/updateform/bookingdetails/:id', async (req, res) => {
+  try {
+    const serviceId = req.params.id;
+    
+    // 1. Get service details
+    const [serviceRows] = await pool.query(`
+      SELECT 
+        s.*, 
+        c.categoryname,
+        s.available_days,
+        s.slot_1_time,
+        s.slot_2_time,
+        s.slot_3_time
+      FROM add_services s
+      JOIN category c ON s.category_id = c.id
+      WHERE s.id = ?
+    `, [serviceId]);
+
+    if (serviceRows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Service not found'
+      });
+    }
+
+    const serviceData = serviceRows[0];
+    
+    // 2. Parse available days and time slots
+    const availableDays = serviceData.available_days 
+      ? serviceData.available_days.split(',').map(day => day.trim())
+      : [];
+      
+    const timeSlots = [
+      serviceData.slot_1_time,
+      serviceData.slot_2_time,
+      serviceData.slot_3_time
+    ].filter(slot => slot);
+
+    // 3. Prepare response data
+    const responseData = {
+      service_id: serviceData.id,
+      service_title: serviceData.service_title,
+      provider_name: serviceData.provider_name,
+      category: serviceData.categoryname,
+      description: serviceData.description,
+      duration_minutes: serviceData.duration_minutes,
+      regular_price: serviceData.regular_price,
+      member_price: serviceData.member_price,
+      available_days: availableDays,
+      time_slots: timeSlots.filter(slot => slot && slot.trim() !== ''), // Ensure non-empty slots
+      location: serviceData.location
+    };
+
+    res.json({
+      success: true,
+      data: responseData
+    });
+
+  } catch (error) {
+    console.error('Error fetching service details:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch service details',
+      error: error.message
+    });
+  }
+});
+
 module.exports = BookingFormApi;

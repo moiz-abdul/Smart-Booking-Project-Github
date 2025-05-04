@@ -1,0 +1,8 @@
+.status-completed {
+    color: #35dc80;
+    font-weight: bold;
+  }
+  
+  .booking-row .status-completed {
+    text-transform: capitalize;
+  }

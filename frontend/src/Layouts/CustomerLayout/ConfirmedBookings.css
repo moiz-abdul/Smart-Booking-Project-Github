@@ -1,3 +1,53 @@
+
+/* Add these styles to your existing CSS file */
+.booking-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.modify-btn {
+  background-color: #ffc107;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modify-btn:hover {
+  background-color: #e0a800;
+}
+
+.cancel-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background-color: #c82333;
+}
+
+.current-booking-details {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.payment-info {
+  background-color: #e7f5ff;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+
+
+
 .confirmed-bookings {
   max-width: 900px;
   margin: 2rem auto;

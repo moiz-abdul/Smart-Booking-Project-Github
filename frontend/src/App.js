@@ -42,6 +42,8 @@ import ServiceProviderLayout from './Layouts/ProviderLayout/ProviderMainLayoutfi
 import ServiceDashboard from './ServiceProviderComponents/ProviderDashboardComponent/ProviderDashboard';
 import ProviderReceivedBookings  from './ServiceProviderComponents/ReceivedBookingsComponent/receivedbookings';
 import ProviderCancelBookings from './ServiceProviderComponents/CancelBookingsComponent/providercancelbookings';
+import ProviderConfirmedBookings from './ServiceProviderComponents/ConfirmBookingsComponent/providerconfirmbookings';
+import ProviderCompletedBookings from './ServiceProviderComponents/CompletedBookingsComponent/providercompletedbookings';
 
 
 
@@ -103,9 +105,11 @@ function App() {
 
       {/* Service Provider Side Routing Links  */}
       <Routes>
-        <Route path='/provider/dashboard' element={<ServiceProviderLayout> <ServiceDashboard /> </ServiceProviderLayout>} />
-        <Route path='/provider/receivedbookings' element={<ServiceProviderLayout> <ProviderReceivedBookings /> </ServiceProviderLayout>} />
-        <Route path='/provider/cancelbookings' element={<ServiceProviderLayout> <ProviderCancelBookings /> </ServiceProviderLayout>} />
+        <Route path='/provider/dashboard' element={<ServiceProviderLayout> <ServiceDashboard/> </ServiceProviderLayout>} />
+        <Route path='/provider/receivedbookings' element={<ServiceProviderLayout> <ProviderReceivedBookings/> </ServiceProviderLayout>} />
+        <Route path='/provider/cancelbookings' element={<ServiceProviderLayout> <ProviderCancelBookings/> </ServiceProviderLayout>} />
+        <Route path='/provider/confirmedbookings' element={<ServiceProviderLayout> <ProviderConfirmedBookings/> </ServiceProviderLayout>} />
+        <Route path='/provider/completedbookings' element={<ServiceProviderLayout> <ProviderCompletedBookings/> </ServiceProviderLayout>} />
       </Routes>
 
       {/* Admin Side Routing Links */}

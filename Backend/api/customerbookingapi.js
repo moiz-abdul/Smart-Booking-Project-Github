@@ -213,6 +213,106 @@ CustomerBookingsApi.get('/completed', async (req, res) => {
   }
 });
 
+// Upate Cancel bookings Status for customer Cancellation 
+CustomerBookingsApi.put('/:bookingId/cancel', async (req, res) => {
+  try {
+    const { user_id } = req.query; // Get user_id from query params
+    
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'User ID is required' 
+      });
+    }
+
+    const [result] = await pool.execute(
+      'UPDATE bookingform SET is_status = "cancel" WHERE id = ? AND user_id = ?',
+      [req.params.bookingId, user_id]
+    );
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Booking not found or not owned by user' 
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Booking cancelled successfully' 
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      success: false, 
+      message: err.message 
+    });
+  }
+});
+
+
+
+// Upate Avaliable Day , Timeslot and Status bookings Pending on customer Modifications. 
+// Update Booking - Updated to use params instead of req.user
+CustomerBookingsApi.put('/:bookingId/update', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    const { selected_available_day, selected_available_time_slot } = req.body;
+    
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    // Check availability
+    const [existing] = await pool.execute(
+      `SELECT id FROM bookingform 
+       WHERE service_id = (SELECT service_id FROM bookingform WHERE id = ?)
+       AND selected_available_day = ? 
+       AND selected_available_time_slot = ?
+       AND is_status NOT IN ("cancel", "rejected")
+       AND id != ?`,
+      [req.params.bookingId, selected_available_day, selected_available_time_slot, req.params.bookingId]
+    );
+    
+    if (existing.length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'This time slot is already booked' 
+      });
+    }
+    
+    // Update booking
+    const [result] = await pool.execute(
+      `UPDATE bookingform SET 
+        selected_available_day = ?, 
+        selected_available_time_slot = ?, 
+        is_status = "pending"
+       WHERE id = ? AND user_id = ?`,
+      [selected_available_day, selected_available_time_slot, req.params.bookingId, user_id]
+    );
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Booking not found or not owned by user' 
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Booking updated successfully. Status set to pending for provider approval.' 
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      success: false, 
+      message: err.message 
+    });
+  }
+});
+
+
 // Helper functions
 function formatTime(timeString) {
   if (!timeString) return '';

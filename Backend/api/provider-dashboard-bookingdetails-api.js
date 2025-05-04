@@ -62,6 +62,55 @@ ProviderDashboardBookingsDetailsApi.get('/pending', async (req, res) => {
 });
 
 
+// Get pending bookings for provider's services
+ProviderDashboardBookingsDetailsApi.get('/confirm', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Provider user_id is required'
+      });
+    }
+
+    // First get all service_ids for this provider
+    const [services] = await pool.query(
+      'SELECT id FROM add_services WHERE user_id = ?',
+      [user_id]
+    );
+
+    if (services.length === 0) {
+      return res.json({
+        success: true,
+        data: []
+      });
+    }
+
+    const serviceIds = services.map(s => s.id);
+    
+    // Then get pending bookings for these services
+    const [bookings] = await pool.query(`
+      SELECT * FROM bookingform 
+      WHERE service_id IN (?) 
+      AND is_status = 'confirm'
+      ORDER BY selected_available_day, start_time
+    `, [serviceIds]);
+
+    res.json({
+      success: true,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error fetching provider bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch bookings',
+      error: error.message
+    });
+  }
+});
+
 // Get Cancel bookings for provider's services
 ProviderDashboardBookingsDetailsApi.get('/cancel', async (req, res) => {
   try {
@@ -111,6 +160,54 @@ ProviderDashboardBookingsDetailsApi.get('/cancel', async (req, res) => {
   }
 });
 
+// Get Completed bookings for provider's services
+ProviderDashboardBookingsDetailsApi.get('/completed', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Provider user_id is required'
+      });
+    }
+
+    // First get all service_ids for this provider
+    const [services] = await pool.query(
+      'SELECT id FROM add_services WHERE user_id = ?',
+      [user_id]
+    );
+
+    if (services.length === 0) {
+      return res.json({
+        success: true,
+        data: []
+      });
+    }
+
+    const serviceIds = services.map(s => s.id);
+    
+    // Then get CANCELED bookings for these services
+    const [bookings] = await pool.query(`
+      SELECT * FROM bookingform 
+      WHERE service_id IN (?) 
+      AND is_status = 'completed'
+      ORDER BY selected_available_day DESC, start_time DESC
+    `, [serviceIds]);
+
+    res.json({
+      success: true,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error fetching canceled bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch canceled bookings',
+      error: error.message
+    });
+  }
+});
 
 // Update booking status
 ProviderDashboardBookingsDetailsApi.put('/:id/status', async (req, res) => {
@@ -118,7 +215,7 @@ ProviderDashboardBookingsDetailsApi.put('/:id/status', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if (!['confirm', 'cancel'].includes(status)) {
+    if (!['confirm', 'cancel', 'completed'].includes(status)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid status value'

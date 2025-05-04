@@ -1,131 +1,127 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
 import './ModifyBookingModal.css';
 
-const ModifyBookingModal = ({ 
-  show, 
-  onClose, 
-  booking, 
-  onSave
-}) => {
-  // Initialize state with current booking time slot
-  const [newTimeSlot, setNewTimeSlot] = useState(booking?.selected_available_time_slot || "");
+const UpdateBookingModal = ({ show, onClose, onSubmit, booking, service }) => {
+  const [selectedDay, setSelectedDay] = useState(booking.selected_available_day);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(booking.selected_available_time_slot);
+  const [availableDays, setAvailableDays] = useState([]);
+  const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
 
-  // Available time slots - you can adjust these as needed
-  const availableTimeSlots = [
-    "9:00 AM - 11:00 AM",
-    "10:00 AM - 12:00 PM",
-    "11:00 AM - 1:00 PM",
-    "2:00 PM - 4:00 PM",
-    "3:00 PM - 5:00 PM",
-    "4:00 PM - 6:00 PM"
-  ];
+  // Add debug logging
+  useEffect(() => {
+    console.log('Service details received:', service);
+    
+    if (service) {
+      // Safely handle available_days
+      const days = Array.isArray(service.available_days) 
+        ? service.available_days 
+        : (typeof service.available_days === 'string' 
+            ? service.available_days.split(',') 
+            : []);
+      
+      setAvailableDays(days.map(day => day.trim()).filter(day => day));
+      
+      // Use time_slots from service if available
+      const slots = service.time_slots || [
+        service.slot_1_time,
+        service.slot_2_time,
+        service.slot_3_time
+      ].filter(slot => slot && typeof slot === 'string');
+      
+      console.log('Available Time Slots:', slots);
+      setAvailableTimeSlots(slots);
+    }
+  }, [service]);
 
-  const handleSubmit = () => {
-    // Call the parent component's save function with the updated time slot
-    onSave({
-      ...booking,
-      selected_available_time_slot: newTimeSlot
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    const time = new Date(`1970-01-01T${timeString}`);
+    return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({
+      day: selectedDay,
+      timeSlot: selectedTimeSlot
     });
   };
 
-  // Reset the selected time slot when booking changes
-  React.useEffect(() => {
-    if (booking) {
-      setNewTimeSlot(booking.selected_available_time_slot);
-    }
-  }, [booking]);
-
-  // If not showing or no booking, don't render
-  if (!show || !booking) {
-    return null;
-  }
-
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        <div className="modal-header">
-          <h3>Modify Booking</h3>
-          <button className="close-btn" onClick={onClose}>×</button>
-        </div>
-        
-        <div className="modal-body">
-          <div className="form-group">
-            <label>Service Name</label>
-            <input 
+    <Modal show={show} onHide={onClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Modify Booking</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3">
+            <Form.Label>Service Name</Form.Label>
+            <Form.Control 
               type="text" 
-              className="form-control" 
               value={booking.service_name} 
               readOnly 
             />
-          </div>
-          
-          <div className="form-group">
-            <label>Service Category</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              value={booking.service_category} 
-              readOnly 
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Date</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              value={booking.selected_available_day} 
-              readOnly 
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Current Time Slot</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              value={booking.selected_available_time_slot} 
-              readOnly 
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Select New Time Slot</label>
-            <div className="time-slots-container">
-              {availableTimeSlots.map((slot, index) => (
-                <button
-                  key={index}
-                  className={`time-slot-btn ${newTimeSlot === slot ? 'selected' : ''}`}
-                  onClick={() => setNewTimeSlot(slot)}
-                >
-                  {slot}
-                </button>
-              ))}
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Current Booking Details</Form.Label>
+            <div className="current-booking-details">
+              <p><strong>Day:</strong> {booking.selected_available_day}</p>
+              <p><strong>Time:</strong> {formatTime(booking.selected_available_time_slot)}</p>
+              <p><strong>Duration:</strong> {booking.duration_minutes} minutes</p>
             </div>
-          </div>
-          
-          <div className="status-change-notice">
-            <p>
-              <strong>Note:</strong> Modifying this booking will change its status to "Pending" and move it to the Bookings page.
+          </Form.Group>
+
+          <div className="payment-info">
+            <p className="text-success">
+              <strong>You have already paid, please select a new timeslot or day for rescheduling</strong>
             </p>
           </div>
-        </div>
-        
-        <div className="modal-footer">
-          <button className="cancel-btn" onClick={onClose}>
-            Cancel
-          </button>
-          <button 
-            className="save-btn" 
-            onClick={handleSubmit}
-            disabled={!newTimeSlot || newTimeSlot === booking.selected_available_time_slot}
-          >
-            Update Booking
-          </button>
-        </div>
-      </div>
-    </div>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Available Day</Form.Label>
+            <Form.Select 
+              value={selectedDay} 
+              onChange={(e) => setSelectedDay(e.target.value)}
+              required
+            >
+              <option value="">Select a day</option>
+              {availableDays.map(day => (
+                <option key={day} value={day}>{day}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Time Slot</Form.Label>
+        <Form.Select 
+          value={selectedTimeSlot} 
+          onChange={(e) => setSelectedTimeSlot(e.target.value)}
+          required
+          disabled={!selectedDay}
+        >
+          <option value="">Select a time slot</option>
+          {availableTimeSlots.map((slot, index) => (
+            <option key={`${slot}-${index}`} value={slot}>
+              {formatTime(slot)}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+
+          <div className="d-flex justify-content-end gap-2">
+            <Button variant="secondary" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit">
+              Update Booking
+            </Button>
+          </div>
+        </Form>
+      </Modal.Body>
+    </Modal>
   );
 };
 
-export default ModifyBookingModal;
+export default UpdateBookingModal;

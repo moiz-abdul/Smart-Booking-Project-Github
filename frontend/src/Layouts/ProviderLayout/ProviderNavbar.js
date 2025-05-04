@@ -137,11 +137,14 @@ const ProviderNavbar = ({ username }) => {
                         <Link className="nav-link" to="/provider/receivedbookings">
                             Received Bookings
                         </Link>
-                        <Link className="nav-link" to="/provider/confirmbookings">
+                        <Link className="nav-link" to="/provider/confirmedbookings">
                             Confirm Bookings
                         </Link>
                         <Link className="nav-link" to="/provider/cancelbookings">
                             Cancel Bookings
+                        </Link>
+                        <Link className="nav-link" to="/provider/completedbookings">
+                            Completed Bookings
                         </Link>
                     </div>
                     <div className="navbar-buttons">
