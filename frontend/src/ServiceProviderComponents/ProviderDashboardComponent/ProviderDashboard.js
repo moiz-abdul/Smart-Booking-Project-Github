@@ -77,27 +77,33 @@ const ServiceDashboard = () => {
 
     // Update the handleEdit function
     const handleEdit = (service) => {
+        console.log('Original Service Object:', service); // Add this for debugging
+      
         setCurrentService({
-            id: service.id,
-            serviceTitle: service.serviceTitle,
-            providerName: service.provider_name,
-            userId: service.user_id,
-            categoryId: service.category_id,
-            serviceDescription: service.description,
-            serviceDuration: service.duration_minutes,
-            serviceFee: service.regular_price,
-            discountedFee: service.member_price,
-            availableDays: service.available_days ? service.available_days.split(',') : [],
-            timeSlots: [
-                service.slot_1_time,
-                service.slot_2_time,
-                service.slot_3_time
-            ].filter(slot => slot),
-            location: service.location
+          id: service.id,
+          serviceTitle: service.serviceTitle || service.service_title,
+          categoryId: service.categoryId || service.category_id,
+          description: service.serviceDescription || service.description,
+          duration: service.serviceDuration || service.duration_minutes,
+          regular_price: service.regular_price,
+          memberPrice: service.discountedFee || service.member_price,
+          availableDays: Array.isArray(service.availableDays) 
+            ? service.availableDays 
+            : (service.available_days 
+                ? service.available_days.split(',').map(day => day.trim())
+                : []),
+          timeSlots: [
+            service.slot_1_time || service.timeSlots?.[0] || '',
+            service.slot_2_time || service.timeSlots?.[1] || '',
+            service.slot_3_time || service.timeSlots?.[2] || ''
+          ].filter(slot => slot),
+          location: service.location || service.serviceLocation || ''
         });
+        
         setShowEditModal(true);
-    };
+      };
 
+      
     const handleDelete = async (serviceId) => {
         if (!window.confirm("Are you sure you want to delete this service?")) return;
 

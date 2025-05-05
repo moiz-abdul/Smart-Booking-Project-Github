@@ -44,7 +44,6 @@ const AdminNavbar = ({ username }) => {
                         Careers
                         </Link>
                         
-
                     </div>
                     <div className="navbar-buttons d-flex">
                         <div className="dropdown">
