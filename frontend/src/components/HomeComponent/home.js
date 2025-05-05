@@ -1,163 +1,109 @@
-import React, { useState, useEffect} from 'react';
-import { FaCalendarAlt, FaUserMd, FaSearch, FaCreditCard, FaRegStar, FaSignInAlt, FaUserPlus } from 'react-icons/fa';
+
+import logo from '../../Assets/images/logoblack.JPG';
+
+
+import React, { useState, useEffect, useRef } from 'react';
+import { FaCalendarAlt, FaUserMd, FaSearch, FaCreditCard, FaRegStar, FaSignInAlt, FaUserPlus, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { MdCategory, MdNotifications } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import "bootstrap/dist/css/bootstrap.min.css";
 
-// import Header from '../../Layouts/UserLayout/UserNavbar';
-
-
+// Home Component
 const HomePage = () => {
   const [activeTab, setActiveTab] = useState('customer');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedSlideCategory, setSelectedSlideCategory] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
-
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ratings, setRatings] = useState({});
+  const slideInterval = useRef(null);
   const navigate = useNavigate();
 
+  // Fetch services and ratings
   useEffect(() => {
-      const fetchData = async () => {
-          try {
-              // Fetch services and ratings in parallel
-              const [servicesRes, ratingsRes] = await Promise.all([
-                  fetch('http://localhost:5000/api/homepagecardservices/all'),
-                  fetch('http://localhost:5000/api/homepagecardservices/ratings')
-              ]);
+    const fetchData = async () => {
+      try {
+        // Fetch services and ratings in parallel
+        const [servicesRes, ratingsRes] = await Promise.all([
+          fetch('http://localhost:5000/api/homepagecardservices/all'),
+          fetch('http://localhost:5000/api/homepagecardservices/ratings')
+        ]);
 
-              const servicesData = await servicesRes.json();
-              const ratingsData = await ratingsRes.json();
+        const servicesData = await servicesRes.json();
+        const ratingsData = await ratingsRes.json();
 
-              if (servicesData.success) {
-                  setServices(servicesData.data);
-              }
+        if (servicesData.success) {
+          setServices(servicesData.data);
+        }
 
-              if (ratingsData.success) {
-                  const ratingsMap = {};
-                  ratingsData.data.forEach(item => {
-                      ratingsMap[item.service_id] = item;
-                  });
-                  setRatings(ratingsMap);
-              }
-          } catch (error) {
-              console.error("Error fetching data:", error);
-          } finally {
-              setLoading(false);
-          }
-      };
+        if (ratingsData.success) {
+          const ratingsMap = {};
+          ratingsData.data.forEach(item => {
+            ratingsMap[item.service_id] = item;
+          });
+          setRatings(ratingsMap);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      fetchData();
+    fetchData();
   }, []);
 
+  // Auto-advance slideshow every 5 seconds
+  useEffect(() => {
+    slideInterval.current = setInterval(() => {
+      if (filteredServices.length > 3) {
+        setCurrentSlide((prev) => (prev + 1) % Math.ceil(filteredServices.length / 3));
+      }
+    }, 5000);
+
+    return () => {
+      if (slideInterval.current) {
+        clearInterval(slideInterval.current);
+      }
+    };
+  }, [selectedCategory, services]);
+
+  // Format time function
   const formatTime = (timeString) => {
-      if (!timeString) return '';
-      const time = new Date(`1970-01-01T${timeString}`);
-      return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (!timeString) return '';
+    const time = new Date(`1970-01-01T${timeString}`);
+    return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  // Render rating stars
   const renderStars = (rating) => {
-      const numericRating = Number(rating) || 0;
-      const clampedRating = Math.min(Math.max(numericRating, 0), 5); // Ensure between 0-5
-      
-      const fullStars = Math.floor(clampedRating);
-      const hasHalfStar = clampedRating % 1 >= 0.5;
-      const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-  
-      return (
-          <div className="star-rating">
-              {[...Array(fullStars)].map((_, i) => (
-                  <i key={`full-${i}`} className="fas fa-star text-warning"></i>
-              ))}
-              {hasHalfStar && <i className="fas fa-star-half-alt text-warning"></i>}
-              {[...Array(emptyStars)].map((_, i) => (
-                  <i key={`empty-${i}`} className="far fa-star text-warning"></i>
-              ))}
-              <span className="ms-2">{rating.toFixed(1)}/5</span>
-          </div>
-      );
+    const numericRating = Number(rating) || 0;
+    const clampedRating = Math.min(Math.max(numericRating, 0), 5);
+
+    const fullStars = Math.floor(clampedRating);
+    const hasHalfStar = clampedRating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+    return (
+      <div className="star-rating">
+        {[...Array(fullStars)].map((_, i) => (
+          <i key={`full-${i}`} className="fas fa-star text-warning"></i>
+        ))}
+        {hasHalfStar && <i className="fas fa-star-half-alt text-warning"></i>}
+        {[...Array(emptyStars)].map((_, i) => (
+          <i key={`empty-${i}`} className="far fa-star text-warning"></i>
+        ))}
+        <span className="ms-2">{clampedRating.toFixed(1)}/5</span>
+      </div>
+    );
   };
-  
+
+  // Handle booking
   const handleBookNow = (serviceId) => {
-      navigate(`/procurement/${serviceId}`);
-  };
-  
-  if (loading) return <div className="text-center py-5">Loading services...</div>;
-
-  // Categories data
-  const categories = [
-    { id: 'medical', name: 'Medical', icon: '🏥' },
-    { id: 'fitness', name: 'Fitness', icon: '💪' },
-    { id: 'consultation', name: 'Consultation', icon: '📋' },
-    { id: 'coworking', name: 'Co-working', icon: '💼' },
-    { id: 'education', name: 'Education', icon: '🎓' },
-    { id: 'all', name: 'All Services', icon: '🔍' },
-  ];
-
-  // Mock data for service providers
-  const serviceProviders = [
-    { id: 1, name: "Dr. Sarah Johnson", specialty: "Cardiologist", rating: 4.9, availableSlots: 3, category: "medical" },
-    { id: 2, name: "Alex Rodriguez", specialty: "Fitness Trainer", rating: 4.8, availableSlots: 7, category: "fitness" },
-    { id: 3, name: "Emma Williams", specialty: "Nutritionist", rating: 4.7, availableSlots: 5, category: "medical" },
-    { id: 4, name: "Legal Associates", specialty: "Law Firm", rating: 4.6, availableSlots: 2, category: "consultation" },
-    { id: 5, name: "WeWork", specialty: "Co-working Space", rating: 4.5, availableSlots: 10, category: "coworking" },
-    { id: 6, name: "Tutor Pro", specialty: "Online Tutoring", rating: 4.8, availableSlots: 8, category: "education" },
-    { id: 7, name: "Dr. Michael Chen", specialty: "Dermatologist", rating: 4.9, availableSlots: 2, category: "medical" },
-    { id: 8, name: "Yoga Studio", specialty: "Yoga Classes", rating: 4.7, availableSlots: 6, category: "fitness" },
-  ];
-
-  // Mock data for featured service providers
-  const featuredProviders = [
-    { id: 1, name: "Dr. Sarah Johnson", specialty: "Cardiologist", rating: 4.9, availableSlots: 3, category: "medical" },
-    { id: 2, name: "Alex Rodriguez", specialty: "Fitness Trainer", rating: 4.8, availableSlots: 7, category: "fitness" },
-    { id: 3, name: "Emma Williams", specialty: "Nutritionist", rating: 4.7, availableSlots: 5, category: "medical" },
-    { id: 4, name: "Dr. Michael Chen", specialty: "Dermatologist", rating: 4.9, availableSlots: 2, category: "medical" },
-  ];
-
-  // Mock data for slideshow providers
-  const slideshowProviders = [
-    { id: 5, name: "Dr. John Smith", specialty: "Pediatrician", rating: 4.9, availableSlots: 4, category: "medical" },
-    { id: 6, name: "Mary Johnson", specialty: "Personal Trainer", rating: 4.7, availableSlots: 6, category: "fitness" },
-    { id: 7, name: "Robert Lee", specialty: "Tax Attorney", rating: 4.8, availableSlots: 3, category: "consultation" },
-    { id: 8, name: "Sophia Garcia", specialty: "Psychologist", rating: 4.9, availableSlots: 5, category: "medical" },
-    { id: 9, name: "David Wilson", specialty: "Corporate Lawyer", rating: 4.6, availableSlots: 4, category: "consultation" },
-    { id: 10, name: "Linda Brown", specialty: "Yoga Instructor", rating: 4.8, availableSlots: 7, category: "fitness" },
-    { id: 11, name: "James Taylor", specialty: "Dentist", rating: 4.7, availableSlots: 2, category: "medical" },
-    { id: 12, name: "Jennifer Wright", specialty: "Immigration Attorney", rating: 4.8, availableSlots: 5, category: "consultation" },
-  ];
-
-  // Filter providers based on selected category
-  const filteredProviders = selectedCategory === 'all' 
-    ? serviceProviders 
-    : serviceProviders.filter(provider => provider.category === selectedCategory);
-
-  // Filter slideshow providers based on selected category
-  const filteredSlideshowProviders = selectedSlideCategory === 'all'
-    ? slideshowProviders
-    : slideshowProviders.filter(provider => provider.category === selectedSlideCategory);
-
-  // Calculate how many slides there are (assuming 3 providers per slide)
-  const providersPerSlide = 3;
-  const totalSlides = Math.ceil(filteredSlideshowProviders.length / providersPerSlide);
-
-  // Move to the next slide
-  const nextSlide = () => {
-    setCurrentSlide((prevSlide) => (prevSlide + 1) % totalSlides);
+    navigate(`/procurement/${serviceId}`);
   };
 
-  // Move to the previous slide
-  const prevSlide = () => {
-    setCurrentSlide((prevSlide) => (prevSlide - 1 + totalSlides) % totalSlides);
-  };
-
-  // Get current slide providers
-  const currentProviders = filteredSlideshowProviders.slice(
-    currentSlide * providersPerSlide,
-    (currentSlide + 1) * providersPerSlide
-  );
-
+  // Handle feature clicks
   const handleFeatureClick = (feature) => {
     switch (feature) {
       case 'book-appointments':
@@ -180,10 +126,53 @@ const HomePage = () => {
     }
   };
 
+  // Categories data
+  const categories = [
+    { id: 'Medical Appointments', name: 'medical', icon: '🏥' },
+    { id: 'Fitness Classes', name: 'fitness', icon: '💪' },
+    { id: 'Consultations', name: 'Consultations', icon: '📋' },
+    { id: 'Co-working Spaces', name: 'Co-working', icon: '💼' },
+    { id: 'Educational Services', name: 'Education', icon: '🎓' },
+    { id: 'all', name: 'All Services', icon: '🔍' },
+  ];
+
+  // Filter services by category
+  const filteredServices = selectedCategory === 'all'
+    ? services
+    : services.filter(service => service.category.toLowerCase() === selectedCategory.toLowerCase());
+
+  // Calculate how many slides are needed
+  const servicesPerSlide = 3;
+  const totalSlides = Math.max(1, Math.ceil(filteredServices.length / servicesPerSlide));
+
+  // Move to next slide
+  const nextSlide = () => {
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % totalSlides);
+  };
+
+  // Move to previous slide
+  const prevSlide = () => {
+    setCurrentSlide((prevSlide) => (prevSlide - 1 + totalSlides) % totalSlides);
+  };
+
+  // Get current slide services
+  const currentServices = filteredServices.slice(
+    currentSlide * servicesPerSlide,
+    (currentSlide + 1) * servicesPerSlide
+  );
+
+  // Mock data for featured service providers
+  const featuredProviders = [
+    { id: 1, name: "Dr. Sarah Johnson", specialty: "Cardiologist", rating: 4.9, availableSlots: 3, category: "medical" },
+    { id: 2, name: "Alex Rodriguez", specialty: "Fitness Trainer", rating: 4.8, availableSlots: 7, category: "fitness" },
+    { id: 3, name: "Emma Williams", specialty: "Nutritionist", rating: 4.7, availableSlots: 5, category: "medical" },
+    { id: 4, name: "Dr. Michael Chen", specialty: "Dermatologist", rating: 4.9, availableSlots: 2, category: "medical" },
+  ];
+
+  if (loading) return <div className="text-center py-5">Loading services...</div>;
+
   return (
     <div className="homepage-wrapper">
-    {/* <Header/>  */} 
-
       <main>
         {/* Hero section with search and category filter */}
         <section className="hero-section">
@@ -202,81 +191,11 @@ const HomePage = () => {
               <button className="search-btn">Search</button>
             </div>
 
-            <div className="category-filters">
-              {categories.map(category => (
-                <button
-                  key={category.id}
-                  className={`category-btn ${selectedCategory === category.id ? 'selected-category' : ''}`}
-                  onClick={() => setSelectedCategory(category.id)}
-                >
-                  <span className="category-icon">{category.icon}</span>
-                  {category.name}
-                </button>
-              ))}
-            </div>
+           
           </div>
         </section>
 
-        {/* Service Providers Section */}
-        <section className="providers-section">
-        <div className="section-heading">
-            <h2>{selectedCategory === 'all' ? 'All Service Providers' : `${categories.find(c => c.id === selectedCategory)?.name} Providers`}</h2>
-        </div>
-            
-        <div className="row">
-            {services.length > 0 ? (
-                services.map((service) => (
-                    <div key={service.id} className="col-md-4 mb-4">
-                        <div className="service-card p-3 h-100">
-                            <h4>{service.serviceTitle}</h4>
-                            <span className="category-badge">{service.category}</span>
-                            
-                            {/* Rating Display */}
-                            <div className="my-2">
-                                    <strong>Rating:</strong>
-                                    {ratings[service.id] ? (
-                                        renderStars(ratings[service.id].average_rating)
-                                    ) : (
-                                        <span className="text-muted">No ratings yet</span>
-                                    )}
-                                </div>
-                            
-                            <div className="my-2">
-                                <strong>Available Days:</strong> {service.availableDays.join(', ')}
-                            </div>
-                            
-                            <div className="my-2">
-                                <strong>Duration:</strong> {service.duration} mins | 
-                                <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
-                            </div>
-                            
-                            <div className="my-2">
-                                <strong>Price:</strong> ${service.regularPrice} 
-                                {service.memberPrice && (
-                                    <span className="text-success"> (${service.memberPrice} for members)</span>
-                                )}
-                            </div>
-                            
-                            <div className="my-2">
-                                <strong>Location:</strong> {service.location}
-                            </div>
-                            
-                            <button 
-                                className="btn btn-primary mt-2 w-100"
-                                onClick={() => handleBookNow(service.id)}
-                            >
-                                Book Now
-                            </button>
-                        </div>
-                    </div>
-                ))
-            ) : (
-                <div className="col-12 text-center py-5">
-                    No services available at the moment.
-                </div>
-            )}
-        </div>
-    </section>
+        
 
         {/* Role-specific features section */}
         <section className="features-section">
@@ -291,7 +210,6 @@ const HomePage = () => {
                   className="feature-card"
                   tabIndex={0}
                   role="button"
-                  style={{ cursor: 'pointer' }}
                   onClick={() => handleFeatureClick('book-appointments')}
                   onKeyPress={e => (e.key === 'Enter' || e.key === ' ') && handleFeatureClick('book-appointments')}
                 >
@@ -303,31 +221,18 @@ const HomePage = () => {
                   className="feature-card"
                   tabIndex={0}
                   role="button"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => handleFeatureClick('/services')}
+                  onClick={() => handleFeatureClick('services-category')}
                   onKeyPress={e => (e.key === 'Enter' || e.key === ' ') && handleFeatureClick('services-category')}
-                 >
+                >
                   <MdCategory className="feature-icon" />
                   <h3>Services by Category</h3>
                   <p>Find services organized by categories for easy browsing</p>
                 </div>
+
                 <div
                   className="feature-card"
                   tabIndex={0}
                   role="button"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => handleFeatureClick('reminders')}
-                  onKeyPress={e => (e.key === 'Enter' || e.key === ' ') && handleFeatureClick('reminders')}
-                >
-                  <MdNotifications className="feature-icon" />
-                  <h3>Appointment Reminders</h3>
-                  <p>Get notified about upcoming appointments and booking status</p>
-                </div>
-                <div
-                  className="feature-card"
-                  tabIndex={0}
-                  role="button"
-                  style={{ cursor: 'pointer' }}
                   onClick={() => handleFeatureClick('payments')}
                   onKeyPress={e => (e.key === 'Enter' || e.key === ' ') && handleFeatureClick('payments')}
                 >
@@ -339,7 +244,6 @@ const HomePage = () => {
                   className="feature-card"
                   tabIndex={0}
                   role="button"
-                  style={{ cursor: 'pointer' }}
                   onClick={() => handleFeatureClick('reviews')}
                   onKeyPress={e => (e.key === 'Enter' || e.key === ' ') && handleFeatureClick('reviews')}
                 >
@@ -410,80 +314,126 @@ const HomePage = () => {
           </section>
         )}
 
-        {/* New Providers Slideshow Section */}
-        {activeTab === 'customer' && (
-          <section className="providers-slideshow-section">
-            <div className="section-heading">
-              <h2>Browse Providers by Category</h2>
+<div className="category-filters">
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  className={`category-btn ${selectedCategory === category.id ? 'selected-category' : ''}`}
+                  onClick={() => {
+                    setSelectedCategory(category.id);
+                    setCurrentSlide(0); // Reset to first slide when changing category
+                  }}
+                >
+                  <span className="category-icon">{category.icon}</span>
+                  {category.name}
+                </button>
+              ))}
             </div>
 
-            <div className="slideshow-category-filter">
-              <div className="category-filters">
-                {categories.map(category => (
-                  <button
-                    key={category.id}
-                    className={`category-btn ${selectedSlideCategory === category.id ? 'selected-category' : ''}`}
-                    onClick={() => {
-                      setSelectedSlideCategory(category.id);
-                      setCurrentSlide(0); // Reset to first slide when changing category
-                    }}
-                  >
-                    <span className="category-icon">{category.icon}</span>
-                    {category.name}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Services Slideshow Section */}
+        <section className="services-slideshow-section">
+          <div className="section-heading">
+            <h2>{selectedCategory === 'all' ? 'All Services' : `${categories.find(c => c.id === selectedCategory)?.name} Services`}</h2>
+          </div>
 
-            <div className="slideshow-container">
-              <button className="slide-nav-btn prev-btn" onClick={prevSlide} disabled={totalSlides <= 1}>
-                &lt;
-              </button>
+          <div className="slideshow-container">
+            {filteredServices.length > 0 ? (
+              <>
+                <button
+                  className="slide-nav-btn prev-btn"
+                  onClick={prevSlide}
+                  disabled={totalSlides <= 1}
+                >
+                  <FaChevronLeft />
+                </button>
 
-              <div className="slideshow-cards">
-                {currentProviders.map(provider => (
-                  <div key={provider.id} className="slideshow-card">
-                    <div className="provider-avatar">
-                      {provider.name.charAt(0)}
-                    </div>
-                    <h3>{provider.name}</h3>
-                    <p className="provider-specialty">{provider.specialty}</p>
-                    <div className="provider-rating">
-                      <span className="stars">{'★'.repeat(Math.floor(provider.rating))}{'☆'.repeat(5 - Math.floor(provider.rating))}</span>
-                      <span className="rating-value">{provider.rating}</span>
-                    </div>
-                    <div className="available-slots">
-                      <FaCalendarAlt /> {provider.availableSlots} slots available today
-                    </div>
-                    <button className="book-now-btn">Book Now</button>
+                <div className="slideshow-cards-container">
+                  <div className="slideshow-cards">
+                    {currentServices.map((service) => (
+                      <div key={service.id} className="service-card">
+                        <h4>{service.serviceTitle}</h4>
+                        <span className="category-badge">{service.category}</span>
+
+                        {/* Rating Display */}
+                        <div className="my-2">
+                          <strong>Rating:</strong>
+                          {ratings[service.id] ? (
+                            renderStars(ratings[service.id].average_rating)
+                          ) : (
+                            <span className="text-muted">No ratings yet</span>
+                          )}
+                        </div>
+
+                        <div className="my-2">
+                          <strong>Available Days:</strong> {service.availableDays.join(', ')}
+                        </div>
+
+                        <div className="my-2">
+                          <strong>Duration:</strong> {service.duration} mins |
+                          <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
+                        </div>
+
+                        <div className="my-2">
+                          <strong>Price:</strong> ${service.regularPrice}
+                          {service.memberPrice && (
+                            <span className="text-success"> (${service.memberPrice} for members)</span>
+                          )}
+                        </div>
+
+                        <div className="my-2">
+                          <strong>Location:</strong> {service.location}
+                        </div>
+
+                        <button
+                          className="book-now-btn"
+                          onClick={() => handleBookNow(service.id)}
+                        >
+                          Book Now
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                <button
+                  className="slide-nav-btn next-btn"
+                  onClick={nextSlide}
+                  disabled={totalSlides <= 1}
+                >
+                  <FaChevronRight />
+                </button>
+              </>
+            ) : (
+              <div className="no-services-message">
+                No services available for this category.
               </div>
+            )}
+          </div>
 
-              <button className="slide-nav-btn next-btn" onClick={nextSlide} disabled={totalSlides <= 1}>
-                &gt;
-              </button>
-            </div>
-
+          {/* Slideshow navigation dots */}
+          {totalSlides > 1 && (
             <div className="slideshow-dots">
-              {Array.from({ length: totalSlides }).map((_, index) => (
-                <span
+              {[...Array(totalSlides)].map((_, index) => (
+                <div
                   key={index}
                   className={`dot ${currentSlide === index ? 'active-dot' : ''}`}
                   onClick={() => setCurrentSlide(index)}
-                ></span>
+                ></div>
               ))}
             </div>
-          </section>
-        )}
-
+          )}
+        </section>
         {/* Call to action section */}
         <section className="cta-section">
           <h2>Ready to get started?</h2>
           <p>Join thousands of users who are already enjoying our Smart Booking System</p>
           <div className="cta-buttons">
-            <button className="cta-primary">Sign Up Now</button>
-            <button className="cta-secondary">Learn More</button>
+            <button
+              className="cta-primary"
+              onClick={() => navigate('/register')}
+            >
+              Sign Up Now
+            </button>
           </div>
         </section>
       </main>
@@ -491,6 +441,7 @@ const HomePage = () => {
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-section">
+            <img src={logo} alt="Logo" className="footer-logo" />
             <h3>Smart Booking System</h3>
             <p>Efficiently manage appointments and bookings online</p>
           </div>
@@ -515,148 +466,13 @@ const HomePage = () => {
       </footer>
 
       <style jsx>{`
-  
-                /* Star Rating Styles */
-        .star-rating {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .star-rating i {
-            font-size: 1rem;
-            margin-right: 2px;
-        }
-
-        /* Service Card Enhancements */
-        .service-card {
-            border: 1px solid #eee;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
-        }
-
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .category-badge {
-            background-color: #f8f9fa;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-            
-    /* Previous styles remain the same */
-
-        .providers-section {
-          padding: 4rem 5%;
-          background-color: #f9f9f9;
-        }
-
-        .providers-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 2rem;
-          margin-top: 2rem;
-        }
-
-        .provider-card {
-          background-color: white;
-          padding: 1.5rem;
-          border-radius: 10px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-          text-align: center;
-          transition: all 0.3s ease;
-        }
-
-        .provider-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        .provider-avatar {
-          width: 70px;
-          height: 70px;
-          background-color: orange;
-          color: white;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.8rem;
-          margin: 0 auto 1rem;
-          font-weight: bold;
-        }
-
-        .provider-specialty {
-          color: #666;
-          font-size: 0.9rem;
-          margin-bottom: 1rem;
-        }
-
-        .provider-rating {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          margin-bottom: 1rem;
-        }
-
-        .stars {
-          color: orange;
-          font-size: 1.1rem;
-        }
-
-        .rating-value {
-          font-weight: bold;
-        }
-
-        .available-slots {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          color: #666;
-          font-size: 0.9rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .book-now-btn {
-          background-color: orange;
-          color: white;
-          border: none;
-          padding: 0.6rem 1.5rem;
-          border-radius: 5px;
-          cursor: pointer;
-          font-weight: bold;
-          transition: all 0.3s ease;
-          width: 100%;
-        }
-
-        .book-now-btn:hover {
-          background-color: #e67e00;
-        }
-
-        .no-results {
-          grid-column: 1 / -1;
-          text-align: center;
-          padding: 2rem;
-          color: #666;
-        }
-
-        @media (max-width: 768px) {
-          .providers-grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          }
-        }
-      `}</style>
-       <style jsx>{`
+        /* General Styles */
         .homepage-wrapper {
           font-family: 'Segoe UI', sans-serif;
           color: #333;
         }
 
+        /* Hero Section */
         .hero-section {
           height: 70vh;
           background-image: url('https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
@@ -669,6 +485,11 @@ const HomePage = () => {
           text-align: center;
           position: relative;
         }
+          .footer-logo {
+  width: 100px;
+  height: auto;
+}
+
 
         .hero-section::before {
           content: '';
@@ -762,6 +583,140 @@ const HomePage = () => {
           color: white;
         }
 
+        /* Services Slideshow Section Styles */
+        .services-slideshow-section {
+          padding: 4rem 5%;
+          background-color: #f9f9f9;
+          overflow: hidden;
+        }
+
+        .slideshow-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          position: relative;
+          margin: 2rem 0;
+        }
+
+        .slideshow-cards-container {
+          flex: 1;
+          overflow: hidden;
+          max-width: 1200px;
+        }
+
+        .slideshow-cards {
+          display: flex;
+          gap: 1.5rem;
+          width: 100%;
+          justify-content: center;
+        }
+
+        .service-card {
+          background-color: white;
+          padding: 1.5rem;
+          border-radius: 10px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          flex: 1;
+          min-width: 250px;
+          max-width: 350px;
+          transition: transform 0.3s ease;
+        }
+
+        .service-card:hover {
+          transform: translateY(-10px);
+        }
+
+        .category-badge {
+          background-color: #f8f9fa;
+          padding: 3px 8px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          color: #6c757d;
+        }
+
+        .star-rating {
+          display: inline-flex;
+          align-items: center;
+        }
+
+        .star-rating i {
+          font-size: 1rem;
+          margin-right: 2px;
+        }
+
+        .slide-nav-btn {
+          background-color: orange;
+          color: white;
+          border: none;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          z-index: 5;
+        }
+
+        .slide-nav-btn:hover {
+          background-color: #e67e00;
+        }
+
+        .slide-nav-btn:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+
+        .slideshow-dots {
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+          margin-top: 1rem;
+        }
+
+        .dot {
+          width: 10px;
+          height: 10px;
+          background-color: #ccc;
+          border-radius: 50%;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .active-dot {
+          background-color: orange;
+          transform: scale(1.2);
+        }
+
+        .book-now-btn {
+          background-color: orange;
+          color: white;
+          border: none;
+          padding: 0.6rem 1.5rem;
+          border-radius: 5px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: all 0.3s ease;
+          width: 100%;
+          margin-top: 1rem;
+        }
+
+        .book-now-btn:hover {
+          background-color: #e67e00;
+        }
+
+        .no-services-message {
+          text-align: center;
+          padding: 2rem;
+          background-color: white;
+          border-radius: 10px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          width: 100%;
+        }
+
+        /* Features Section */
         .features-section {
           padding: 4rem 5%;
         }
@@ -802,6 +757,7 @@ const HomePage = () => {
           box-shadow: 0 4px 20px rgba(0,0,0,0.1);
           text-align: center;
           transition: transform 0.3s ease;
+          cursor: pointer;
         }
 
         .feature-card:hover {
@@ -824,6 +780,7 @@ const HomePage = () => {
           font-size: 0.9rem;
         }
 
+        /* Featured Providers Section */
         .featured-providers-section {
           padding: 4rem 5%;
           background-color: #f9f9f9;
@@ -865,12 +822,6 @@ const HomePage = () => {
           color: #666;
           margin-bottom: 1rem;
         }
-
-        .provider-rating {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
 
         .provider-rating {
           display: flex;
@@ -899,450 +850,7 @@ const HomePage = () => {
           margin-bottom: 1.5rem;
         }
 
-        .book-now-btn {
-          background-color: orange;
-          color: white;
-          border: none;
-          padding: 0.6rem 1.5rem;
-          border-radius: 5px;
-          cursor: pointer;
-          font-weight: bold;
-          transition: all 0.3s ease;
-          width: 100%;
-        }
-
-        .book-now-btn:hover {
-          background-color: #e67e00;
-        }
-
-        .no-results {
-          grid-column: 1 / -1;
-          text-align: center;
-          padding: 2rem;
-          color: #666;
-        }
-
-        @media (max-width: 768px) {
-          .providers-grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          }
-        }
-      `}</style>
-       <style jsx>{`
-        .homepage-wrapper {
-          font-family: 'Segoe UI', sans-serif;
-          color: #333;
-        }
-
-        .navbar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1rem 5%;
-          background-color: white;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-
-        .logo h1 {
-          color: orange;
-          margin: 0;
-          font-size: 1.8rem;
-        }
-
-        .nav-tabs {
-          display: flex;
-          gap: 1rem;
-        }
-
-        .nav-tab {
-          padding: 0.5rem 1rem;
-          background: none;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 1rem;
-          transition: all 0.3s ease;
-        }
-
-        .active-tab {
-          background-color: #f0f0f0;
-          font-weight: bold;
-          color: orange;
-        }
-
-        .nav-buttons {
-          display: flex;
-          gap: 1rem;
-        }
-
-        .login-btn, .signup-btn {
-          padding: 0.5rem 1rem;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.9rem;
-          transition: all 0.3s ease;
-        }
-
-        .login-btn {
-          background-color: #f0f0f0;
-          color: #333;
-        }
-
-        .signup-btn {
-          background-color: orange;
-          color: white;
-        }
-
-        .hero-section {
-          height: 70vh;
-          background-size: cover;
-          background-position: center;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          text-align: center;
-          position: relative;
-        }
-
-        .hero-section::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0,0,0,0.5);
-        }
-
-        .hero-content {
-          position: relative;
-          z-index: 1;
-          width: 80%;
-          max-width: 800px;
-        }
-
-        .hero-content h1 {
-          font-size: 2.5rem;
-          margin-bottom: 1rem;
-        }
-
-        .hero-content p {
-          font-size: 1.2rem;
-          margin-bottom: 2rem;
-        }
-
-        .search-box {
-          display: flex;
-          align-items: center;
-          background-color: white;
-          border-radius: 30px;
-          padding: 0.5rem 1rem;
-          margin-bottom: 2rem;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-
-        .search-icon {
-          color: #777;
-          margin-right: 0.5rem;
-        }
-
-        .search-box input {
-          flex: 1;
-          border: none;
-          padding: 0.5rem;
-          font-size: 1rem;
-          outline: none;
-        }
-
-        .search-btn {
-          background-color: orange;
-          color: white;
-          border: none;
-          padding: 0.5rem 1rem;
-          border-radius: 20px;
-          cursor: pointer;
-          font-weight: bold;
-        }
-
-        .category-filters {
-          display: flex;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-
-        .category-btn {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          background-color: rgba(255,255,255,0.9);
-          border: none;
-          border-radius: 10px;
-          padding: 0.8rem 1rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          color: #333;
-        }
-
-        .category-icon {
-          font-size: 1.5rem;
-          margin-bottom: 0.3rem;
-        }
-
-        .selected-category {
-          background-color: orange;
-          color: white;
-        }
-
-        .features-section {
-          padding: 4rem 5%;
-        }
-
-        .section-heading {
-          text-align: center;
-          margin-bottom: 3rem;
-        }
-
-        .section-heading h2 {
-          font-size: 2rem;
-          color: #333;
-          position: relative;
-          padding-bottom: 1rem;
-        }
-
-        .section-heading h2::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 100px;
-          height: 4px;
-          background-color: orange;
-        }
-
-        .features-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: 2rem;
-        }
-
-        .feature-card {
-          background-color: white;
-          padding: 2rem;
-          border-radius: 10px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-          text-align: center;
-          transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover {
-          transform: translateY(-10px);
-        }
-
-        .feature-icon {
-          font-size: 2.5rem;
-          color: orange;
-          margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
-          font-size: 1.2rem;
-          margin-bottom: 1rem;
-        }
-
-        .feature-card p {
-          color: #666;
-          font-size: 0.9rem;
-        }
-
-        .featured-providers-section {
-          padding: 4rem 5%;
-          background-color: #f9f9f9;
-        }
-
-        .providers-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: 2rem;
-        }
-
-        .provider-card {
-          background-color: white;
-          padding: 2rem;
-          border-radius: 10px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-          text-align: center;
-          transition: transform 0.3s ease;
-        }
-
-        .provider-card:hover {
-          transform: translateY(-10px);
-        }
-
-        .provider-avatar {
-          width: 80px;
-          height: 80px;
-          background-color: orange;
-          color: white;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2rem;
-          margin: 0 auto 1rem;
-        }
-
-        .provider-specialty {
-          color: #666;
-          margin-bottom: 1rem;
-        }
-
-        .provider-rating {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          margin-bottom: 1rem;
-        }
-
-        .stars {
-          color: orange;
-        }
-
-        .available-slots {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          margin-bottom: 1.5rem;
-          color: #666;
-        }
-
-        .book-now-btn {
-          background-color: orange;
-          color: white;
-          border: none;
-          padding: 0.5rem 1.5rem;
-          border-radius: 5px;
-          cursor: pointer;
-          font-weight: bold;
-          transition: all 0.3s ease;
-        }
-
-        .book-now-btn:hover {
-          background-color: #e67e00;
-        }
-
-        /* Slideshow Section Styles */
-        .providers-slideshow-section {
-          padding: 4rem 5%;
-          background-color: white;
-        }
-
-        .slideshow-category-filter {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 2rem;
-        }
-
-        .category-dropdown {
-          padding: 0.8rem 1.5rem;
-          border-radius: 5px;
-          border: 2px solid orange;
-          background-color: white;
-          font-size: 1rem;
-          cursor: pointer;
-          outline: none;
-          min-width: 200px;
-        }
-
-        .slideshow-container {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          margin-bottom: 2rem;
-        }
-
-        .slideshow-cards {
-          display: flex;
-          justify-content: center;
-          gap: 2rem;
-          width: 100%;
-          max-width: 1200px;
-        }
-
-        .slideshow-card {
-          background-color: white;
-          padding: 2rem;
-          border-radius: 10px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-          text-align: center;
-          transition: transform 0.3s ease;
-          flex: 1;
-          min-width: 250px;
-          max-width: 350px;
-        }
-
-        .slideshow-card:hover {
-          transform: translateY(-10px);
-        }
-
-        .slide-nav-btn {
-          background-color: rgba(255, 165, 0, 0.8);
-          color: white;
-          border: none;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          font-size: 1.5rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          margin: 0 1rem;
-        }
-
-        .slide-nav-btn:hover {
-          background-color: orange;
-        }
-
-        .slide-nav-btn:disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-        }
-
-        .slideshow-dots {
-          display: flex;
-          justify-content: center;
-          gap: 0.5rem;
-          margin-top: 1rem;
-        }
-
-        .dot {
-          width: 12px;
-          height: 12px;
-          background-color: #ccc;
-          border-radius: 50%;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .active-dot {
-          background-color: orange;
-          transform: scale(1.2);
-        }
-
+        /* CTA Section */
         .cta-section {
           padding: 4rem 5%;
           text-align: center;
@@ -1387,6 +895,7 @@ const HomePage = () => {
           border: 2px solid orange;
         }
 
+        /* Footer */
         .footer {
           background-color: #333;
           color: white;
@@ -1405,7 +914,6 @@ const HomePage = () => {
           margin-bottom: 1rem;
           color: orange;
         }
-
         .footer-section ul {
           list-style: none;
           padding: 0;

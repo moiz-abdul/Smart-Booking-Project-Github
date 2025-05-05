@@ -130,23 +130,7 @@ const ProviderNavbar = ({ username }) => {
             <div className="container-fluid">
 
                 <div className="navbar-collapse">
-                    <div className="navbar-nav">
-                        <Link className="nav-link" to="/provider/dashboard">
-                            Provider Dashboard
-                        </Link>
-                        <Link className="nav-link" to="/provider/receivedbookings">
-                            Received Bookings
-                        </Link>
-                        <Link className="nav-link" to="/provider/confirmedbookings">
-                            Confirm Bookings
-                        </Link>
-                        <Link className="nav-link" to="/provider/cancelbookings">
-                            Cancel Bookings
-                        </Link>
-                        <Link className="nav-link" to="/provider/completedbookings">
-                            Completed Bookings
-                        </Link>
-                    </div>
+                    
                     <div className="navbar-buttons">
                         <div className="dropdown">
                             <button

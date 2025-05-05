@@ -1,0 +1,102 @@
+.admin-dashboard-container {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    transition: width 0.3s ease;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.admin-sidebar.open {
+    width: 250px;
+}
+
+.admin-sidebar:not(.open) {
+    width: 80px;
+}
+
+.sidebar-header {
+    padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.sidebar-content {
+    padding: 0 15px;
+}
+
+.user-profile {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.profile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.username {
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-nav-link i {
+    margin-right: 15px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-main-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #f4f6f9;
+}
+
+.admin-middle-content {
+    padding: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        position: fixed;
+        left: -250px;
+        z-index: 1000;
+    }
+
+    .admin-sidebar.open {
+        left: 0;
+    }
+}
