@@ -12,7 +12,8 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// Add this to your services API file
+
+// Update Service Record API 
 ServicesApi.put('/:id', async (req, res) => {
     try {
         const serviceId = req.params.id;
@@ -50,8 +51,7 @@ ServicesApi.put('/:id', async (req, res) => {
                  slot_1_time = ?, 
                  slot_2_time = ?, 
                  slot_3_time = ?, 
-                 location = ?,
-                 updated_at = NOW()
+                 location = ?
              WHERE id = ?`,
             [
                 service_title,
