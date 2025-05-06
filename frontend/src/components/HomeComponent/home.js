@@ -14,10 +14,18 @@ const HomePage = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [SearchKeycurrentSlide, setSearchKeycurrentSlide] = useState(0);
+  const [FiltersApplycurrentSlide, setFiltersApplycurrentSlide] = useState(0);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ratings, setRatings] = useState({});
   const slideInterval = useRef(null);
+  const [filters, setFilters] = useState({
+    timeslots: [],
+    availableDays: [],
+    minRating: null
+  });
+
   const navigate = useNavigate();
 
   // Fetch services and ratings
@@ -28,7 +36,7 @@ const HomePage = () => {
             // Fetch categories, services, and ratings in parallel
             const [categoriesRes, servicesRes, ratingsRes] = await Promise.all([
                 fetch('http://localhost:5000/api/homepagecardservices/categories'),
-                fetch('http://localhost:5000/api/homepagecardservices/all'),
+                fetch('http://localhost:5000/api/homepagecardservices/allservices'),
                 fetch('http://localhost:5000/api/homepagecardservices/ratings')
             ]);
 
@@ -61,17 +69,18 @@ const HomePage = () => {
     fetchData();
 }, []);
 
-      // Perform search
+      // Fetch services for  search keyword 
+
       const performSearch = useCallback(async () => {
         if (searchQuery.trim() === '') {
             // If search query is empty, fetch all services
             try {
-                const response = await fetch('http://localhost:5000/api/homepagecardservices/all');
+                const response = await fetch('http://localhost:5000/api/homepagecardservices/allservices');
                 const data = await response.json();
                 
                 if (data.success) {
                     setServices(data.data);
-                    setCurrentSlide(0);
+                    setSearchKeycurrentSlide(0);
                 }
             } catch (error) {
                 console.error("Error fetching all services:", error);
@@ -85,7 +94,7 @@ const HomePage = () => {
             
             if (data.success) {
                 setServices(data.data);
-                setCurrentSlide(0);
+                setSearchKeycurrentSlide(0);
             }
         } catch (error) {
             console.error("Error performing search:", error);
@@ -97,6 +106,47 @@ const HomePage = () => {
         performSearch();
     }, [performSearch]);
 
+
+  //  Fetch  Services Card on the basis of  Filter Data
+  
+  const handleFilterChange = (filterType, value) => {
+    setFilters(prev => {
+      const newFilters = {...prev};
+      
+      // Toggle selection for multi-select filters
+      if (['timeslots', 'availableDays'].includes(filterType)) {
+        const currentIndex = newFilters[filterType].indexOf(value);
+        if (currentIndex === -1) {
+          newFilters[filterType].push(value);
+        } else {
+          newFilters[filterType].splice(currentIndex, 1);
+        }
+      } else {
+        // For single select like rating
+        newFilters[filterType] = value;
+      }
+
+      return newFilters;
+    });
+  };
+
+  const applyFilters = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/homepagecardservices/filter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(filters)
+      });
+      
+      const data = await response.json();
+      // Update services state with filtered results
+      setServices(data.services);
+    } catch (error) {
+      console.error('Filter error:', error);
+    }
+  };
 
   // Auto-advance slideshow every 5 seconds
   useEffect(() => {
@@ -172,6 +222,8 @@ const HomePage = () => {
   };
 
 
+// FILTER SERVICES BY CATEGORY SECTION START 
+
 
   // Filter services by category
   const filteredServices = selectedCategory === 'all'
@@ -198,10 +250,79 @@ const HomePage = () => {
   (currentSlide + 1) * servicesPerSlide
   );
 
+  // FILTER SERVICES BY CATEGORY SECTION END  
+
+
 // Search button handler
 const handleSearch = () => {
   performSearch();
 };
+
+
+// FILTER SERVICES BY SEARCH SECTION START 
+
+
+  // Filter services by Search Keyword
+
+const SearchkeyfilteredServices = searchQuery.trim() === ''
+  ? services
+  : services.filter(service => 
+      service.serviceTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.providerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+
+// Calculate how many slides are needed
+const SearchkeyservicesPerSlide = 3;
+const SearchkeytotalSlides = Math.max(1, Math.ceil(SearchkeyfilteredServices.length / SearchkeyservicesPerSlide));
+
+// Move to next slide
+const SearchkeynextSlide = () => {
+  setSearchKeycurrentSlide((prevSlide) => (prevSlide + 1) % SearchkeytotalSlides);
+};
+
+// Move to previous slide
+const SearchkeyprevSlide = () => {
+  setSearchKeycurrentSlide((prevSlide) => (prevSlide - 1 + SearchkeytotalSlides) % SearchkeytotalSlides);
+};
+
+// Get current slide services
+const SearchkeycurrentServices = SearchkeyfilteredServices.slice(
+  SearchKeycurrentSlide * SearchkeyservicesPerSlide,
+  (SearchKeycurrentSlide + 1) * SearchkeyservicesPerSlide
+);
+// FILTER SERVICES BY SEARCH SECTION END   
+  
+
+// FILTER SERVICES BY 3 FILTER APPLY SECTION START 
+
+  // Filter services by  3 FILTER APPLY
+  const FiltersApplyfilteredServices = services || [];
+
+  // Calculate how many slides are needed
+  const FiltersApplyservicesPerSlide = 3;
+  const FiltersApplytotalSlides = Math.max(1, Math.ceil(FiltersApplyfilteredServices.length / FiltersApplyservicesPerSlide));
+
+  // Move to next slide
+  const FiltersApplynextSlide = () => {
+  setFiltersApplycurrentSlide((FiltersApplyprevSlide) => (FiltersApplyprevSlide + 1) % FiltersApplytotalSlides);
+  };
+
+  // Move to previous slide
+  const FiltersApplyprevSlide = () => {
+  setFiltersApplycurrentSlide((FiltersApplyprevSlide) => (FiltersApplyprevSlide - 1 + FiltersApplytotalSlides) % FiltersApplytotalSlides);
+  };
+
+  // Get current slide services
+  const FiltersApplycurrentServices = FiltersApplyfilteredServices.slice(
+  FiltersApplycurrentSlide * FiltersApplyservicesPerSlide,
+  (FiltersApplycurrentSlide + 1) * FiltersApplyservicesPerSlide
+  );
+
+  // FILTER SERVICES BY 3 FILTER APPLY SECTION END
+
 
   // Mock data for featured service providers
   const featuredProviders = [
@@ -258,72 +379,78 @@ const handleSearch = () => {
     </div>
 
     <div className="slideshow-container">
-        {filteredServices.length > 0 ? (
+        {SearchkeyfilteredServices.length > 0 ? (
             <>
                 <button
                     className="slide-nav-btn prev-btn"
-                    onClick={prevSlide}
-                    disabled={totalSlides <= 1}
+                    onClick={SearchkeyprevSlide}
+                    disabled={SearchkeytotalSlides <= 1}
                 >
                     <FaChevronLeft />
                 </button>
 
                 <div className="slideshow-cards-container">
                     <div className="slideshow-cards">
-                        {currentServices.map((service) => (
-                            <div key={service.id} className="service-card">
-                                <h4>{service.serviceTitle}</h4>
-                                <span className="category-badge">{service.category}</span>
+                    
+                    {/* Show Service CARDS OF APPLIED KEYWORD SEARCH START */}
 
-                                {/* Rating Display */}
-                                <div className="my-2">
-                                    <strong>Rating:</strong>
-                                    {ratings[service.id] ? (
-                                        renderStars(ratings[service.id].average_rating)
-                                    ) : (
-                                        <span className="text-muted">No ratings yet</span>
-                                    )}
-                                </div>
+    <div className="slideshow-cards-container">
+    <div className="slideshow-cards">
+                    {SearchkeycurrentServices.map((service) => (
+                      <div key={service.id} className="service-card">
+                        <h4>{service.serviceTitle}</h4>
+                        <span className="category-badge">{service.category}</span>
 
-                                <div className="my-2">
-                                    <strong>Provider:</strong> {service.providerName}
-                                </div>
+                        {/* Rating Display */}
+                        <div className="my-2">
+                          <strong>Rating:</strong>
+                          {ratings[service.id] ? (
+                            renderStars(ratings[service.id].average_rating)
+                          ) : (
+                            <span className="text-muted">No ratings yet</span>
+                          )}
+                        </div>
 
-                                <div className="my-2">
-                                    <strong>Available Days:</strong> {service.availableDays.join(', ')}
-                                </div>
+                        <div className="my-2">
+                          <strong>Available Days:</strong> {service.availableDays.join(', ')}
+                        </div>
 
-                                <div className="my-2">
-                                    <strong>Duration:</strong> {service.duration} mins |
-                                    <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
-                                </div>
+                        <div className="my-2">
+                          <strong>Duration:</strong> {service.duration} mins |
+                          <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
+                        </div>
 
-                                <div className="my-2">
-                                    <strong>Price:</strong> ${service.regularPrice}
-                                    {service.memberPrice && (
-                                        <span className="text-success"> (${service.memberPrice} for members)</span>
-                                    )}
-                                </div>
+                        <div className="my-2">
+                          <strong>Price:</strong> ${service.regularPrice}
+                          {service.memberPrice && (
+                            <span className="text-success"> (${service.memberPrice} for members)</span>
+                          )}
+                        </div>
 
-                                <div className="my-2">
-                                    <strong>Location:</strong> {service.location}
-                                </div>
+                        <div className="my-2">
+                          <strong>Location:</strong> {service.location}
+                        </div>
 
-                                <button
-                                    className="book-now-btn"
-                                    onClick={() => handleBookNow(service.id)}
-                                >
-                                    Book Now
-                                </button>
-                            </div>
-                        ))}
+                        <button
+                          className="book-now-btn"
+                          onClick={() => handleBookNow(service.id)}
+                        >
+                          Book Now
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+        {/* Show Service CARDS OF APPLIED KEYWORD SEARCH END */}
+
                     </div>
                 </div>
 
                 <button
                     className="slide-nav-btn next-btn"
-                    onClick={nextSlide}
-                    disabled={totalSlides <= 1}
+                    onClick={SearchkeynextSlide}
+                    disabled={SearchkeytotalSlides <= 1}
                 >
                     <FaChevronRight />
                 </button>
@@ -337,14 +464,14 @@ const handleSearch = () => {
         )}
     </div>
 
-    {/* Slideshow navigation dots */}
-    {totalSlides > 1 && (
+    {/* Search Slideshow navigation dots */}
+    {SearchkeytotalSlides > 1 && (
         <div className="slideshow-dots">
-            {[...Array(totalSlides)].map((_, index) => (
+            {[...Array(SearchkeytotalSlides)].map((_, index) => (
                 <div
                     key={index}
-                    className={`dot ${currentSlide === index ? 'active-dot' : ''}`}
-                    onClick={() => setCurrentSlide(index)}
+                    className={`dot ${SearchKeycurrentSlide === index ? 'active-dot' : ''}`}
+                    onClick={() => setSearchKeycurrentSlide(index)}
                 ></div>
             ))}
         </div>
@@ -587,6 +714,158 @@ const handleSearch = () => {
         </section>
 
   {/* SEARCH BY  CATEGORIES SECTION END */}
+
+
+ {/* USER INPUT SHOW SERVICE CARDS  BY FILTERS SECTION START */}
+
+  <div className="service-filters">
+      {/* Time Slots Filter */}
+      <div className="filter-section">
+        <h4>Time Slots</h4>
+        {['morning', 'afternoon', 'evening', 'night'].map(slot => (
+          <label key={slot}>
+            <input
+              type="checkbox"
+              checked={filters.timeslots.includes(slot)}
+              onChange={() => handleFilterChange('timeslots', slot)}
+            />
+            {slot.charAt(0).toUpperCase() + slot.slice(1)}
+          </label>
+        ))}
+      </div>
+
+      {/* Available Days Filter */}
+      <div className="filter-section">
+        <h4>Available Days</h4>
+        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+          <label key={day}>
+            <input
+              type="checkbox"
+              checked={filters.availableDays.includes(day)}
+              onChange={() => handleFilterChange('availableDays', day)}
+            />
+            {day}
+          </label>
+        ))}
+      </div>
+
+      {/* Ratings Filter */}
+      <div className="filter-section">
+        <h4>Minimum Rating</h4>
+        {[1, 2, 3, 4, 5].map(rating => (
+          <label key={rating}>
+            <input
+              type="radio"
+              name="minRating"
+              checked={filters.minRating === rating}
+              onChange={() => handleFilterChange('minRating', rating)}
+            />
+            {rating}★ & above
+          </label>
+        ))}
+      </div>
+
+      <button onClick={applyFilters}>Apply Filters</button>
+    </div>
+    
+    {/* USER INPUT SHOW SERVICE CARDS  BY FILTERS SECTION END */}
+    
+
+
+{/* Show Service CARDS RESULT OF APPLIED FILTER START */}
+
+<div className="slideshow-container">
+            {FiltersApplyfilteredServices.length > 0 ? (
+              <>
+                <button
+                  className="slide-nav-btn prev-btn"
+                  onClick={FiltersApplyprevSlide}
+                  disabled={FiltersApplytotalSlides <= 1}
+                >
+                  <FaChevronLeft />
+                </button>
+
+                <div className="slideshow-cards-container">
+                  <div className="slideshow-cards">
+                    {FiltersApplycurrentServices .map((service) => (
+                      <div key={service.id} className="service-card">
+                        <h4>{service.serviceTitle}</h4>
+                        <span className="category-badge">{service.category}</span>
+
+                        {/* Rating Display */}
+                        <div className="my-2">
+                          <strong>Rating:</strong>
+                          {ratings[service.id] ? (
+                            renderStars(ratings[service.id].average_rating)
+                          ) : (
+                            <span className="text-muted">No ratings yet</span>
+                          )}
+                        </div>
+
+                        <div className="my-2">
+                          <strong>Available Days:</strong> {service.availableDays.join(', ')}
+                        </div>
+
+                        <div className="my-2">
+                          <strong>Duration:</strong> {service.duration} mins |
+                          <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
+                        </div>
+
+                        <div className="my-2">
+                          <strong>Price:</strong> ${service.regularPrice}
+                          {service.memberPrice && (
+                            <span className="text-success"> (${service.memberPrice} for members)</span>
+                          )}
+                        </div>
+
+                        <div className="my-2">
+                          <strong>Location:</strong> {service.location}
+                        </div>
+
+                        <button
+                          className="book-now-btn"
+                          onClick={() => handleBookNow(service.id)}
+                        >
+                          Book Now
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  className="slide-nav-btn next-btn"
+                  onClick={FiltersApplynextSlide}
+                  disabled={FiltersApplytotalSlides <= 1}
+                >
+                  <FaChevronRight />
+                </button>
+              </>
+            ) : (
+              <div className="no-services-message">
+                No services available for the selected filters.
+              </div>
+            )}
+          </div>
+
+          {/* Slideshow navigation dots */}
+          {FiltersApplytotalSlides > 1 && (
+            <div className="slideshow-dots">
+              {[...Array(FiltersApplytotalSlides)].map((_, index) => (
+                <div
+                  key={index}
+                  className={`dot ${FiltersApplycurrentSlide === index ? 'active-dot' : ''}`}
+                  onClick={() => setFiltersApplycurrentSlide(index)}
+                ></div>
+              ))}
+            </div>
+          )}
+
+
+        {/* Show Service CARDS RESULT OF APPLIED FILTER END */}
+
+
+ {/* SHOW SERVICE CARDS  BY FILTERS SECTION ALSO END HERE */}
 
 
         {/* Call to action section */}
