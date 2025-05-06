@@ -13,7 +13,7 @@ const pool = mysql.createPool({
 });
 
 // Get ALL services deetails for Home PAge card on home page
-HomepageServicesCardApi.get('/all', async (req, res) => {
+HomepageServicesCardApi.get('/allservices', async (req, res) => {
     try {
         const [services] = await pool.execute(`
             SELECT s.*, c.categoryname 
@@ -254,5 +254,74 @@ HomepageServicesCardApi.get('/search', async (req, res) => {
         });
     }
 });
+
+
+// 
+
+// Backend API Endpoint
+HomepageServicesCardApi.get('/filter', async (req, res) => {
+    const { timeslots, availableDays, minRating } = req.body;
+  
+    let query = `
+      SELECT s.*, 
+             AVG(cr.rating) as average_rating, 
+             COUNT(cr.id) as review_count
+      FROM add_services s
+      LEFT JOIN customer_reviews cr ON s.id = cr.service_id
+      WHERE 1=1
+    `;
+  
+    const queryParams = [];
+  
+    // Time Slots Filter
+    if (timeslots && timeslots.length) {
+      const timeConditions = timeslots.map(slot => {
+        switch(slot) {
+          case 'morning':
+            return `(s.slot_1_time BETWEEN '06:00:00' AND '12:00:00' OR 
+                     s.slot_2_time BETWEEN '06:00:00' AND '12:00:00' OR 
+                     s.slot_3_time BETWEEN '06:00:00' AND '12:00:00')`;
+          case 'afternoon':
+            return `(s.slot_1_time BETWEEN '12:00:00' AND '17:00:00' OR 
+                     s.slot_2_time BETWEEN '12:00:00' AND '17:00:00' OR 
+                     s.slot_3_time BETWEEN '12:00:00' AND '17:00:00')`;
+          case 'evening':
+            return `(s.slot_1_time BETWEEN '17:00:00' AND '21:00:00' OR 
+                     s.slot_2_time BETWEEN '17:00:00' AND '21:00:00' OR 
+                     s.slot_3_time BETWEEN '17:00:00' AND '21:00:00')`;
+          case 'night':
+            return `(s.slot_1_time >= '21:00:00' OR 
+                     s.slot_2_time >= '21:00:00' OR 
+                     s.slot_3_time >= '21:00:00')`;
+        }
+      });
+      query += ` AND (${timeConditions.join(' OR ')})`;
+    }
+  
+    // Available Days Filter
+    if (availableDays && availableDays.length) {
+      const dayConditions = availableDays.map(day => 
+        `s.available_days LIKE ?`
+      );
+      query += ` AND (${dayConditions.join(' OR ')})`;
+      availableDays.forEach(day => queryParams.push(`%${day}%`));
+    }
+  
+    // Ratings Filter
+    if (minRating) {
+      query += ` GROUP BY s.id HAVING average_rating >= ?`;
+      queryParams.push(parseFloat(minRating));
+    } else {
+      query += ` GROUP BY s.id`;
+    }
+  
+    try {
+      const [services] = await pool.execute(query, queryParams);
+      res.json({ success: true, data: services });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
 
 module.exports = HomepageServicesCardApi;
