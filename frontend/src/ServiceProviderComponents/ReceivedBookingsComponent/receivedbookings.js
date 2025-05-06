@@ -92,7 +92,7 @@ const ProviderReceivedBookings  = () => {
   );
 
   return (
-    <div className="customer-dashboard">
+    <div className="Provider-recievedbooking-dashboard-container">
       <h2>Pending Bookings</h2>
       <div className="bookings-container">
         {bookings.length > 0 ? (

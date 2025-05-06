@@ -3,6 +3,7 @@ import './UserNavbar.css';
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { FaSignInAlt, FaUserPlus } from 'react-icons/fa';
+import logo from '../../Assets/images/logoblack.png';
 
 const UserNavbar = ({ activeTab, setActiveTab }) =>
 {
@@ -10,8 +11,9 @@ const UserNavbar = ({ activeTab, setActiveTab }) =>
     return(
 
         <header className="navbar">
-      <div className="logo">
-        <h1>SmartBook</h1>
+      <div  className="logo">
+   
+        <h1>Smart Booking system</h1>
       </div>
       <div className="nav-tabs">
         <button

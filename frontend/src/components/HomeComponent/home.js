@@ -1,5 +1,5 @@
 
-import logo from '../../Assets/images/logoblack.JPG';
+//import logo from '../../Assets/images/logoblack.JPG';
 
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -607,7 +607,7 @@ const handleSearch = () => {
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-section">
-            <img src={logo} alt="Logo" className="footer-logo" />
+        
             <h3>Smart Booking System</h3>
             <p>Efficiently manage appointments and bookings online</p>
           </div>

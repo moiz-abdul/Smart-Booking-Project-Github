@@ -27,9 +27,7 @@
 }
 
 /* Logout button container */
-.logout-container {
-    /* Optional: add spacing or alignment if needed */
-}
+
 
 /* Logout button styles */
 .logout-button {
@@ -48,4 +46,112 @@
 .logout-button:hover {
     background-color: #e68a00;
     /* Slightly darker on hover */
+}/* Your existing styles */
+.navbar1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    height: 70px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    color: #ff9900;
+    margin: 0;
+}
+
+/* New styles for the actions container */
+.actions-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Notification button styles */
+.notification-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.notification-button:hover {
+    background-color: #e0e0e0;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #f44336;
+    color: white;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2px;
+    font-weight: bold;
+}
+
+/* Notifications dropdown */
+.notifications-dropdown {
+    position: absolute;
+    top: 60px;
+    right: 80px;
+    width: 300px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: #f9f9f9;
+}
+
+.notification-item p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* Logout button style */
+.logout-button {
+    padding: 0.5rem 1rem;
+    background-color: #ff9900;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.logout-button:hover {
+    background-color: #e0e0e0;
+    
 }

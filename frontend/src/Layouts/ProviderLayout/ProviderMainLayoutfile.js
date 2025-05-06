@@ -25,8 +25,9 @@ const ServiceProviderLayout = ({ children }) => {
                     <nav className="sidebar-nav">
                         <button className="nav-item" onClick={() => navigate('/provider/dashboard')}>Dashboard</button>
                         <button className="nav-item" onClick={() => navigate('/provider/receivedbookings')}>Recieved Bookings</button>
-                       
-
+                        <button className="nav-item" onClick={() => navigate('/provider/cancelbookings')}>Canceled bookings</button>
+                        <button className="nav-item" onClick={() => navigate('/provider/confirmedbookings')}>Confirmed bookings</button>
+                        <button className="nav-item" onClick={() => navigate('/provider/completedbookings')}>Completed bookings</button>
                     </nav>
                 </div>
                

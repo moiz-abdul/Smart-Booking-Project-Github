@@ -86,7 +86,7 @@ const ProviderCancelBookings = () => {
   );
 
   return (
-    <div className="customer-dashboard">
+    <div className="Provider-canceledbooking-dashboard-container">
       <h2>Canceled Bookings</h2>
       <div className="bookings-container">
         {bookings.length > 0 ? (

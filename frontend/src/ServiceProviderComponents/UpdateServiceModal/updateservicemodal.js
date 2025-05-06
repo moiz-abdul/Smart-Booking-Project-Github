@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, Form, Alert, InputGroup } from 'react-bootstrap';
+import './updateservicemodal.css';
 
 const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
   const [serviceData, setServiceData] = useState({
@@ -21,12 +22,10 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
 
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/categories');
-        
         if (response.data && response.data.success) {
           setCategories(response.data.data || []);
         } else {
@@ -37,110 +36,46 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
         setError('Failed to load categories');
       }
     };
-  
+
     fetchCategories();
   }, []);
 
-
-   // Debug function to log service object
-   const logServiceObject = (serviceObj) => {
+  const logServiceObject = (serviceObj) => {
     console.log('Full Service Object:', serviceObj);
     Object.keys(serviceObj).forEach(key => {
       console.log(`${key}: ${serviceObj[key]}`);
     });
   };
 
-  // Populate form when service prop changes
   useEffect(() => {
     if (service) {
-      // Log the entire service object for debugging
       logServiceObject(service);
 
-      // Create a comprehensive mapping with multiple fallback options
       const updatedServiceData = {
-        // Service Title
-        serviceTitle: 
-          service.serviceTitle || 
-          service.service_title || 
-          service.title || 
-          '',
-
-        // Category ID
-        categoryId: 
-          service.categoryId || 
-          service.category_id || 
-          service.category || 
-          '',
-
-        // Description
-        description: 
-          service.serviceDescription || 
-          service.description || 
-          service.desc || 
-          '',
-
-        // Duration
-        duration: 
-          service.serviceDuration || 
-          service.duration_minutes || 
-          service.duration || 
-          '',
-
-        // Regular Price
-        regularPrice: 
-          service.serviceFee || 
-          service.regular_price || 
-          service.price || 
-          '',
-
-        // Member Price
-        memberPrice: 
-          service.discountedFee || 
-          service.member_price || 
-          service.memberPrice || 
-          '',
-
-        // Available Days
-        availableDays: Array.isArray(service.availableDays) 
-          ? service.availableDays 
+        serviceTitle: service.serviceTitle || service.service_title || service.title || '',
+        categoryId: service.categoryId || service.category_id || service.category || '',
+        description: service.serviceDescription || service.description || service.desc || '',
+        duration: service.serviceDuration || service.duration_minutes || service.duration || '',
+        regularPrice: service.serviceFee || service.regular_price || service.price || '',
+        memberPrice: service.discountedFee || service.member_price || service.memberPrice || '',
+        availableDays: Array.isArray(service.availableDays)
+          ? service.availableDays
           : (typeof service.available_days === 'string'
               ? service.available_days.split(',').map(day => day.trim())
               : []),
-
-        // Time Slots
         timeSlots: [
-          service.slot_1_time || 
-          service.timeSlots?.[0] || 
-          service.firstTimeSlot || 
-          '',
-          
-          service.slot_2_time || 
-          service.timeSlots?.[1] || 
-          service.secondTimeSlot || 
-          '',
-          
-          service.slot_3_time || 
-          service.timeSlots?.[2] || 
-          service.thirdTimeSlot || 
-          ''
+          service.slot_1_time || service.timeSlots?.[0] || service.firstTimeSlot || '',
+          service.slot_2_time || service.timeSlots?.[1] || service.secondTimeSlot || '',
+          service.slot_3_time || service.timeSlots?.[2] || service.thirdTimeSlot || ''
         ],
-
-        // Location
-        location: 
-          service.location || 
-          service.serviceLocation || 
-          ''
+        location: service.location || service.serviceLocation || ''
       };
 
-      // Log the mapped data for verification
       console.log('Mapped Service Data:', updatedServiceData);
-
-      // Set the state with the mapped data
       setServiceData(updatedServiceData);
     }
   }, [service]);
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -159,7 +94,6 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
     }
   };
 
-  // Handle time slot changes
   const handleTimeSlotChange = (index, value) => {
     const newTimeSlots = [...serviceData.timeSlots];
     newTimeSlots[index] = value;
@@ -169,7 +103,6 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -191,12 +124,12 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
         location: serviceData.location || null,
         user_id: userData.id
       };
-
+      console.log('Payload being sent to API:', payload);
       const response = await axios.put(
         `http://localhost:5000/api/services/${service.id}`, 
         payload
       );
-
+      console.log('API Response:', response);
       onUpdateSuccess();
       onClose();
     } catch (err) {
@@ -208,17 +141,24 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
   };
 
   return (
-    <Modal show={show} onHide={onClose} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Update Service</Modal.Title>
+    <Modal 
+      show={show} 
+      onHide={onClose} 
+      centered 
+      size="lg"
+      dialogClassName="update-modal"
+    >
+      <Modal.Header className="update-modal-header">
+        <Modal.Title className="update-modal-title">Update Service</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        {error && <Alert variant="danger">{error}</Alert>}
+      <Modal.Body className="update-modal-body">
+        {error && <Alert variant="danger" className="update-alert">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
-          <div className="row">
-            <div className="form-group col-md-4">
+          <div className="update-row">
+            <div className="update-col">
               <Form.Label>Service Title*</Form.Label>
               <Form.Control
+                className="update-input"
                 type="text"
                 name="serviceTitle"
                 value={serviceData.serviceTitle}
@@ -227,9 +167,10 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
               />
             </div>
 
-            <div className="form-group col-md-4">
+            <div className="update-col">
               <Form.Label>Category*</Form.Label>
               <Form.Select
+                className="update-select"
                 name="categoryId"
                 value={serviceData.categoryId}
                 onChange={handleChange}
@@ -244,9 +185,10 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
               </Form.Select>
             </div>
 
-            <div className="form-group col-md-4">
+            <div className="update-col">
               <Form.Label>Duration (mins)*</Form.Label>
               <Form.Control
+                className="update-input"
                 type="number"
                 name="duration"
                 value={serviceData.duration}
@@ -257,9 +199,10 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
             </div>
           </div>
 
-          <div className="form-group">
+          <div className="update-group">
             <Form.Label>Service Description*</Form.Label>
             <Form.Control
+              className="update-textarea"
               as="textarea"
               rows={2}
               name="description"
@@ -269,12 +212,13 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
             />
           </div>
 
-          <div className="row">
-            <div className="form-group col-md-4">
+          <div className="update-row">
+            <div className="update-col">
               <Form.Label>Regular Price ($)*</Form.Label>
-              <InputGroup>
+              <InputGroup className="update-input-group">
                 <InputGroup.Text>$</InputGroup.Text>
                 <Form.Control
+                  className="update-input"
                   type="number"
                   name="regularPrice"
                   value={serviceData.regularPrice}
@@ -286,11 +230,12 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
               </InputGroup>
             </div>
 
-            <div className="form-group col-md-4">
+            <div className="update-col">
               <Form.Label>Member Price ($)</Form.Label>
-              <InputGroup>
+              <InputGroup className="update-input-group">
                 <InputGroup.Text>$</InputGroup.Text>
                 <Form.Control
+                  className="update-input"
                   type="number"
                   name="memberPrice"
                   value={serviceData.memberPrice || ''}
@@ -301,9 +246,10 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
               </InputGroup>
             </div>
 
-            <div className="form-group col-md-4">
+            <div className="update-col">
               <Form.Label>Location</Form.Label>
               <Form.Control
+                className="update-input"
                 type="text"
                 name="location"
                 value={serviceData.location || ''}
@@ -313,10 +259,10 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
             </div>
           </div>
 
-          <div className="row">
-            <div className="form-group col-md-6">
+          <div className="update-row">
+            <div className="update-col">
               <Form.Label>Available Days*</Form.Label>
-              <div className="d-flex flex-wrap">
+              <div className="update-checkbox-group">
                 {daysOfWeek.map(day => (
                   <Form.Check
                     key={day}
@@ -326,22 +272,22 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
                     value={day}
                     checked={serviceData.availableDays.includes(day)}
                     onChange={handleChange}
-                    className="mr-2 mb-2"
+                    className="update-checkbox"
                   />
                 ))}
               </div>
             </div>
 
-            <div className="form-group col-md-6">
+            <div className="update-col">
               <Form.Label>Time Slots*</Form.Label>
-              <div className="d-flex">
+              <div className="update-time-slots">
                 {[0, 1, 2].map((index) => (
                   <Form.Control
                     key={index}
+                    className="update-time-input"
                     type="time"
                     value={serviceData.timeSlots[index] || ''}
                     onChange={(e) => handleTimeSlotChange(index, e.target.value)}
-                    className="mr-2"
                     required={index === 0}
                   />
                 ))}
@@ -349,13 +295,14 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
             </div>
           </div>
 
-          <div className="d-flex justify-content-end mt-3">
-            <Button variant="secondary" onClick={onClose} className="mr-2">
+          <div className="update-actions">
+            <Button variant="secondary" onClick={onClose} className="update-button cancel">
               Cancel
             </Button>
             <Button 
               variant="primary" 
               type="submit" 
+              className="update-button submit"
               disabled={loading}
             >
               {loading ? 'Updating...' : 'Update Service'}

@@ -86,7 +86,7 @@ const ProviderCompletedBookings = () => {
   );
 
   return (
-    <div className="customer-dashboard">
+    <div className="Provider-completedbooking-dashboard-container">
       <h2>Completed Bookings</h2>
       <div className="bookings-container">
         {bookings.length > 0 ? (

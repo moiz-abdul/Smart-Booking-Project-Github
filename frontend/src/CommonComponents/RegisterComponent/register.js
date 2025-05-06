@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import './register.css';
+import loginBackground from '../../Assets/images/loginbackground.png';
+
 
 export default function RoleBaseRegister() {
     const [email, setEmail] = useState("");
@@ -98,7 +100,16 @@ export default function RoleBaseRegister() {
     };
 
     return (
-        <div className="register-container">
+        <div>
+               
+        <div className="register-containerregister">
+         
+        <div
+  className="register-background"
+  style={{
+    backgroundImage: `url(${loginBackground})`,
+  }}
+></div>
             <button
                 type="button"
                 className="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
@@ -107,7 +118,7 @@ export default function RoleBaseRegister() {
             >
                 <i className="bi bi-arrow-left me-2"></i>Go Back
             </button>
-            <div className="register-background"></div>
+        
             <div className="register-wrapper">
                 {/* Go Back Button - Positioned Absolutely */}
 
@@ -248,6 +259,7 @@ export default function RoleBaseRegister() {
                     </form>
                 </div>
             </div>
+        </div>
         </div>
     );
 }

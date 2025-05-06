@@ -180,7 +180,7 @@ const ServiceDashboard = () => {
     };
 
     return (
-        <div className="container py-4">
+        <div className="containerProDashboard py-4 ">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h1>My Services</h1>
                 <Button variant="success" onClick={handleAddService}>

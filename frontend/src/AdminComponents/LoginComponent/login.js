@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from 'axios';
 import "./superAdminlogin.css";
+import loginBackground from '../../Assets/images/loginbackground.png';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -40,15 +41,20 @@ export default function AdminLogin() {
 
   // New function to handle going back two pages
   const handleGoBack = () => {
-    if (window.history.length > 2) {
-      navigate(-2);
-    } else {
+  
       navigate('/'); // Fallback to home page
-    }
+    
   };
 
   return (
-    <div className="register-container">
+    <div className="register-containeradmin">
+      <div
+  className="register-background"
+  style={{
+    backgroundImage: `url(${loginBackground})`,
+  }}
+></div>
+
       {/* Go Back Button */}
       <button
         type="button"

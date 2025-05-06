@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import "./userlogin.css"; // Use the same CSS as register page
+import loginBackground from '../../Assets/images/loginbackground.png';
 
 
 export default function RoleBasedLogin() {
@@ -70,8 +71,13 @@ export default function RoleBasedLogin() {
 
     return (
 
-        <div className="register-container">
-
+        <div className="register-containerlogin">
+<div
+  className="register-background"
+  style={{
+    backgroundImage: `url(${loginBackground})`,
+  }}
+></div>
 
             {/* Go Back Button - Positioned Absolutely */}
             <button

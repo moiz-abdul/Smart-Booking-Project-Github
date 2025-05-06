@@ -1,5 +1,6 @@
 import { useNavigate, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Bell } from 'lucide-react'; // Import Bell icon
 import './ProviderNavbar.css';
 import axios from 'axios';
 
@@ -18,6 +19,11 @@ const ProviderNavbar = ({ username }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    
+    // Notification state
+    const [notificationCount, setNotificationCount] = useState(2); // Example count
+    const [showNotifications, setShowNotifications] = useState(false);
+    const notificationRef = useRef(null); // Reference for notification area
 
     // Fetch user data from localStorage
     const fetchUserData = () => {
@@ -109,6 +115,12 @@ const ProviderNavbar = ({ username }) => {
         localStorage.removeItem("userData");
         navigate("/login");
     };
+    
+    // Toggle notifications
+    const toggleNotifications = (e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        setShowNotifications(!showNotifications);
+    };
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -123,18 +135,60 @@ const ProviderNavbar = ({ username }) => {
             document.removeEventListener('click', handleClickOutside);
         };
     }, [dropdownOpen]);
+    
+    // Close notifications when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+                setShowNotifications(false);
+            }
+        };
+
+        // Add event listener when dropdown is open
+        if (showNotifications) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        // Clean up the event listener
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showNotifications]);
 
     return (
-        <nav className="navbar-green">
+        <nav className="navbar-green1">
             <span className="navbar-brand">Service Provider Panel</span>
             <div className="container-fluid">
 
                 <div className="navbar-collapse">
                     
                     <div className="navbar-buttons">
-                        <div className="dropdown">
+                        {/* Notification Bell */}
+                        <div ref={notificationRef} className="notification-container">
+                            <div className="notification-button" onClick={toggleNotifications}>
+                            <Bell size={20} color="black" />
+                                {notificationCount > 0 && (
+                                    <span className="notification-badge">{notificationCount}</span>
+                                )}
+                            </div>
+                            {showNotifications && (
+                                <div className="notifications-dropdown">
+                                    <div className="notification-header">
+                                        <span>Notifications</span>
+                                    </div>
+                                    <div className="notification-item">
+                                        <p>New booking request received</p>
+                                    </div>
+                                    <div className="notification-item">
+                                        <p>Customer left a review for your service</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="dropdownprovider">
                             <button
-                                className="dropdownbutton"
+                                className="dropdownbuttonprovider"
                                 type="button"
                                 onClick={toggleDropdown}
                             >

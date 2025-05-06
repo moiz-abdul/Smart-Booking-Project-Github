@@ -1,0 +1,158 @@
+/* Modal layout */
+.update-modal {
+    max-width: 81vw;
+  /* changed from 100% to 95% to control overflow */
+  margin: auto;
+  border-radius:2px ;
+ 
+  }
+  
+  .update-modal-header {
+    width: 80vw;
+    background-color: #f8f9fa;
+    padding: 5px 24px;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .update-modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .update-modal-body {
+    width: 80vw;
+    padding: 15px;
+    background-color: #ffffff;
+  }
+  
+  /* Alert */
+  .update-alert {
+    margin-bottom: 16px;
+  }
+  
+  /* Form Layout */
+  .update-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .update-col {
+    flex: 1 1 30%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Input and Select */
+  .update-input,
+  .update-select,
+  .update-textarea {
+    border: 1px solid #ced4da;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  
+  .update-input:focus,
+  .update-select:focus,
+  .update-textarea:focus {
+    border-color: #86b7fe;
+    outline: none;
+  }
+  
+  /* Textarea */
+  .update-textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+  
+  /* Input group */
+  .update-input-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .update-input-group .form-control {
+    border-radius: 0 6px 6px 0;
+  }
+  
+  /* Checkboxes */
+  .update-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  
+  .update-checkbox label {
+    margin-right: 10px;
+  }
+  
+  /* Time Inputs */
+  .update-time-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  
+  .update-time-input {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+  }
+  
+  /* Actions */
+  .update-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    gap: 12px;
+  }
+  
+  .update-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+  }
+  
+  .update-button.cancel {
+    background-color: #e0e0e0;
+    color: #333;
+  }
+  
+  .update-button.cancel:hover {
+    background-color: #d6d6d6;
+  }
+  
+  .update-button.submit {
+    background-color: #0d6efd;
+    color: white;
+  }
+  
+  .update-button.submit:hover {
+    background-color: #0b5ed7;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .update-col {
+      flex: 1 1 100%;
+    }
+  
+    .update-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  
+    .update-button {
+      width: 100%;
+    }
+  }
+  

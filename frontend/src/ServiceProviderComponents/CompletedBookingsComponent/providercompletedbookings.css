@@ -1,3 +1,14 @@
+.Provider-completedbooking-dashboard-container{
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 90%;
+  max-width: 92%;
+  min-width: 1050px;
+  margin-top: 30px;
+}
+
 .status-completed {
     color: #35dc80;
     font-weight: bold;
