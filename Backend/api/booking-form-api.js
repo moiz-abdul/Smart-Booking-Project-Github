@@ -95,6 +95,31 @@ BookingFormApi.post('/check-availability', async (req, res) => {
   }
 });
 
+// Check Membership Status
+BookingFormApi.post('/check-membership', async (req, res) => {
+  try {
+    const { user_id, service_id } = req.body;
+    
+    const [membershipRows] = await pool.query(`
+      SELECT * FROM bookingform 
+      WHERE user_id = ? 
+      AND service_id = ? 
+      AND payment_type = 'Membership' 
+      AND membership_end_time > NOW()
+    `, [user_id, service_id]);
+
+    res.json({
+      success: true,
+      has_active_membership: membershipRows.length > 0
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check membership'
+    });
+  }
+});
+
 // Existing booking creation endpoint
 BookingFormApi.post('/bookingdetails', async (req, res) => {
   let connection;
@@ -120,15 +145,21 @@ BookingFormApi.post('/bookingdetails', async (req, res) => {
       payment_type,
       location,
       special_instructions,
-      is_status
+      is_status,
+
+      membership_type,
+      membership_start_time,
+      membership_end_time,
+      monthly_membership_fee,
+      yearly_membership_fee
     } = req.body;
 
-    // Validate required fields
+    // Modify required fields validation
     const requiredFields = [
       'user_id', 'customer_name', 'customer_email', 'customer_phone',
       'service_id', 'service_name', 'service_category', 'duration_minutes',
       'start_time', 'end_time', 'selected_available_day',
-      'selected_available_time_slot', 'payment_type', 'is_status'
+      'selected_available_time_slot', 'is_status'
     ];
     
     const missingFields = requiredFields.filter(field => !req.body[field]);
@@ -138,7 +169,7 @@ BookingFormApi.post('/bookingdetails', async (req, res) => {
         message: `Missing required fields: ${missingFields.join(', ')}`
       });
     }
-
+    
     // First check availability again (in case of race condition)
     const [existingBookings] = await connection.query(`
       SELECT COUNT(*) as count 
@@ -164,11 +195,14 @@ BookingFormApi.post('/bookingdetails', async (req, res) => {
        start_time, end_time, selected_available_day, 
        selected_available_time_slot, pay_per_booking_price,
        membership_price, payment_type, location,
-       special_instructions, is_status)
+       special_instructions, is_status,
+       membership_type, membership_start_time, membership_end_time,
+       monthly_membership_fee, yearly_membership_fee)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 
               TIME(?), TIME(?), ?, 
               TIME(?), ?, ?, ?, 
-              ?, ?, ?)
+              ?, ?, ?,
+              ?, ?, ?, ?, ?)
     `;
 
     const insertValues = [
@@ -186,10 +220,16 @@ BookingFormApi.post('/bookingdetails', async (req, res) => {
       selected_available_time_slot.includes(':') ? selected_available_time_slot.split(':').slice(0, 2).join(':') : selected_available_time_slot,
       pay_per_booking_price,
       membership_price || null,
-      payment_type,
+      payment_type || null,
       location || null,
       special_instructions || null,
-      is_status
+      is_status,
+      membership_type || null,
+      membership_start_time || null,
+      membership_end_time || null,
+      monthly_membership_fee || null,
+      yearly_membership_fee || null
+
     ];
 
     const [result] = await connection.query(insertQuery, insertValues);
@@ -217,8 +257,24 @@ BookingFormApi.post('/bookingdetails', async (req, res) => {
   }
 });
 
-// GET booking details for Updating Booking Form on Customer Dashboard 
+// New endpoint to get server time
+BookingFormApi.get('/server-time', async (req, res) => {
+  try {
+    const [serverTimeResult] = await pool.query('SELECT NOW() as timestamp');
+    res.json({
+      success: true,
+      timestamp: serverTimeResult[0].timestamp
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch server time'
+    });
+  }
+});
 
+
+// GET booking details for Updating Booking Form on Customer Dashboard 
 BookingFormApi.get('/updateform/bookingdetails/:id', async (req, res) => {
   try {
     const serviceId = req.params.id;

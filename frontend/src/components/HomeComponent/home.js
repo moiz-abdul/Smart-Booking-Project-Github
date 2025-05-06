@@ -2,7 +2,7 @@
 import logo from '../../Assets/images/logoblack.JPG';
 
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FaCalendarAlt, FaUserMd, FaSearch, FaCreditCard, FaRegStar, FaSignInAlt, FaUserPlus, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { MdCategory, MdNotifications } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 const HomePage = () => {
   const [activeTab, setActiveTab] = useState('customer');
   const [searchQuery, setSearchQuery] = useState('');
+  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [services, setServices] = useState([]);
@@ -20,38 +21,82 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   // Fetch services and ratings
+  // Fetch categories, services, and ratings
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        // Fetch services and ratings in parallel
-        const [servicesRes, ratingsRes] = await Promise.all([
-          fetch('http://localhost:5000/api/homepagecardservices/all'),
-          fetch('http://localhost:5000/api/homepagecardservices/ratings')
-        ]);
+        try {
+            // Fetch categories, services, and ratings in parallel
+            const [categoriesRes, servicesRes, ratingsRes] = await Promise.all([
+                fetch('http://localhost:5000/api/homepagecardservices/categories'),
+                fetch('http://localhost:5000/api/homepagecardservices/all'),
+                fetch('http://localhost:5000/api/homepagecardservices/ratings')
+            ]);
 
-        const servicesData = await servicesRes.json();
-        const ratingsData = await ratingsRes.json();
+            const categoriesData = await categoriesRes.json();
+            const servicesData = await servicesRes.json();
+            const ratingsData = await ratingsRes.json();
 
-        if (servicesData.success) {
-          setServices(servicesData.data);
+            if (categoriesData.success) {
+                setCategories(categoriesData.data);
+            }
+
+            if (servicesData.success) {
+                setServices(servicesData.data);
+            }
+
+            if (ratingsData.success) {
+                const ratingsMap = {};
+                ratingsData.data.forEach(item => {
+                    ratingsMap[item.service_id] = item;
+                });
+                setRatings(ratingsMap);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
         }
-
-        if (ratingsData.success) {
-          const ratingsMap = {};
-          ratingsData.data.forEach(item => {
-            ratingsMap[item.service_id] = item;
-          });
-          setRatings(ratingsMap);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
     };
 
     fetchData();
-  }, []);
+}, []);
+
+      // Perform search
+      const performSearch = useCallback(async () => {
+        if (searchQuery.trim() === '') {
+            // If search query is empty, fetch all services
+            try {
+                const response = await fetch('http://localhost:5000/api/homepagecardservices/all');
+                const data = await response.json();
+                
+                if (data.success) {
+                    setServices(data.data);
+                    setCurrentSlide(0);
+                }
+            } catch (error) {
+                console.error("Error fetching all services:", error);
+            }
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/homepagecardservices/search?query=${encodeURIComponent(searchQuery)}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                setServices(data.data);
+                setCurrentSlide(0);
+            }
+        } catch (error) {
+            console.error("Error performing search:", error);
+        }
+    }, [searchQuery]);
+
+    // Trigger search when search query changes
+    useEffect(() => {
+        performSearch();
+    }, [performSearch]);
+
 
   // Auto-advance slideshow every 5 seconds
   useEffect(() => {
@@ -126,20 +171,12 @@ const HomePage = () => {
     }
   };
 
-  // Categories data
-  const categories = [
-    { id: 'Medical Appointments', name: 'medical', icon: '🏥' },
-    { id: 'Fitness Classes', name: 'fitness', icon: '💪' },
-    { id: 'Consultations', name: 'Consultations', icon: '📋' },
-    { id: 'Co-working Spaces', name: 'Co-working', icon: '💼' },
-    { id: 'Educational Services', name: 'Education', icon: '🎓' },
-    { id: 'all', name: 'All Services', icon: '🔍' },
-  ];
+
 
   // Filter services by category
   const filteredServices = selectedCategory === 'all'
-    ? services
-    : services.filter(service => service.category.toLowerCase() === selectedCategory.toLowerCase());
+  ? services
+  : services.filter(service => service.category === selectedCategory);
 
   // Calculate how many slides are needed
   const servicesPerSlide = 3;
@@ -147,19 +184,24 @@ const HomePage = () => {
 
   // Move to next slide
   const nextSlide = () => {
-    setCurrentSlide((prevSlide) => (prevSlide + 1) % totalSlides);
+  setCurrentSlide((prevSlide) => (prevSlide + 1) % totalSlides);
   };
 
   // Move to previous slide
   const prevSlide = () => {
-    setCurrentSlide((prevSlide) => (prevSlide - 1 + totalSlides) % totalSlides);
+  setCurrentSlide((prevSlide) => (prevSlide - 1 + totalSlides) % totalSlides);
   };
 
   // Get current slide services
   const currentServices = filteredServices.slice(
-    currentSlide * servicesPerSlide,
-    (currentSlide + 1) * servicesPerSlide
+  currentSlide * servicesPerSlide,
+  (currentSlide + 1) * servicesPerSlide
   );
+
+// Search button handler
+const handleSearch = () => {
+  performSearch();
+};
 
   // Mock data for featured service providers
   const featuredProviders = [
@@ -174,28 +216,144 @@ const HomePage = () => {
   return (
     <div className="homepage-wrapper">
       <main>
-        {/* Hero section with search and category filter */}
+
+        {/* Hero section of search keyword START */}
+
         <section className="hero-section">
-          <div className="hero-content">
-            <h1>Book Your Services Online</h1>
-            <p>Find and book appointments with top professionals in your area</p>
+                <div className="hero-content">
+                    <h1>Book Your Services Online</h1>
+                    <p>Find and book appointments with top professionals in your area</p>
 
-            <div className="search-box">
-              <FaSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search services, providers..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button className="search-btn">Search</button>
+                    <div className="search-box">
+                        <FaSearch className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search services, providers..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSearch();
+                                }
+                            }}
+                        />
+                        <button 
+                            className="search-btn"
+                            onClick={handleSearch}
+                        >
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+
+            <section className="services-slideshow-section">
+    <div className="section-heading">
+        <h2>
+            {searchQuery 
+                ? `Search Results for "${searchQuery}"` 
+                : 'Services'}
+        </h2>
+    </div>
+
+    <div className="slideshow-container">
+        {filteredServices.length > 0 ? (
+            <>
+                <button
+                    className="slide-nav-btn prev-btn"
+                    onClick={prevSlide}
+                    disabled={totalSlides <= 1}
+                >
+                    <FaChevronLeft />
+                </button>
+
+                <div className="slideshow-cards-container">
+                    <div className="slideshow-cards">
+                        {currentServices.map((service) => (
+                            <div key={service.id} className="service-card">
+                                <h4>{service.serviceTitle}</h4>
+                                <span className="category-badge">{service.category}</span>
+
+                                {/* Rating Display */}
+                                <div className="my-2">
+                                    <strong>Rating:</strong>
+                                    {ratings[service.id] ? (
+                                        renderStars(ratings[service.id].average_rating)
+                                    ) : (
+                                        <span className="text-muted">No ratings yet</span>
+                                    )}
+                                </div>
+
+                                <div className="my-2">
+                                    <strong>Provider:</strong> {service.providerName}
+                                </div>
+
+                                <div className="my-2">
+                                    <strong>Available Days:</strong> {service.availableDays.join(', ')}
+                                </div>
+
+                                <div className="my-2">
+                                    <strong>Duration:</strong> {service.duration} mins |
+                                    <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
+                                </div>
+
+                                <div className="my-2">
+                                    <strong>Price:</strong> ${service.regularPrice}
+                                    {service.memberPrice && (
+                                        <span className="text-success"> (${service.memberPrice} for members)</span>
+                                    )}
+                                </div>
+
+                                <div className="my-2">
+                                    <strong>Location:</strong> {service.location}
+                                </div>
+
+                                <button
+                                    className="book-now-btn"
+                                    onClick={() => handleBookNow(service.id)}
+                                >
+                                    Book Now
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <button
+                    className="slide-nav-btn next-btn"
+                    onClick={nextSlide}
+                    disabled={totalSlides <= 1}
+                >
+                    <FaChevronRight />
+                </button>
+            </>
+        ) : (
+            <div className="no-services-message">
+                {searchQuery 
+                    ? `No services found for "${searchQuery}"` 
+                    : "No services available"}
             </div>
+        )}
+    </div>
 
-           
-          </div>
-        </section>
-
+    {/* Slideshow navigation dots */}
+    {totalSlides > 1 && (
+        <div className="slideshow-dots">
+            {[...Array(totalSlides)].map((_, index) => (
+                <div
+                    key={index}
+                    className={`dot ${currentSlide === index ? 'active-dot' : ''}`}
+                    onClick={() => setCurrentSlide(index)}
+                ></div>
+            ))}
+        </div>
+    )}
+</section>
         
+           {/* Hero section of search keyword END  */}
+
+
 
         {/* Role-specific features section */}
         <section className="features-section">
@@ -314,23 +472,27 @@ const HomePage = () => {
           </section>
         )}
 
-<div className="category-filters">
-              {categories.map(category => (
-                <button
-                  key={category.id}
-                  className={`category-btn ${selectedCategory === category.id ? 'selected-category' : ''}`}
-                  onClick={() => {
-                    setSelectedCategory(category.id);
-                    setCurrentSlide(0); // Reset to first slide when changing category
-                  }}
-                >
-                  <span className="category-icon">{category.icon}</span>
-                  {category.name}
-                </button>
-              ))}
-            </div>
+           {/* SEARCH BY  CATEGORIES SECTION START */}
 
-            {/* Services Slideshow Section */}
+
+           <div className="category-filters">
+            {categories.map(category => (
+                <button
+                    key={category.id}
+                    className={`category-btn ${selectedCategory === category.id ? 'selected-category' : ''}`}
+                    onClick={() => {
+                        setSelectedCategory(category.id);
+                        setCurrentSlide(0); // Reset to first slide when changing category
+                    }}
+                >
+                    <span className="category-icon">{category.icon}</span>
+                    {category.name}
+                </button>
+            ))}
+        </div>
+
+            {/* Category Wise Services Cards Slideshow Section */}
+
         <section className="services-slideshow-section">
           <div className="section-heading">
             <h2>{selectedCategory === 'all' ? 'All Services' : `${categories.find(c => c.id === selectedCategory)?.name} Services`}</h2>
@@ -423,6 +585,10 @@ const HomePage = () => {
             </div>
           )}
         </section>
+
+  {/* SEARCH BY  CATEGORIES SECTION END */}
+
+
         {/* Call to action section */}
         <section className="cta-section">
           <h2>Ready to get started?</h2>
