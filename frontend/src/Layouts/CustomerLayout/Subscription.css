@@ -1,0 +1,51 @@
+.subscriptions-page {
+    padding: 30px;
+  }
+  
+  .subscription-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .subscription-card {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+  }
+  
+  .btn-group button {
+    margin-right: 10px;
+    padding: 6px 12px;
+  }
+  
+  .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-card {
+    background: white;
+    padding: 20px;
+    border-radius: 6px;
+    width: 400px;
+  }
+  
+  .option {
+    margin-top: 10px;
+  }
+  
+  .note {
+    margin-top: 15px;
+    font-style: italic;
+    font-size: 0.9em;
+    color: #555;
+  }

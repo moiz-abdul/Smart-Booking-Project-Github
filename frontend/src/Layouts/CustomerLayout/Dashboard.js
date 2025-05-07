@@ -20,6 +20,7 @@ const CusDashboard = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reminders, setReminders] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -48,6 +49,50 @@ const CusDashboard = () => {
       setLoading(false);
     }
   }, [navigate]);
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    const userData = localStorage.getItem("userData");
+
+    if (!token || !userData) {
+      navigate("/login");
+      return;
+    }
+
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    const parsedUserData = JSON.parse(userData);
+
+    if (parsedUserData.id) {
+      fetchReminders(parsedUserData.id); // New
+      fetchBookings(parsedUserData.id);  // Existing
+    }
+  }, []);
+
+  const fetchReminders = async (userId) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/customerbookingdetails/reminders`, {
+        params: { user_id: userId }
+      });
+
+      if (response.data?.success) {
+        setReminders(response.data.data);
+      }
+    } catch (err) {
+      console.error('Error while fetching reminders:', err);
+    }
+  };
+
+  const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    const [hour, minute] = timeStr.split(':');
+    let h = +hour;
+    const suffix = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${h}:${minute} ${suffix}`;
+  };
+
+
 
   const fetchBookings = async (userId) => {
     try {
@@ -147,6 +192,22 @@ const CusDashboard = () => {
 
   return (
     <div className="customer-dashboard">
+
+{reminders.length > 0 && (
+        <div className="reminders-section">
+          <h3>Reminders</h3>
+          <ul className="reminder-list">
+            {reminders.map((reminder, index) => (
+              <li key={index} className="reminder-item alert alert-info">
+                <strong>
+                  You have a Reminder of Booking service <em>{reminder.service_title}</em> of your selected timeslot {formatTime(reminder.start_time)} - {formatTime(reminder.end_time)}.
+                </strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      
       <h2>Your Pending Bookings</h2>
       <div className="bookings-container">
         {bookings.length > 0 ? (
@@ -157,6 +218,8 @@ const CusDashboard = () => {
           <p className="no-bookings">No pending bookings found.</p>
         )}
       </div>
+
+
     </div>
   );
 };

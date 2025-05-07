@@ -35,6 +35,7 @@ import CusDashboard from './Layouts/CustomerLayout/Dashboard'
 import ConfirmedBookings from './Layouts/CustomerLayout/ConfirmedBookings'
 import CancelBookingCustomerDashboard from './Layouts/CustomerLayout/CancelBookings';
 import CompletedBookings from './Layouts/CustomerLayout/CompletedBookings';
+import CustomerSubscriptions from './Layouts/CustomerLayout/Subscription';
 
 // ----------------  SERVICE PROVIDER SIDE LINKS --------------------
 
@@ -44,7 +45,7 @@ import ProviderReceivedBookings  from './ServiceProviderComponents/ReceivedBooki
 import ProviderCancelBookings from './ServiceProviderComponents/CancelBookingsComponent/providercancelbookings';
 import ProviderConfirmedBookings from './ServiceProviderComponents/ConfirmBookingsComponent/providerconfirmbookings';
 import ProviderCompletedBookings from './ServiceProviderComponents/CompletedBookingsComponent/providercompletedbookings';
-
+import ProviderRevenueReport from './ServiceProviderComponents/RevenueReportComponent/provider-revenue-report';
 
 
 // ---------------- ADMIN SIDE LINKS --------------------
@@ -97,6 +98,7 @@ function App() {
           <Route path="/CustomerDashboard/ConfirmedBookings" element={<CustomerProtectedRoute><ConfirmedBookings /></CustomerProtectedRoute>} />
           <Route index path="/CustomerDashboard/CompletedBookings" element={<CustomerProtectedRoute><CompletedBookings /></CustomerProtectedRoute>} />
           <Route index path="/CustomerDashboard/CancelBookings" element={<CustomerProtectedRoute><CancelBookingCustomerDashboard /></CustomerProtectedRoute>} />
+          <Route index path="/CustomerDashboard/Subscriptions" element={<CustomerProtectedRoute><CustomerSubscriptions /></CustomerProtectedRoute>} />
         </Route>
         <Route path='/booking-form' element={<BookingForm />} />
         <Route path='/payment' element={<PaymentFormPage />} /> 
@@ -110,6 +112,7 @@ function App() {
         <Route path='/provider/cancelbookings' element={<ServiceProviderLayout> <ProviderCancelBookings/> </ServiceProviderLayout>} />
         <Route path='/provider/confirmedbookings' element={<ServiceProviderLayout> <ProviderConfirmedBookings/> </ServiceProviderLayout>} />
         <Route path='/provider/completedbookings' element={<ServiceProviderLayout> <ProviderCompletedBookings/> </ServiceProviderLayout>} />
+        <Route path='/provider/revenuereport' element={<ServiceProviderLayout> <ProviderRevenueReport/> </ServiceProviderLayout>} />
       </Routes>
 
       {/* Admin Side Routing Links */}

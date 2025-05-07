@@ -28,6 +28,7 @@ const ServiceProviderLayout = ({ children }) => {
                         <button className="nav-item" onClick={() => navigate('/provider/cancelbookings')}>Canceled bookings</button>
                         <button className="nav-item" onClick={() => navigate('/provider/confirmedbookings')}>Confirmed bookings</button>
                         <button className="nav-item" onClick={() => navigate('/provider/completedbookings')}>Completed bookings</button>
+                        <button className="nav-item" onClick={() => navigate('/provider/revenuereport')}>Revenue Report</button>
                     </nav>
                 </div>
                

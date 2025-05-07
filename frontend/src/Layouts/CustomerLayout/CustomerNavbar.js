@@ -1,81 +1,130 @@
-import { useNavigate } from 'react-router-dom';  // Correct import for the hook
-import { Bell } from 'lucide-react'; // Import Bell icon from lucide-react
-import { useState, useEffect, useRef } from 'react'; // Import additional hooks
+import { Bell } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './CustomerNavbar.css';
 
 const Header = () => {
-    const navigate = useNavigate();  // This must be inside the component
-    const [notificationCount, setNotificationCount] = useState(3); // Example notification count
-    const [showNotifications, setShowNotifications] = useState(false);
-    const notificationRef = useRef(null); // Reference for the notification area
+  const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0); // ✅ track visible notification badge count
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef(null);
+  const [userId, setUserId] = useState(null);
 
-    // Close notifications when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (notificationRef.current && !notificationRef.current.contains(event.target)) {
-                setShowNotifications(false);
-            }
-        };
+  // Get user and fetch notifications on mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("userData"));
+    if (user?.id) {
+      setUserId(user.id);
+      fetchNotifications(user.id);
+    }
+  }, []);
 
-        // Add event listener when dropdown is open
-        if (showNotifications) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
+  // Fetch latest notifications
+  const fetchNotifications = async (id) => {
+    try {
+      const { data } = await axios.get(`http://localhost:5000/api/customerbookingdetails/notifications`, {
+        params: { user_id: id }
+      });
 
-        // Clean up the event listener
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [showNotifications]);
+      if (data?.success) {
+        setNotifications(data.data);
+        setNotificationCount(data.data.length); // ✅ set initial count
+      }
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    }
+  };
 
-    const handleLogout = () => {
-        // Your logout logic here, e.g., clear tokens, redirect, etc.
-        console.log("User logged out");
-        localStorage.removeItem("userToken");
-        localStorage.removeItem("userData");
-        navigate('/');  // This will now work as navigate is defined
+  // Hide dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
     };
 
-    const toggleNotifications = (e) => {
-        e.stopPropagation(); // Prevent event from bubbling up
-        setShowNotifications(!showNotifications);
-    };
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
 
-    return (
-        <>
-            <header className="navbar1">
-                <div className="logo">
-                    <h1>Customer Dashboard</h1>
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifications]);
+
+  // ✅ Toggle dropdown and mark notifications as seen
+  const toggleNotifications = () => {
+    const willShow = !showNotifications;
+    setShowNotifications(willShow);
+
+    // ✅ Mark as read = reset counter
+    if (willShow) {
+      setNotificationCount(0);
+    }
+  };
+
+  // Format notification message
+  const formattedMessage = (item) => {
+    const status = item.is_status.toLowerCase();
+  
+    let message = `Service Provider ${item.provider_name} has ${status} your Booking ${item.service_title}`;
+  
+    if (status === 'cancel') {
+      message += ', Your payment has Refunded';
+    }
+
+    if (status === 'completed') {
+      message += ', Add reviews from Complete Bookings Page';
+    }
+  
+  
+    return message;
+  };
+  // Logout logic
+  const handleLogout = () => {
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("userData");
+    navigate('/');
+  };
+
+  return (
+    <header className="navbar1">
+      <div className="logo">
+        <h1>Customer Dashboard</h1>
+      </div>
+      <div className="actions-container">
+        <div className="notification-container" ref={notificationRef}>
+          <div className="notification-button" onClick={toggleNotifications}>
+            <Bell size={20} />
+            {/* ✅ Show count badge only if > 0 */}
+            {notificationCount > 0 && (
+              <span className="notification-badge">{notificationCount}</span>
+            )}
+          </div>
+
+          {showNotifications && (
+            <div className="notifications-dropdown">
+              {notifications.length > 0 ? (
+                notifications.map((notification, index) => (
+                  <div className="notification-item" key={index}>
+                    <p>{formattedMessage(notification)}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="notification-item">
+                  <p>No notifications</p>
                 </div>
-                <div className="actions-container">
-                    <div ref={notificationRef} className="notification-container">
-                        <div className="notification-button" onClick={toggleNotifications}>
-                            <Bell size={20} />
-                            {notificationCount > 0 && (
-                                <span className="notification-badge">{notificationCount}</span>
-                            )}
-                        </div>
-                        {showNotifications && (
-                            <div className="notifications-dropdown">
-                                <div className="notification-item">
-                                    <p>Your order #1234 has been shipped</p>
-                                </div>
-                                <div className="notification-item">
-                                    <p>New product available in your area</p>
-                                </div>
-                                <div className="notification-item">
-                                    <p>Payment received successfully</p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    <button className="logout-button" onClick={handleLogout}>
-                        Logout
-                    </button>
-                </div>
-            </header>
-        </>
-    );
+              )}
+            </div>
+          )}
+        </div>
+
+        <button className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+    </header>
+  );
 };
 
 export default Header;

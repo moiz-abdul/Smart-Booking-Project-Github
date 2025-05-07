@@ -209,6 +209,44 @@ ProviderDashboardBookingsDetailsApi.get('/completed', async (req, res) => {
   }
 });
 
+
+// Provider Navbar Notification API 
+
+ProviderDashboardBookingsDetailsApi.get('/providernotification', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+
+    if (!user_id) {
+      return res.status(400).json({ success: false, message: 'Provider user_id is required' });
+    }
+
+    const query = `
+      SELECT b.customer_name, b.service_name, b.is_status, b.created_at
+      FROM bookingform b
+      JOIN add_services s ON s.id = b.service_id
+      WHERE s.user_id = ?
+        AND b.is_status IN ('cancel', 'pending')
+      ORDER BY b.created_at DESC
+      LIMIT 3
+    `;
+
+    const [rows] = await pool.query(query, [user_id]);
+
+    res.json({
+      success: true,
+      data: rows
+    });
+  } catch (error) {
+    console.error("Provider Notification Error:", error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch provider notifications',
+      error: error.message
+    });
+  }
+});
+
+
 // Update booking status
 ProviderDashboardBookingsDetailsApi.put('/:id/status', async (req, res) => {
   try {

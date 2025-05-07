@@ -213,6 +213,72 @@ CustomerBookingsApi.get('/completed', async (req, res) => {
   }
 });
 
+
+// Notifications For Customer Dashboard 
+CustomerBookingsApi.get('/notifications', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+
+    if (!user_id) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
+
+    const [rows] = await pool.query(`
+      SELECT b.is_status, b.service_id, b.created_at, s.provider_name, s.service_title
+      FROM bookingform b
+      JOIN add_services s ON s.id = b.service_id
+      WHERE b.user_id = ? AND b.is_status IN ('confirm', 'cancel', 'completed')
+      ORDER BY b.created_at DESC
+      LIMIT 3
+    `, [user_id]);
+
+    res.json({
+      success: true,
+      data: rows
+    });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch notifications',
+      error: error.message
+    });
+  }
+});
+
+// Reminders For Customer Dashboard 
+CustomerBookingsApi.get('/reminders', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+
+    if (!user_id) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
+
+    const [rows] = await pool.query(`
+      SELECT b.start_time, b.end_time, b.service_id, s.service_title, b.created_at
+      FROM bookingform b
+      JOIN add_services s ON s.id = b.service_id
+      WHERE b.user_id = ? AND b.is_status = 'confirm'
+      ORDER BY b.created_at DESC
+      LIMIT 2
+    `, [user_id]);
+
+    res.json({
+      success: true,
+      data: rows
+    });
+  } catch (error) {
+    console.error('Error fetching reminders:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch reminders',
+      error: error.message
+    });
+  }
+});
+
+
 // Upate Cancel bookings Status for customer Cancellation 
 CustomerBookingsApi.put('/:bookingId/cancel', async (req, res) => {
   try {

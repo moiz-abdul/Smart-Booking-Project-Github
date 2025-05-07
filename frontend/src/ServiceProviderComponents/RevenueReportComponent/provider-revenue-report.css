@@ -1,0 +1,38 @@
+.revenue-report {
+    padding: 20px;
+    background: #fff;
+  }
+  
+  .filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .filters input {
+    padding: 5px;
+  }
+  
+  .filters button {
+    padding: 6px 12px;
+    background-color: #141fd7;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .revenue-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .revenue-table th, .revenue-table td {
+    border: 1px solid #eee;
+    padding: 8px 10px;
+    text-align: left;
+  }
+  
+  .error-message {
+    color: red;
+    margin-bottom: 10px;
+  }

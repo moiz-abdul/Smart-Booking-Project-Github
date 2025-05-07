@@ -18,7 +18,7 @@ const CustomerDashboard = () => {
                         <button className="nav-item" onClick={() => navigate('/CustomerDashboard/ConfirmedBookings')}>Confirm Bookings</button>
                         <button className="nav-item" onClick={() => navigate('/CustomerDashboard/CancelBookings')}>Cancel Bookings</button>
                         <button className="nav-item" onClick={() => navigate('/CustomerDashboard/CompletedBookings')}>Completed Bookings</button>
-
+                        <button className="nav-item" onClick={() => navigate('/CustomerDashboard/Subscriptions')}>Subscriptions</button>
                     </nav>
                 </div>
                 <div className="content-area">
