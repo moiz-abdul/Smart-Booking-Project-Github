@@ -259,7 +259,7 @@ HomepageServicesCardApi.get('/search', async (req, res) => {
 // 
 
 // Backend API Endpoint
-HomepageServicesCardApi.get('/filter', async (req, res) => {
+HomepageServicesCardApi.post('/filter', async (req, res) => {
     const { timeslots, availableDays, minRating } = req.body;
   
     let query = `
@@ -293,14 +293,19 @@ HomepageServicesCardApi.get('/filter', async (req, res) => {
             return `(s.slot_1_time >= '21:00:00' OR 
                      s.slot_2_time >= '21:00:00' OR 
                      s.slot_3_time >= '21:00:00')`;
+          default:
+            return '';
         }
-      });
-      query += ` AND (${timeConditions.join(' OR ')})`;
+      }).filter(Boolean);
+  
+      if (timeConditions.length > 0) {
+        query += ` AND (${timeConditions.join(' OR ')})`;
+      }
     }
   
     // Available Days Filter
     if (availableDays && availableDays.length) {
-      const dayConditions = availableDays.map(day => 
+      const dayConditions = availableDays.map(day =>
         `s.available_days LIKE ?`
       );
       query += ` AND (${dayConditions.join(' OR ')})`;
@@ -317,7 +322,7 @@ HomepageServicesCardApi.get('/filter', async (req, res) => {
   
     try {
       const [services] = await pool.execute(query, queryParams);
-      res.json({ success: true, data: services });
+      res.json({ success: true, services });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }
