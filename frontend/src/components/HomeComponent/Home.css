@@ -1,94 +1,93 @@
 /* Home.css */
 
-/* General styling for the page */
-body {
-    
-    font-family: Arial, sans-serif;
-    padding: 0;
-    
-  }
-
-.alignment
-{
-    width: 100%;
-    margin: 0 auto; /* Center content */
+.filters-and-results-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
 }
-  
-  .hero-section {
-    background: linear-gradient(135deg, #c9eccb, #1e90ff);
-    color: #fff;
-    width: 1251px;
-    padding: 100px 0;
-    margin-left: -73px;
-    margin-right: 30px;
-  }
-  
-  .hero-title {
-    font-size: 2.5rem;
-    font-weight: bold;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.25rem;
-    line-height: 1.6;
-  }
-  
-  .hero-image {
-    max-height: 400px;
-  }
-  
-  .btn-primary {
-    background-color: #1e90ff;
-    border-color: #1e90ff;
-  }
-  
-  .btn-outline-light {
-    border-color: #fff;
-    color: #fff;
-  }
-  
-  .btn-outline-light:hover {
-    background-color: #fff;
-    color: #0052cc;
-  }
-  
-  /* Project Status Section */
-  .project-status {
-    background: #f4f4f9;
-    padding: 60px 0;
-  }
-  
-  .project-status h2 {
-    font-size: 2rem;
-    color: #333;
-    margin-bottom: 40px;
-  }
-  
-  .project-card {
-    background: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  .project-card h3 {
-    font-size: 1.5rem;
-    color: #1e90ff;
-  }
-  
-  .project-card p {
-    font-size: 1rem;
-    color: #666;
-  }
-  
-  .project-card .btn {
-    background-color: #1e90ff;
-    color: white;
-    border: none;
-  }
-  
-  .project-card .btn:hover {
-    background-color: #0052cc;
-  }
-  
+
+.service-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.filter-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.apply-filter-btn {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Slideshow area */
+.slideshow-container {
+  position: relative;
+}
+
+.slideshow-cards-container {
+  overflow: hidden;
+}
+
+.slideshow-cards {
+  display: flex;
+  gap: 1rem;
+  transition: transform 0.3s ease-in-out;
+}
+
+.service-card {
+  flex: 1 0 30%;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.slide-nav-btn {
+  position: absolute;
+  top: 40%;
+  background-color: #eee;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.prev-btn {
+  left: -20px;
+}
+
+.next-btn {
+  right: -20px;
+}
+
+.slideshow-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  margin: 0 5px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.active-dot {
+  background-color: #717171;
+}

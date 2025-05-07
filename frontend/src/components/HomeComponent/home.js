@@ -1,11 +1,12 @@
 
 //import logo from '../../Assets/images/logoblack.JPG';
-
+import ServiceFiltersAndSlideshow from './filterslideshow'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FaCalendarAlt, FaUserMd, FaSearch, FaCreditCard, FaRegStar, FaSignInAlt, FaUserPlus, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { MdCategory, MdNotifications } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import Categorywisesearch from './categorywisesearch'
 
 // Home Component
 const HomePage = () => {
@@ -109,44 +110,34 @@ const HomePage = () => {
 
   //  Fetch  Services Card on the basis of  Filter Data
   
-  const handleFilterChange = (filterType, value) => {
-    setFilters(prev => {
-      const newFilters = {...prev};
-      
-      // Toggle selection for multi-select filters
-      if (['timeslots', 'availableDays'].includes(filterType)) {
-        const currentIndex = newFilters[filterType].indexOf(value);
-        if (currentIndex === -1) {
-          newFilters[filterType].push(value);
-        } else {
-          newFilters[filterType].splice(currentIndex, 1);
-        }
-      } else {
-        // For single select like rating
-        newFilters[filterType] = value;
-      }
+  
 
-      return newFilters;
-    });
+  const filteredServices = selectedCategory === 'all'
+  ? services
+  : services.filter(service => service.category === selectedCategory);
+
+  // Calculate how many slides are needed
+  const servicesPerSlide = 3;
+  const totalSlides = Math.max(1, Math.ceil(filteredServices.length / servicesPerSlide));
+
+  // Move to next slide
+  const nextSlide = () => {
+  setCurrentSlide((prevSlide) => (prevSlide + 1) % totalSlides);
   };
 
-  const applyFilters = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/homepagecardservices/filter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(filters)
-      });
-      
-      const data = await response.json();
-      // Update services state with filtered results
-      setServices(data.services);
-    } catch (error) {
-      console.error('Filter error:', error);
-    }
+  // Move to previous slide
+  const prevSlide = () => {
+  setCurrentSlide((prevSlide) => 
+    (prevSlide - 1 + totalSlides) % totalSlides);
   };
+
+  // Get current slide services
+  const currentServices = filteredServices.slice(
+  currentSlide * servicesPerSlide,
+  (currentSlide + 1) * servicesPerSlide
+  );
+
+
 
   // Auto-advance slideshow every 5 seconds
   useEffect(() => {
@@ -222,33 +213,6 @@ const HomePage = () => {
   };
 
 
-// FILTER SERVICES BY CATEGORY SECTION START 
-
-
-  // Filter services by category
-  const filteredServices = selectedCategory === 'all'
-  ? services
-  : services.filter(service => service.category === selectedCategory);
-
-  // Calculate how many slides are needed
-  const servicesPerSlide = 3;
-  const totalSlides = Math.max(1, Math.ceil(filteredServices.length / servicesPerSlide));
-
-  // Move to next slide
-  const nextSlide = () => {
-  setCurrentSlide((prevSlide) => (prevSlide + 1) % totalSlides);
-  };
-
-  // Move to previous slide
-  const prevSlide = () => {
-  setCurrentSlide((prevSlide) => (prevSlide - 1 + totalSlides) % totalSlides);
-  };
-
-  // Get current slide services
-  const currentServices = filteredServices.slice(
-  currentSlide * servicesPerSlide,
-  (currentSlide + 1) * servicesPerSlide
-  );
 
   // FILTER SERVICES BY CATEGORY SECTION END  
 
@@ -444,10 +408,15 @@ const SearchkeycurrentServices = SearchkeyfilteredServices.slice(
 
         {/* Show Service CARDS OF APPLIED KEYWORD SEARCH END */}
 
+        
                     </div>
+                    
                 </div>
 
+                
                 <button
+
+
                     className="slide-nav-btn next-btn"
                     onClick={SearchkeynextSlide}
                     disabled={SearchkeytotalSlides <= 1}
@@ -464,6 +433,7 @@ const SearchkeycurrentServices = SearchkeyfilteredServices.slice(
         )}
     </div>
 
+    <ServiceFiltersAndSlideshow/>
     {/* Search Slideshow navigation dots */}
     {SearchkeytotalSlides > 1 && (
         <div className="slideshow-dots">
@@ -599,273 +569,10 @@ const SearchkeycurrentServices = SearchkeyfilteredServices.slice(
           </section>
         )}
 
-           {/* SEARCH BY  CATEGORIES SECTION START */}
+          
 
-
-           <div className="category-filters">
-            {categories.map(category => (
-                <button
-                    key={category.id}
-                    className={`category-btn ${selectedCategory === category.id ? 'selected-category' : ''}`}
-                    onClick={() => {
-                        setSelectedCategory(category.id);
-                        setCurrentSlide(0); // Reset to first slide when changing category
-                    }}
-                >
-                    <span className="category-icon">{category.icon}</span>
-                    {category.name}
-                </button>
-            ))}
-        </div>
-
-            {/* Category Wise Services Cards Slideshow Section */}
-
-        <section className="services-slideshow-section">
-          <div className="section-heading">
-            <h2>{selectedCategory === 'all' ? 'All Services' : `${categories.find(c => c.id === selectedCategory)?.name} Services`}</h2>
-          </div>
-
-          <div className="slideshow-container">
-            {filteredServices.length > 0 ? (
-              <>
-                <button
-                  className="slide-nav-btn prev-btn"
-                  onClick={prevSlide}
-                  disabled={totalSlides <= 1}
-                >
-                  <FaChevronLeft />
-                </button>
-
-                <div className="slideshow-cards-container">
-                  <div className="slideshow-cards">
-                    {currentServices.map((service) => (
-                      <div key={service.id} className="service-card">
-                        <h4>{service.serviceTitle}</h4>
-                        <span className="category-badge">{service.category}</span>
-
-                        {/* Rating Display */}
-                        <div className="my-2">
-                          <strong>Rating:</strong>
-                          {ratings[service.id] ? (
-                            renderStars(ratings[service.id].average_rating)
-                          ) : (
-                            <span className="text-muted">No ratings yet</span>
-                          )}
-                        </div>
-
-                        <div className="my-2">
-                          <strong>Available Days:</strong> {service.availableDays.join(', ')}
-                        </div>
-
-                        <div className="my-2">
-                          <strong>Duration:</strong> {service.duration} mins |
-                          <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
-                        </div>
-
-                        <div className="my-2">
-                          <strong>Price:</strong> ${service.regularPrice}
-                          {service.memberPrice && (
-                            <span className="text-success"> (${service.memberPrice} for members)</span>
-                          )}
-                        </div>
-
-                        <div className="my-2">
-                          <strong>Location:</strong> {service.location}
-                        </div>
-
-                        <button
-                          className="book-now-btn"
-                          onClick={() => handleBookNow(service.id)}
-                        >
-                          Book Now
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <button
-                  className="slide-nav-btn next-btn"
-                  onClick={nextSlide}
-                  disabled={totalSlides <= 1}
-                >
-                  <FaChevronRight />
-                </button>
-              </>
-            ) : (
-              <div className="no-services-message">
-                No services available for this category.
-              </div>
-            )}
-          </div>
-
-          {/* Slideshow navigation dots */}
-          {totalSlides > 1 && (
-            <div className="slideshow-dots">
-              {[...Array(totalSlides)].map((_, index) => (
-                <div
-                  key={index}
-                  className={`dot ${currentSlide === index ? 'active-dot' : ''}`}
-                  onClick={() => setCurrentSlide(index)}
-                ></div>
-              ))}
-            </div>
-          )}
-        </section>
-
-  {/* SEARCH BY  CATEGORIES SECTION END */}
-
-
- {/* USER INPUT SHOW SERVICE CARDS  BY FILTERS SECTION START */}
-
-  <div className="service-filters">
-      {/* Time Slots Filter */}
-      <div className="filter-section">
-        <h4>Time Slots</h4>
-        {['morning', 'afternoon', 'evening', 'night'].map(slot => (
-          <label key={slot}>
-            <input
-              type="checkbox"
-              checked={filters.timeslots.includes(slot)}
-              onChange={() => handleFilterChange('timeslots', slot)}
-            />
-            {slot.charAt(0).toUpperCase() + slot.slice(1)}
-          </label>
-        ))}
-      </div>
-
-      {/* Available Days Filter */}
-      <div className="filter-section">
-        <h4>Available Days</h4>
-        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-          <label key={day}>
-            <input
-              type="checkbox"
-              checked={filters.availableDays.includes(day)}
-              onChange={() => handleFilterChange('availableDays', day)}
-            />
-            {day}
-          </label>
-        ))}
-      </div>
-
-      {/* Ratings Filter */}
-      <div className="filter-section">
-        <h4>Minimum Rating</h4>
-        {[1, 2, 3, 4, 5].map(rating => (
-          <label key={rating}>
-            <input
-              type="radio"
-              name="minRating"
-              checked={filters.minRating === rating}
-              onChange={() => handleFilterChange('minRating', rating)}
-            />
-            {rating}★ & above
-          </label>
-        ))}
-      </div>
-
-      <button onClick={applyFilters}>Apply Filters</button>
-    </div>
-    
-    {/* USER INPUT SHOW SERVICE CARDS  BY FILTERS SECTION END */}
-    
-
-
-{/* Show Service CARDS RESULT OF APPLIED FILTER START */}
-
-<div className="slideshow-container">
-            {FiltersApplyfilteredServices.length > 0 ? (
-              <>
-                <button
-                  className="slide-nav-btn prev-btn"
-                  onClick={FiltersApplyprevSlide}
-                  disabled={FiltersApplytotalSlides <= 1}
-                >
-                  <FaChevronLeft />
-                </button>
-
-                <div className="slideshow-cards-container">
-                  <div className="slideshow-cards">
-                    {FiltersApplycurrentServices .map((service) => (
-                      <div key={service.id} className="service-card">
-                        <h4>{service.serviceTitle}</h4>
-                        <span className="category-badge">{service.category}</span>
-
-                        {/* Rating Display */}
-                        <div className="my-2">
-                          <strong>Rating:</strong>
-                          {ratings[service.id] ? (
-                            renderStars(ratings[service.id].average_rating)
-                          ) : (
-                            <span className="text-muted">No ratings yet</span>
-                          )}
-                        </div>
-
-                        <div className="my-2">
-                          <strong>Available Days:</strong> {service.availableDays.join(', ')}
-                        </div>
-
-                        <div className="my-2">
-                          <strong>Duration:</strong> {service.duration} mins |
-                          <strong> Slots:</strong> {service.timeSlots.map(formatTime).join(', ')}
-                        </div>
-
-                        <div className="my-2">
-                          <strong>Price:</strong> ${service.regularPrice}
-                          {service.memberPrice && (
-                            <span className="text-success"> (${service.memberPrice} for members)</span>
-                          )}
-                        </div>
-
-                        <div className="my-2">
-                          <strong>Location:</strong> {service.location}
-                        </div>
-
-                        <button
-                          className="book-now-btn"
-                          onClick={() => handleBookNow(service.id)}
-                        >
-                          Book Now
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <button
-                  className="slide-nav-btn next-btn"
-                  onClick={FiltersApplynextSlide}
-                  disabled={FiltersApplytotalSlides <= 1}
-                >
-                  <FaChevronRight />
-                </button>
-              </>
-            ) : (
-              <div className="no-services-message">
-                No services available for the selected filters.
-              </div>
-            )}
-          </div>
-
-          {/* Slideshow navigation dots */}
-          {FiltersApplytotalSlides > 1 && (
-            <div className="slideshow-dots">
-              {[...Array(FiltersApplytotalSlides)].map((_, index) => (
-                <div
-                  key={index}
-                  className={`dot ${FiltersApplycurrentSlide === index ? 'active-dot' : ''}`}
-                  onClick={() => setFiltersApplycurrentSlide(index)}
-                ></div>
-              ))}
-            </div>
-          )}
-
-
-        {/* Show Service CARDS RESULT OF APPLIED FILTER END */}
-
-
- {/* SHOW SERVICE CARDS  BY FILTERS SECTION ALSO END HERE */}
+          
+ 
 
 
         {/* Call to action section */}
@@ -881,7 +588,9 @@ const SearchkeycurrentServices = SearchkeyfilteredServices.slice(
             </button>
           </div>
         </section>
+        <Categorywisesearch/>
       </main>
+
 
       <footer className="footer">
         <div className="footer-content">
