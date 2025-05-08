@@ -164,6 +164,26 @@ const BookingForm = () => {
     }
   };
 
+  const checkReservedTime = async () => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/bookform/check-reserved-period', {
+        selected_day: formData.selected_available_day,
+        selected_start_time: formData.start_time,
+        selected_end_time: formData.end_time
+      });
+  
+      if (res.data.success && res.data.is_reserved) {
+        setError(`Booking time blocked by admin: ${res.data.reason}`);
+        return false;
+      }
+  
+      return true;
+    } catch (err) {
+      setError("Failed to check reserved periods.");
+      return false;
+    }
+  };
+
   const checkAvailability = async () => {
     try {
       setCheckingAvailability(true);
@@ -198,7 +218,11 @@ const BookingForm = () => {
     throw new Error('Please fill all required fields');
   }
 
-      // First check availability
+        // Frist Check reserved period
+    const isReserved = await checkReservedTime();
+    if (!isReserved) return;
+
+    // Then Second Check availability
     const isAvailable = await checkAvailability();
     if (!isAvailable) return;
 

@@ -23,6 +23,7 @@ const AddServiceModal = ({ show, onClose, title, onSaveSuccess, editData = null 
   const [serviceData, setServiceData] = useState(initialState);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [reservedWarnings, setReservedWarnings] = useState([]);
   const [error, setError] = useState(null);
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -42,6 +43,63 @@ const AddServiceModal = ({ show, onClose, title, onSaveSuccess, editData = null 
       setIsLoading(false);
     }
   };
+
+  const checkReservedPeriods = async () => {
+    const warnings = [];
+  
+    for (let day of serviceData.available_days) {
+      for (let i = 0; i < 3; i++) {
+        const time = serviceData[`slot_${i + 1}_time`];
+        if (!time) continue;
+  
+        const [hour, minute] = time.split(':').map(Number);
+        const start = new Date();
+        start.setHours(hour);
+        start.setMinutes(minute);
+  
+        const end = new Date(start.getTime() + serviceData.duration_minutes * 60000);
+        const endTime = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
+  
+        try {
+          const res = await axios.post('http://localhost:5000/api/bookform/check-reserved-period', {
+            selected_day: day,
+            selected_start_time: time,
+            selected_end_time: endTime
+          });
+  
+          if (res.data?.is_reserved) {
+            warnings.push(
+              `⚠️ Reserved: ${day} ${formatTime(time)} - ${formatTime(endTime)} → ${res.data.reason}`
+            );
+          }
+        } catch (err) {
+          console.error('Check reserved periods failed:', err);
+        }
+      }
+    }
+  
+    setReservedWarnings(warnings);
+  };
+
+  const formatTime = (timeStr) => {
+    const [h, m] = timeStr.split(':').map(Number);
+    const date = new Date();
+    date.setHours(h);
+    date.setMinutes(m);
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+  };
+  
+  useEffect(() => {
+    if (
+      serviceData.duration_minutes &&
+      serviceData.available_days.length &&
+      (serviceData.slot_1_time || serviceData.slot_2_time || serviceData.slot_3_time)
+    ) {
+      checkReservedPeriods();
+    } else {
+      setReservedWarnings([]);
+    }
+  }, [serviceData.available_days, serviceData.slot_1_time, serviceData.slot_2_time, serviceData.slot_3_time, serviceData.duration_minutes]);
 
   const fetchUserData = () => {
     const storedUserData = localStorage.getItem('userData');
@@ -216,8 +274,19 @@ const AddServiceModal = ({ show, onClose, title, onSaveSuccess, editData = null 
           </div>
 
           <div className="modal-body">
-            {error && <div className="alert alert-danger">{error}</div>}
+                {error && <div className="alert alert-danger">{error}</div>}
             {isLoading && <div className="text-center">Loading...</div>}
+
+            {reservedWarnings.length > 0 && (
+              <div className="alert alert-warning">
+                <strong>Admin Reserved Time Warnings:</strong>
+                <ul className="mb-0 mt-1">
+                  {reservedWarnings.map((msg, index) => (
+                    <li key={index}>{msg}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <form>
               <div className="row">

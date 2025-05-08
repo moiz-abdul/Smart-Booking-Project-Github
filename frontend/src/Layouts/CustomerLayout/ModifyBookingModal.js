@@ -40,8 +40,51 @@ const UpdateBookingModal = ({ show, onClose, onSubmit, booking, service }) => {
     return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const handleSubmit = (e) => {
+  const checkReservedPeriod = async () => {
+    try {
+      const serviceDuration = booking.duration_minutes;
+      const [hour, minute] = selectedTimeSlot.split(':').map(Number);
+  
+      const start = new Date();
+      start.setHours(hour);
+      start.setMinutes(minute);
+  
+      const end = new Date(start.getTime() + serviceDuration * 60000);
+      const endTime = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
+  
+      const res = await fetch('http://localhost:5000/api/bookform/check-reserved-period', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          selected_day: selectedDay,
+          selected_start_time: selectedTimeSlot,
+          selected_end_time: endTime
+        })
+      });
+  
+      const data = await res.json();
+  
+      if (data.success && data.is_reserved) {
+        alert(`Booking time blocked by admin: For ${data.reason} on ${selectedDay} from ${selectedTimeSlot} – ${endTime}`);
+        return false;
+      }
+  
+      return true;
+    } catch (err) {
+      console.error("Reserved period check failed:", err);
+      alert("Failed to check reserved period. Please try again.");
+      return false;
+    }
+  };
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // 🛡️ Check if selected time falls in reserved period
+    const isReserved = await checkReservedPeriod();
+    if (!isReserved) return;
+  
+    // Everything is fine — continue
     onSubmit({
       day: selectedDay,
       timeSlot: selectedTimeSlot

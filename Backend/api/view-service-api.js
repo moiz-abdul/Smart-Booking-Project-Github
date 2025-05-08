@@ -154,7 +154,6 @@ ServicesApi.delete('/:id', async (req, res) => {
         const { id: serviceId } = req.params;
         const userId = req.query.user_id;
 
-        // 1. VALIDATE USER ID
         if (!userId || isNaN(userId)) {
             return res.status(400).json({ 
                 success: false, 
@@ -162,7 +161,7 @@ ServicesApi.delete('/:id', async (req, res) => {
             });
         }
 
-        // 2. VERIFY SERVICE OWNERSHIP
+        // 1. Validate ownership
         const [service] = await connection.execute(
             `SELECT id FROM add_services WHERE id = ? AND user_id = ?`,
             [serviceId, userId]
@@ -175,22 +174,29 @@ ServicesApi.delete('/:id', async (req, res) => {
             });
         }
 
-        // 3. DELETE PAYMENTS LINKED TO BOOKINGS
+        // 2. Delete customer reviews (by booking IDs linked to the service)
         await connection.execute(
-            `DELETE paymentform 
-             FROM paymentform 
-             JOIN bookingform ON paymentform.booking_id = bookingform.id 
+            `DELETE customer_reviews FROM customer_reviews
+             JOIN bookingform ON bookingform.id = customer_reviews.booking_id 
              WHERE bookingform.service_id = ?`,
             [serviceId]
         );
 
-        // 4. DELETE BOOKINGS
+        // 3. Delete payments linked to those bookings
+        await connection.execute(
+            `DELETE paymentform FROM paymentform 
+             JOIN bookingform ON bookingform.id = paymentform.booking_id 
+             WHERE bookingform.service_id = ?`,
+            [serviceId]
+        );
+
+        // 4. Delete bookings linked to this service
         await connection.execute(
             `DELETE FROM bookingform WHERE service_id = ?`,
             [serviceId]
         );
 
-        // 5. DELETE SERVICE
+        // 5. Finally, delete the service
         await connection.execute(
             `DELETE FROM add_services WHERE id = ?`,
             [serviceId]
@@ -198,19 +204,19 @@ ServicesApi.delete('/:id', async (req, res) => {
 
         await connection.commit();
 
-        res.status(200).json({ 
-            success: true, 
-            message: 'Service, all bookings, and payment records deleted successfully' 
+        res.status(200).json({
+            success: true,
+            message: 'Service, associated reviews, bookings, and payments deleted successfully'
         });
 
     } catch (err) {
         if (connection) await connection.rollback();
         console.error('Delete Error:', err);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to delete service',
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete service data',
             error: err.message,
-            code: err.code // Helps debug MySQL errors
+            code: err.code
         });
     } finally {
         if (connection) connection.release();

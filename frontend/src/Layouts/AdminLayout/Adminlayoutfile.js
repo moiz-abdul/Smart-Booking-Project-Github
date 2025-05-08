@@ -30,11 +30,9 @@ const AdminLayout = ({ children }) => {
 
                         <div className="sidebar">
                             <nav className="sidebar-nav">
-                                <button className="nav-item" onClick={() => navigate('/registeradmins/users')}>Users</button>
-                                <button className="nav-item" onClick={() => navigate('/registeradmins/documentspage')}>Documents</button>
-                                <button className="nav-item" onClick={() => navigate('/registeradmins/careerspage')}>Careers</button>
-
-
+                                <button className="nav-item" onClick={() => navigate('/registeradmin/usermanagement')}>User Management</button>
+                                <button className="nav-item" onClick={() => navigate('/registeradmin/reservationmanagement')}>Reservation Management</button>
+                                <button className="nav-item" onClick={() => navigate('/registeradmin/reservedperiods')}>Reserved Periods</button>
                             </nav>
                         </div>
                     </div>

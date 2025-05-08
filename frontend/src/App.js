@@ -53,9 +53,10 @@ import ProviderRevenueReport from './ServiceProviderComponents/RevenueReportComp
 import AdminLayout from './Layouts/AdminLayout/Adminlayoutfile';
 import AdminProtectedRoute from './AdminComponents/ProtectedRoutes/AdminProtectedRoute';
 import AdminLogin from './AdminComponents/LoginComponent/login';
-import AdminDashboard from './AdminComponents/DashboardComponent/UserDetailsComponent/ViewUsers';
-import DocumentPage from './AdminComponents/DocumentsPage/documentspage';
-import AdminCareersPage from './AdminComponents/CareersPage/careerspage';
+import AdminUserManagement from './AdminComponents/DashboardComponent/UserDetailsComponent/ViewUsers';
+import AdminReservationManagement from './AdminComponents/ReservationManagementComponent/reservationmanagement';
+import AdminReservedPeriods from './AdminComponents/AdminReservedPeriodsComponent/adminreservedperiods';
+
 
 // ADMIN SIDE LINKS END
 
@@ -119,9 +120,9 @@ function App() {
 
       <Routes>
         <Route path='/admin/login' element={<AdminLogin />} />
-        <Route path='/registeradmins/users' element={<AdminProtectedRoute><AdminLayout> <AdminDashboard /> </AdminLayout></AdminProtectedRoute>} />
-        <Route path='/registeradmins/documentspage' element={<AdminLayout> <DocumentPage /> </AdminLayout>} />
-        <Route path='/registeradmins/careerspage' element={<AdminLayout> <AdminCareersPage /> </AdminLayout>} />
+        <Route path='/registeradmin/usermanagement' element={<AdminProtectedRoute><AdminLayout> <AdminUserManagement /> </AdminLayout></AdminProtectedRoute>} />
+        <Route path='/registeradmin/reservationmanagement' element={<AdminProtectedRoute><AdminLayout> <AdminReservationManagement /> </AdminLayout></AdminProtectedRoute>} />
+        <Route path='/registeradmin/reservedperiods' element={<AdminProtectedRoute><AdminLayout> <AdminReservedPeriods /> </AdminLayout></AdminProtectedRoute>} />
       </Routes>
 
 

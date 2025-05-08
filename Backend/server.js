@@ -22,6 +22,7 @@ const ProviderDashboardBookingsDetailsApi = require('./api/provider-dashboard-bo
 const CustomerReviewsAPI = require('./api/customer-reviews-api');
 const ProviderRevenueReportApi = require('./api/provider-revenue-report-api');
 const SubscriptionApi = require('./api/subscriptions-api');
+const AdminSideApis = require('./api/admin-side-apis');
 
 
 // Load environment variables
@@ -62,6 +63,7 @@ app.use('/api/providerbookingdetails',ProviderDashboardBookingsDetailsApi);
 app.use('/api/customerreviews',CustomerReviewsAPI);
 app.use('/api/providerrevenuereport',ProviderRevenueReportApi);
 app.use('/api/subscriptions/',SubscriptionApi);
+app.use('/api/adminside/',AdminSideApis);
 
 
 // Base Route

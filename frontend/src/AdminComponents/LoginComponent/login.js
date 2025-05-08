@@ -25,7 +25,7 @@ export default function AdminLogin() {
         // Set up axios default headers for subsequent requests
         axios.defaults.headers.common['Authorization'] = `Bearer ${adminloginResponse.data.token}`;
 
-        navigate("/registeradmins/users");
+        navigate("/registeradmin/usermanagement");
       }
     }
     catch (err) {

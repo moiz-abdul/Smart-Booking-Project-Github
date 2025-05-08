@@ -52,8 +52,42 @@ BookingFormApi.get('/bookingdetails/:id', async (req, res) => {
   }
 });
 
+// Check Reserved Timeslot of the day by Admin SIDE
+BookingFormApi.post('/check-reserved-period', async (req, res) => {
+  const { selected_day, selected_start_time, selected_end_time } = req.body;
 
-// New endpoint to check availability
+  if (!selected_day || !selected_start_time || !selected_end_time) {
+    return res.status(400).json({ success: false, message: "Missing required fields." });
+  }
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT * FROM reserved_periods 
+       WHERE day = ? 
+       AND (
+         (start_time <= ? AND end_time > ?) OR
+         (start_time < ? AND end_time >= ?) OR
+         (start_time >= ? AND end_time <= ?)
+       )`,
+      [selected_day, selected_start_time, selected_start_time, selected_end_time, selected_end_time, selected_start_time, selected_end_time]
+    );
+
+    if (rows.length > 0) {
+      return res.json({
+        success: true,
+        is_reserved: true,
+        reason: rows[0].reason || "Time falls in unavailable admin slot"
+      });
+    }
+
+    return res.json({ success: true, is_reserved: false });
+  } catch (err) {
+    console.error("Reserved period check failed:", err);
+    res.status(500).json({ success: false, message: "Server error while checking reserved times" });
+  }
+});
+
+// check availability of the timslot already booked or not
 BookingFormApi.post('/check-availability', async (req, res) => {
   try {
     const { service_id, selected_day, selected_time_slot } = req.body;
