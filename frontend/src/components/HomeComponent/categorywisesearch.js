@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './Home.css';
+import { useNavigate } from 'react-router-dom';
+
 import {
   FaCalendarAlt,
   FaUserMd,
@@ -105,8 +107,9 @@ const Home = () => {
   };
 
   const handleBookNow = (serviceId) => {
-    console.log("Book now for:", serviceId);
+    navigate(`/procurement/${serviceId}`);
   };
+  const navigate = useNavigate();
 
   const renderStars = (rating) => {
     const numericRating = Number(rating) || 0;

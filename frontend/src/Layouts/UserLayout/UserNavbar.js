@@ -15,20 +15,7 @@ const UserNavbar = ({ activeTab, setActiveTab }) =>
    
         <h1>Smart Booking system</h1>
       </div>
-      <div className="nav-tabs">
-        <button
-          className={`nav-tab ${activeTab === 'customer' ? 'active-tab' : ''}`}
-          onClick={() => setActiveTab('customer')}
-        >
-          Customer
-        </button>
-        <button
-          className={`nav-tab ${activeTab === 'provider' ? 'active-tab' : ''}`}
-          onClick={() => setActiveTab('provider')}
-        >
-          Service Provider
-        </button>
-      </div>
+      
       <div className="nav-buttons">
       <Link style={{ textDecoration: "none", marginRight: "10px" }} to="/login">
         <button className="login-btn" onClick={() => navigate('/customerlogin')}>
