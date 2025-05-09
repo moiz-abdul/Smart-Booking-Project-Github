@@ -1,0 +1,243 @@
+/* Main Container */
+.admin-user-management {
+    padding: 2rem 0;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  /* Header Section */
+  .header-section {
+    margin-bottom: 2rem;
+  }
+  
+  .header-icon {
+    font-size: 2rem;
+    color: #4e73df;
+    margin-right: 1rem;
+  }
+  
+  .page-title {
+    color: #2e3a4e;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .search-bar {
+    max-width: 600px;
+  }
+  
+  .search-input {
+    border-radius: 0.35rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d3e2;
+  }
+  
+  .search-input:focus {
+    border-color: #bac8f3;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+  }
+  
+  /* Status Cards */
+  .status-cards {
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    transition: transform 0.3s ease;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stat-card .card-body {
+    padding: 1.5rem;
+  }
+  
+  .stat-card h5 {
+    font-size: 0.9rem;
+    color: #858796;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-card h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #5a5c69;
+  }
+  
+  .total-users {
+    border-left: 4px solid #4e73df;
+  }
+  
+  .admins {
+    border-left: 4px solid #1cc88a;
+  }
+  
+  .providers {
+    border-left: 4px solid #36b9cc;
+  }
+  
+  /* Table Card */
+  .table-card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+  }
+  
+  .table-card .card-body {
+    padding: 0;
+  }
+  
+  .table {
+    margin-bottom: 0;
+  }
+  
+  .table thead {
+    background-color: #f8f9fc;
+  }
+  
+  .table th {
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    color: #4e73df;
+    border-bottom: 1px solid #e3e6f0;
+  }
+  
+  .table td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border-top: 1px solid #e3e6f0;
+  }
+  
+  /* User Info */
+  .user-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #4e73df;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-weight: bold;
+  }
+  
+  .user-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-details small {
+    color: #858796;
+    font-size: 0.8rem;
+  }
+  
+  /* Role Badges */
+  .role-badge {
+    display: flex;
+    align-items: center;
+  }
+  
+  .role-icon {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+  }
+  
+  .role-icon.admin {
+    color: #1cc88a;
+  }
+  
+  .role-icon.provider {
+    color: #36b9cc;
+  }
+  
+  .role-icon.user {
+    color: #858796;
+  }
+  
+  /* Action Buttons */
+  .action-buttons .btn {
+    margin-right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .btn-edit {
+    background-color: #f6c23e;
+    color: #fff;
+    border: none;
+  }
+  
+  .btn-edit:hover {
+    background-color: #dda20a;
+  }
+  
+  .btn-delete {
+    background-color: #e74a3b;
+    color: #fff;
+    border: none;
+  }
+  
+  .btn-delete:hover {
+    background-color: #be2617;
+  }
+  
+  /* Pagination */
+  .pagination-container {
+    margin-top: 2rem;
+  }
+  
+  .page-item.active .page-link {
+    background-color: #4e73df;
+    border-color: #4e73df;
+  }
+  
+  .page-link {
+    color: #4e73df;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: 0.35rem;
+  }
+  
+  .page-link:hover {
+    color: #224abe;
+  }
+  
+  /* Empty State */
+  .no-users {
+    padding: 3rem;
+  }
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #858796;
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #dddfeb;
+  }
+  
+  /* Loading Spinner */
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    padding: 3rem;
+  }
+  
+  .error-message {
+    margin-top: 2rem;
+  }

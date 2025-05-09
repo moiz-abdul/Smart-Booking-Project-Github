@@ -3,7 +3,7 @@
 import ServiceFiltersAndSlideshow from './filterslideshow'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { FaCalendarAlt, FaFilter, FaTags, FaUserMd, FaSearch, FaCreditCard, FaRegStar, FaSignInAlt, FaUserPlus, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
+import { FaCalendarAlt, FaBell, FaCalendarCheck, FaFilter, FaTags, FaUserMd, FaSearch, FaCreditCard, FaRegStar, FaSignInAlt, FaUserPlus, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { MdCategory, MdNotifications, MdPadding } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import Categorywisesearch from './categorywisesearch'
@@ -238,7 +238,24 @@ const HomePage = () => {
       service.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+// Reveal elements on scroll
+function revealOnScroll() {
+  const reveals = document.querySelectorAll('.reveal');
+  
+  reveals.forEach(element => {
+    const windowHeight = window.innerHeight;
+    const revealTop = element.getBoundingClientRect().top;
+    const revealPoint = 50; // trigger point from bottom
+    
+    if (revealTop < windowHeight - revealPoint) {
+      element.classList.add('active');
+    }
+  });
+}
 
+// Trigger on scroll and page load
+window.addEventListener('scroll', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
   // Calculate how many slides are needed
   const SearchkeyservicesPerSlide = 3;
   const SearchkeytotalSlides = Math.max(1, Math.ceil(SearchkeyfilteredServices.length / SearchkeyservicesPerSlide));
@@ -467,6 +484,78 @@ const HomePage = () => {
               </div>
             )}
           </div>
+           {/* Role-specific features section */}
+        <section className="features-section">
+          <div className="section-heading">
+            <h2>Customer Features</h2>
+          </div>
+
+          <div className="features-grid">
+
+            <>
+              <div
+                className="feature-card"
+
+
+              >
+                <FaCalendarAlt className="feature-icon" />
+                <h3>Book Appointments</h3>
+                <p>Browse and book available time slots with your preferred service providers</p>
+              </div>
+              <div
+                className="feature-card"
+
+
+              >
+                <MdCategory className="feature-icon" />
+                <h3>Get Service Providers by Category</h3>
+                <p>Find services organized by categories for easy browsing</p>
+              </div>
+
+              <div
+                className="feature-card"
+
+
+              >
+                <FaCreditCard className="feature-icon" />
+                <h3>Flexible Payment Options</h3>
+                <p>Choose between membership subscriptions or pay-per-booking</p>
+              </div>
+              <div
+                className="feature-card"
+
+
+              >
+                <FaRegStar className="feature-icon" />
+                <h3>Reviews & Ratings</h3>
+                <p>Rate service providers and read reviews from other customers</p>
+              </div>
+            </>
+            <div className="feature-card">
+              <FaBell className="feature-icon" />
+              <h3>Reminders & Notifications</h3>
+              <p>Get timely alerts for upcoming appointments and important updates from your service providers</p>
+            </div>
+            <div className="feature-card">
+              <FaSearch className="feature-icon" />
+              <h3>Search Services</h3>
+              <p>Find exactly what you need by searching for specific services offered by professionals</p>
+            </div>
+            <div className="feature-card">
+              <FaCalendarCheck className="feature-icon" />
+              <h3>Reschedules</h3>
+              <p>Easily modify your bookings with flexible rescheduling options when plans change</p>
+            </div>
+            <div className="feature-card">
+              <FaFilter className="feature-icon" />
+              <h3>Search by Filters</h3>
+              <p>Narrow down options using filters like location, availability, ratings, and more</p>
+            </div>
+
+
+
+          </div>
+        </section>
           <br></br>
           <br></br>
           <div className="section-heading">
@@ -493,72 +582,66 @@ const HomePage = () => {
 
         {/* Hero section of search keyword END  */}
 
+{/* Provider Features Section */}
+<section className="features-section">
+  <div className="section-heading">
+    <h2>Provider Features</h2>
+  </div>
 
-
-        {/* Role-specific features section */}
-        <section className="features-section">
-          <div className="section-heading">
-            <h2>{activeTab === 'customer' ? 'Customer Features' : 'Service Provider Features'}</h2>
-          </div>
-
-          <div className="features-grid">
-
-            <>
-              <div
-                className="feature-card"
-                tabIndex={0}
-                role="button"
-                onClick={() => handleFeatureClick('book-appointments')}
-                onKeyPress={e => (e.key === 'Enter' || e.key === ' ') && handleFeatureClick('book-appointments')}
-              >
-                <FaCalendarAlt className="feature-icon" />
-                <h3>Book Appointments</h3>
-                <p>Browse and book available time slots with your preferred service providers</p>
-              </div>
-              <div
-                className="feature-card"
-                tabIndex={0}
-                role="button"
-                onClick={() => handleFeatureClick('services-category')}
-                onKeyPress={e => (e.key === 'Enter' || e.key === ' ') && handleFeatureClick('services-category')}
-              >
-                <MdCategory className="feature-icon" />
-                <h3>Services by Category</h3>
-                <p>Find services organized by categories for easy browsing</p>
-              </div>
-
-              <div
-                className="feature-card"
-                tabIndex={0}
-                role="button"
-                onClick={() => handleFeatureClick('payments')}
-                onKeyPress={e => (e.key === 'Enter' || e.key === ' ') && handleFeatureClick('payments')}
-              >
-                <FaCreditCard className="feature-icon" />
-                <h3>Flexible Payment Options</h3>
-                <p>Choose between membership subscriptions or pay-per-booking</p>
-              </div>
-              <div
-                className="feature-card"
-                tabIndex={0}
-                role="button"
-                onClick={() => handleFeatureClick('reviews')}
-                onKeyPress={e => (e.key === 'Enter' || e.key === ' ') && handleFeatureClick('reviews')}
-              >
-                <FaRegStar className="feature-icon" />
-                <h3>Reviews & Ratings</h3>
-                <p>Rate service providers and read reviews from other customers</p>
-              </div>
-            </>
-
-
-
-
-          </div>
-        </section>
+  <div className="features-grid">
+    <div className="feature-card">
+      <FaUserMd className="feature-icon" />
+      <h3>Profile Management</h3>
+      <p>Create and manage your professional profile to showcase your services and expertise</p>
+    </div>
+    
+    <div className="feature-card">
+      <FaCalendarAlt className="feature-icon" />
+      <h3>Appointment Management</h3>
+      <p>Easily manage your schedule, availability, and client appointments</p>
+    </div>
+    
+    <div className="feature-card">
+      <FaCreditCard className="feature-icon" />
+      <h3>Payment Processing</h3>
+      <p>Securely accept payments and manage your earnings in one place</p>
+    </div>
+    
+    <div className="feature-card">
+      <FaRegStar className="feature-icon" />
+      <h3>Client Reviews</h3>
+      <p>Receive and respond to client feedback to build your reputation</p>
+    </div>
+    
+    <div className="feature-card">
+      <FaBell className="feature-icon" />
+      <h3>Client Notifications</h3>
+      <p>Automated reminders and notifications to reduce no-shows</p>
+    </div>
+    
+    <div className="feature-card">
+      <FaSearch className="feature-icon" />
+      <h3>Service Visibility</h3>
+      <p>Increase your discoverability with optimized search results</p>
+    </div>
+    
+    <div className="feature-card">
+      <FaCalendarCheck className="feature-icon" />
+      <h3>Booking Customization</h3>
+      <p>Set your service durations, buffer times, and booking rules</p>
+    </div>
+    
+    <div className="feature-card">
+      <FaFilter className="feature-icon" />
+      <h3>Client Management</h3>
+      <p>Track client history, preferences, and special requirements</p>
+    </div>
+  </div>
+</section>
+       
 
         {/* Featured Providers Section (shown only in customer tab) */}
-{/*
+        {/*
         <section className="featured-providers-section">
           <div className="section-heading">
             <h2>Featured Service Providers</h2>
@@ -587,13 +670,14 @@ const HomePage = () => {
 
 
 */}
+<div id='categorysection' className="available-slots"></div>
         <br></br>
-          <br></br>
-          <div className="section-heading ">
-            <h2>  Services by Category</h2>
-          </div>
+        <br></br>
+        <div className="section-heading spacebetween2">
+          <h2>  Services by Category</h2>
+        </div>
 
-       
+
         <div >
           <Categorywisesearch />
         </div>
