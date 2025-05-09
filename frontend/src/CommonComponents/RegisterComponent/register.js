@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import './register.css';
 import loginBackground from '../../Assets/images/loginbackground.png';
-
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export default function RoleBaseRegister() {
     const [email, setEmail] = useState("");
@@ -18,6 +18,9 @@ export default function RoleBaseRegister() {
         label: "",
         color: ""
     });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
     // Password strength checker
@@ -40,13 +43,13 @@ export default function RoleBaseRegister() {
 
         if (score <= 2) {
             label = "Weak";
-            color = "danger";
+            color = "#ff4757"; // Red
         } else if (score <= 4) {
             label = "Moderate";
-            color = "warning";
+            color = "#ffa502"; // Orange
         } else {
             label = "Strong";
-            color = "success";
+            color = "#2ed573"; // Green
         }
 
         return { score, label, color };
@@ -62,16 +65,19 @@ export default function RoleBaseRegister() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
         // Password matching check
         if (password !== confirmPassword) {
             setErrorMessage("Passwords do not match!");
+            setIsSubmitting(false);
             return;
         }
 
         // Password strength check
         if (passwordStrength.score <= 2) {
             setErrorMessage("Password is too weak. Please choose a stronger password.");
+            setIsSubmitting(false);
             return;
         }
 
@@ -88,6 +94,8 @@ export default function RoleBaseRegister() {
             navigate("/login");
         } catch (error) {
             setErrorMessage(error.response?.data?.message || "Registration failed!");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -99,35 +107,72 @@ export default function RoleBaseRegister() {
         }
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const toggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+    };
+
+    useEffect(() => {
+        const createParticles = () => {
+            const container = document.querySelector('.register-container');
+            if (!container) return;
+            
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 10 + 5;
+                const posX = Math.random() * 100;
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 10;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(particle);
+            }
+        };
+        
+        createParticles();
+    }, []);
+
     return (
-        <div>
-               
         <div className="register-containerregister">
-         
-        <div
-  className="register-background"
-  style={{
-    backgroundImage: `url(${loginBackground})`,
-  }}
-></div>
+            <div
+                className="register-background"
+                style={{
+                    backgroundImage: `url(${loginBackground})`,
+                }}
+            ></div>
+            
             <button
                 type="button"
-                className="btn btn-outline-secondary position-absolute top-0 start-0 m-3"
+                className="btn btn-outline-secondary position-absolute top-0 start-0 m-3 back-button"
                 onClick={handleGoBack}
-                style={{ zIndex: 1000 }} // Ensure it's above other elements
+                style={{ zIndex: 1000 }}
             >
                 <i className="bi bi-arrow-left me-2"></i>Go Back
             </button>
         
             <div className="register-wrapper">
-                {/* Go Back Button - Positioned Absolutely */}
-
-
                 <div className="register-form-container">
                     <form onSubmit={handleSubmit} className="register-form">
                         <h4 className="text-center mb-4">Register Account</h4>
 
-                        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+                        {errorMessage && (
+                            <div className="alert alert-danger animate__animated animate__shakeX">
+                                {errorMessage}
+                            </div>
+                        )}
 
                         <div className="row">
                             <div className="col-md-6 mb-3">
@@ -173,26 +218,43 @@ export default function RoleBaseRegister() {
 
                             <div className="col-md-6 mb-3">
                                 <label htmlFor="password" className="form-label">Password</label>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    value={password}
-                                    id="password"
-                                    placeholder="Enter password"
-                                    required
-                                />
+                                <div className="password-input-container">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        className="form-control"
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        value={password}
+                                        id="password"
+                                        placeholder="Enter password"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="password-toggle"
+                                        onClick={togglePasswordVisibility}
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
+                                    >
+                                        {showPassword ? (
+                                            <FaEyeSlash className="eye-icon" />
+                                        ) : (
+                                            <FaEye className="eye-icon" />
+                                        )}
+                                    </button>
+                                </div>
                                 {password && (
                                     <div className="password-strength-container mt-2">
-                                        <div
-                                            className={`password-strength-bar bg-${passwordStrength.color}`}
-                                            style={{
-                                                width: `${passwordStrength.score * 17}%`,
-                                                height: '5px',
-                                                transition: 'width 0.5s ease-in-out'
-                                            }}
-                                        ></div>
-                                        <small className={`text-${passwordStrength.color}`}>
+                                        <div className="progress" style={{ height: '5px' }}>
+                                            <div 
+                                                className="progress-bar" 
+                                                role="progressbar" 
+                                                style={{ 
+                                                    width: `${passwordStrength.score * 25}%`,
+                                                    backgroundColor: passwordStrength.color,
+                                                    transition: 'width 0.5s ease, background-color 0.5s ease'
+                                                }}
+                                            ></div>
+                                        </div>
+                                        <small style={{ color: passwordStrength.color }}>
                                             {passwordStrength.label} Password
                                         </small>
                                     </div>
@@ -203,22 +265,36 @@ export default function RoleBaseRegister() {
                         <div className="row">
                             <div className="col-md-6 mb-3">
                                 <label htmlFor="confirmpassword" className="form-label">Confirm Password</label>
-                                <input
-                                    type="password"
-                                    className={`form-control ${confirmPassword && password !== confirmPassword
-                                        ? 'is-invalid'
-                                        : confirmPassword
-                                            ? 'is-valid'
-                                            : ''
-                                        }`}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    value={confirmPassword}
-                                    id="confirmpassword"
-                                    placeholder="Confirm password"
-                                    required
-                                />
+                                <div className="password-input-container">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        className={`form-control ${confirmPassword && password !== confirmPassword
+                                            ? 'is-invalid'
+                                            : confirmPassword && password === confirmPassword
+                                                ? 'is-valid'
+                                                : ''
+                                            }`}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        value={confirmPassword}
+                                        id="confirmpassword"
+                                        placeholder="Confirm password"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="password-toggle"
+                                        onClick={toggleConfirmPasswordVisibility}
+                                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                                    >
+                                        {showConfirmPassword ? (
+                                            <FaEyeSlash className="eye-icon" />
+                                        ) : (
+                                            <FaEye className="eye-icon" />
+                                        )}
+                                    </button>
+                                </div>
                                 {confirmPassword && password !== confirmPassword && (
-                                    <div className="invalid-feedback">
+                                    <div className="invalid-feedback d-block">
                                         Passwords do not match
                                     </div>
                                 )}
@@ -255,11 +331,39 @@ export default function RoleBaseRegister() {
                             </div>
                         </div>
 
-                        <button type="submit" className="btn btn-primary w-100 mt-3">Register</button>
+                        <button 
+                            type="submit" 
+                            className="btn btn-primary w-100 mt-3 register-button"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Registering...
+                                </>
+                            ) : (
+                                'Register'
+                            )}
+                        </button>
+
+                        <div className="text-center mt-3 login-link-container">
+                            <p className="mb-0">
+                                Already have an account?{' '}
+                                <a 
+                                    href="/login" 
+                                    className="login-link"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        navigate('/login');
+                                    }}
+                                >
+                                    Login here
+                                </a>
+                            </p>
+                        </div>
                     </form>
                 </div>
             </div>
-        </div>
         </div>
     );
 }

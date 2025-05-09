@@ -363,7 +363,7 @@ const BookingForm = () => {
         <h4 className="alert-heading">Error</h4>
         <p>{error}</p>
         <div className="d-flex justify-content-between mt-3">
-          <button className="btn btn-secondary" onClick={() => navigate(-1)}>
+          <button className="btn btn-secondary" onClick={() => navigate(-2)}>
             Go Back
           </button>
           <button className="btn btn-primary" onClick={() => {

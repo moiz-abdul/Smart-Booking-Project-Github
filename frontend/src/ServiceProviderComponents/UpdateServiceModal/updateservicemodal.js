@@ -41,12 +41,6 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
     fetchCategories();
   }, []);
 
-  const logServiceObject = (serviceObj) => {
-    console.log('Full Service Object:', serviceObj);
-    Object.keys(serviceObj).forEach(key => {
-      console.log(`${key}: ${serviceObj[key]}`);
-    });
-  };
   const checkReservedPeriods = async () => {
     const warnings = [];
   
@@ -111,29 +105,27 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
 
   useEffect(() => {
     if (service) {
-      logServiceObject(service);
-
+      console.log('Service prop received:', service);
+      
       const updatedServiceData = {
-        serviceTitle: service.serviceTitle || service.service_title || service.title || '',
-        categoryId: service.categoryId || service.category_id || service.category || '',
-        description: service.serviceDescription || service.description || service.desc || '',
-        duration: service.serviceDuration || service.duration_minutes || service.duration || '',
-        regularPrice: service.serviceFee || service.regular_price || service.price || '',
-        memberPrice: service.discountedFee || service.member_price || service.memberPrice || '',
-        availableDays: Array.isArray(service.availableDays)
-          ? service.availableDays
-          : (typeof service.available_days === 'string'
-              ? service.available_days.split(',').map(day => day.trim())
-              : []),
+        serviceTitle: service.serviceTitle || '',
+        categoryId: service.categoryId || '',
+        description: service.description || '',
+        duration: service.duration || '',
+        regularPrice: service.regularPrice || '',
+        memberPrice: service.memberPrice || '',
+        availableDays: Array.isArray(service.availableDays) 
+          ? service.availableDays 
+          : [],
         timeSlots: [
-          service.slot_1_time || service.timeSlots?.[0] || service.firstTimeSlot || '',
-          service.slot_2_time || service.timeSlots?.[1] || service.secondTimeSlot || '',
-          service.slot_3_time || service.timeSlots?.[2] || service.thirdTimeSlot || ''
+          service.timeSlots?.[0] || '',
+          service.timeSlots?.[1] || '',
+          service.timeSlots?.[2] || ''
         ],
-        location: service.location || service.serviceLocation || ''
+        location: service.location || ''
       };
 
-      console.log('Mapped Service Data:', updatedServiceData);
+      console.log('Initialized serviceData:', updatedServiceData);
       setServiceData(updatedServiceData);
     }
   }, [service]);
@@ -172,6 +164,7 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
 
     try {
       const userData = JSON.parse(localStorage.getItem('userData'));
+      
       const payload = {
         service_title: serviceData.serviceTitle,
         category_id: serviceData.categoryId,
@@ -186,12 +179,15 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
         location: serviceData.location || null,
         user_id: userData.id
       };
-      console.log('Payload being sent to API:', payload);
+
+      console.log('Update payload:', payload);
+      
       const response = await axios.put(
         `http://localhost:5000/api/services/${service.id}`, 
         payload
       );
-      console.log('API Response:', response);
+      
+      console.log('Update response:', response.data);
       onUpdateSuccess();
       onClose();
     } catch (err) {
@@ -215,16 +211,16 @@ const UpdateServiceModal = ({ show, onClose, service, onUpdateSuccess }) => {
       </Modal.Header>
       <Modal.Body className="update-modal-body">
         {error && <Alert variant="danger" className="update-alert">{error}</Alert>}
-              {reservedWarnings.length > 0 && (
-        <Alert variant="warning" className="update-alert">
-          <strong>Admin Reserved Time Warnings:</strong>
-          <ul className="mb-0 mt-1">
-            {reservedWarnings.map((msg, idx) => (
-              <li key={idx}>{msg}</li>
-            ))}
-          </ul>
-        </Alert>
-      )}
+        {reservedWarnings.length > 0 && (
+          <Alert variant="warning" className="update-alert">
+            <strong>Admin Reserved Time Warnings:</strong>
+            <ul className="mb-0 mt-1">
+              {reservedWarnings.map((msg, idx) => (
+                <li key={idx}>{msg}</li>
+              ))}
+            </ul>
+          </Alert>
+        )}
         <Form onSubmit={handleSubmit}>
           <div className="update-row">
             <div className="update-col">
