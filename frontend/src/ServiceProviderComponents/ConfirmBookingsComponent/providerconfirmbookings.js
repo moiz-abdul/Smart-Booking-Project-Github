@@ -132,8 +132,8 @@ const ProviderConfirmedBookings  = () => {
                     <span className="booking-label">Payment:</span>
                     <span className="booking-value">{booking.payment_type}</span>
                   </div>
-                </div>
-
+                </div><br></br>
+                <p>Please click <b>Completed button</b> below after completing service for Customer give Reviews and Ratings</p>
                 <div className="booking-actions">
                   <button 
                     className="complete-btn"

@@ -15,13 +15,7 @@ import RoleBaseRegister from './CommonComponents/RegisterComponent/register';
 import UserLayout from './Layouts/UserLayout/UserLayoutFile';
 import Home from './components/HomeComponent/home';
 import CustomerProtectedRoute from './components/ProtectedRoutes/UserProtectedRoute';
-import ProjectStatusPage from './components/ProjectStatusComponent/projectstatus';
-import AboutUsPage from './components/AboutUsComponent/Aboutus';
-import Complaints from './components/complaints';
 import ProcurementSection from './components/procurement';
-import Public_Documents from './components/public-documents';
-import ProjectMis from './components/projectmis';
-import Careers from './components/careers';
 
 
 //  CUSTOMER SIDE LINKS
@@ -61,13 +55,6 @@ import AdminReservedPeriods from './AdminComponents/AdminReservedPeriodsComponen
 // ADMIN SIDE LINKS END
 
 
-// OTHER LINKS
-
-// import TopRibbon from './components/HomeComponent/topribbon';
-// import BottomRibbon from './components/HomeComponent/BottomRibbon';
-// import Footer from './components/HomeComponent/Footer'; 
-
-
 function App() {
   return (
     <div >
@@ -82,13 +69,7 @@ function App() {
       {/* Main (HOME PAGE) Side Routing Links  */}
       <Routes>
         <Route path='/' element={<UserLayout><Home /></UserLayout>} />
-        <Route path='/projectstatus' element={<UserLayout> <ProjectStatusPage /> </UserLayout>} />
-        <Route path='/aboutus' element={<UserLayout> <AboutUsPage /> </UserLayout>} />
         <Route path='/procurement/:serviceId' element={<UserLayout> <ProcurementSection /> </UserLayout>} />
-        <Route path='/public-documents' element={<UserLayout><Public_Documents /></UserLayout>} />
-        <Route path="/complaints" element={<UserLayout> <Complaints /> </UserLayout>} />
-        <Route path="/projectmis" element={<UserLayout>  <ProjectMis /> </UserLayout>} />
-        <Route path="/careers" element={<UserLayout> <Careers /> </UserLayout>} />
       </Routes>
 
             {/* Customer Side Routing Links  */}
@@ -124,18 +105,6 @@ function App() {
         <Route path='/registeradmin/reservationmanagement' element={<AdminProtectedRoute><AdminLayout> <AdminReservationManagement /> </AdminLayout></AdminProtectedRoute>} />
         <Route path='/registeradmin/reservedperiods' element={<AdminProtectedRoute><AdminLayout> <AdminReservedPeriods /> </AdminLayout></AdminProtectedRoute>} />
       </Routes>
-
-
-                       {/* OTHER ROUTNG LINKS */}
-
-      {/* Customer Side Routing Links  
-      <Routes>
-        {/* <Route path='/customer/dashboard' element={<CustomerProtectedRoute><CustomerLayout><Dashboard /></CustomerLayout></CustomerProtectedRoute>} /> */}   {/* Customer Dashboard Link  */}
-        {/* <Route path='/registerstaff/documentspage' element={<CustomerLayout> <DocumentPage /> </CustomerLayout>} /> */} 
-        {/* <Route path='/registerstaff/careerspage' element={<CustomerLayout> <AdminCareersPage /> </CustomerLayout>} /> 
-      </Routes> */}
-
-
 
     </div>
   );
