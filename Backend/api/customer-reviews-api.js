@@ -56,4 +56,37 @@ CustomerReviewsAPI.post('/', async (req, res) => {
   }
 });
 
+// GET Reviews by Service ID
+CustomerReviewsAPI.get('/:serviceId', async (req, res) => {
+  const { serviceId } = req.params;
+
+  try {
+    const [reviews] = await pool.query(`
+      SELECT 
+        cr.id,
+        cr.review_text,
+        cr.rating,
+        cr.created_at,
+        u.username
+      FROM customer_reviews cr
+      JOIN users u ON cr.user_id = u.id
+      WHERE cr.service_id = ?
+      ORDER BY cr.created_at DESC
+    `, [serviceId]);
+
+    res.status(200).json({
+      success: true,
+      reviews
+    });
+
+  } catch (error) {
+    console.error('Error fetching customer reviews:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch reviews'
+    });
+  }
+});
+
+
 module.exports = CustomerReviewsAPI;

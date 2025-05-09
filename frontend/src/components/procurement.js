@@ -7,6 +7,7 @@ const ProcurementSection = () => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
   const [serviceDetails, setServiceDetails] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,6 +29,21 @@ const ProcurementSection = () => {
 
     fetchBookingDetails();
   }, [serviceId]);
+
+    // Fetch customer reviews for this service
+  const fetchReviews = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/customerreviews/${serviceId}`);
+      const data = await response.json();
+      if (data.success) {
+        setReviews(data.reviews || []);
+      }
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+    }
+  };
+
+fetchReviews();
 
   const handleBookNow = () => {
     localStorage.setItem('booking_service_id', serviceId);
@@ -155,7 +171,7 @@ const ProcurementSection = () => {
             </div>
           </div>
         </div>
-
+        
         {/* Provider Info Card */}
         <div className="col-lg-4">
           <div className="card shadow-sm h-100">
@@ -185,6 +201,37 @@ const ProcurementSection = () => {
             </div>
           </div>
         </div>
+
+                    {/* CUSTOMER REVIEWS SECTION */}
+    <div className="card shadow-sm mt-5">
+      <div className="card-body">
+        <h4 className="card-title fw-bold mb-4">Customer Reviews</h4>
+
+        {reviews.length === 0 && (
+          <p className="text-muted">No customer reviews available for this service yet.</p>
+        )}
+
+        {reviews.map((review, index) => (
+          <div key={index} className="border rounded-2 p-3 mb-3 bg-light">
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <strong>{review.username}</strong>
+              <span className="text-muted small">
+                {new Date(review.created_at).toLocaleDateString()}
+              </span>
+            </div>
+            <div className="mb-2">
+              {Array.from({ length: review.rating }).map((_, i) => (
+                <span key={i} style={{ color: '#ffc107', fontSize: '16px' }}>★</span>
+              ))}
+              {Array.from({ length: 5 - review.rating }).map((_, i) => (
+                <span key={`empty-${i}`} style={{ color: '#e4e5e9', fontSize: '16px' }}>★</span>
+              ))}
+            </div>
+            <p className="mb-0">{review.review_text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
       </div>
     </div>
   );

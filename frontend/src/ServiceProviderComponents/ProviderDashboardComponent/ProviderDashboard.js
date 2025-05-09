@@ -82,10 +82,10 @@ const ServiceDashboard = () => {
         setCurrentService({
           id: service.id,
           serviceTitle: service.serviceTitle || service.service_title,
-          categoryId: service.categoryId || service.category_id,
+          categoryId: String(service.categoryId || service.category_id),
           description: service.serviceDescription || service.description,
           duration: service.serviceDuration || service.duration_minutes,
-          regular_price: service.regular_price,
+          regularPrice: service.regularPrice || '',
           memberPrice: service.discountedFee || service.member_price,
           availableDays: Array.isArray(service.availableDays) 
             ? service.availableDays 

@@ -112,22 +112,28 @@ ServicesApi.get('/', async (req, res) => {
             });
         }
 
-        const formattedServices = services.map(service => ({
-            id: service.id,
-            serviceTitle: service.service_title,
-            serviceCategory: service.categoryname,
-            serviceDescription: service.description,
-            serviceDuration: service.duration_minutes,
-            serviceFee: service.regular_price,
-            discountedFee: service.member_price,
-            availableDays: service.available_days ? service.available_days.split(',') : [],
-            timeSlots: [
-                service.slot_1_time,
-                service.slot_2_time,
-                service.slot_3_time
-            ].filter(slot => slot),
-            location: service.location || 'Not specified'
-        }));
+const formattedServices = services.map(service => ({
+    id: service.id,
+    serviceTitle: service.service_title,
+    serviceCategory: service.categoryname,
+    categoryId: service.category_id,         
+    regularPrice: service.regular_price,   
+    member_price: service.member_price,      
+
+    serviceDescription: service.description,
+    serviceDuration: service.duration_minutes,
+    
+    serviceFee: service.regular_price,   
+    discountedFee: service.member_price, 
+
+    availableDays: service.available_days ? service.available_days.split(',') : [],
+    timeSlots: [
+        service.slot_1_time,
+        service.slot_2_time,
+        service.slot_3_time
+    ].filter(slot => slot),
+    location: service.location || 'Not specified'
+}));
 
         res.status(200).json({ 
             success: true, 
