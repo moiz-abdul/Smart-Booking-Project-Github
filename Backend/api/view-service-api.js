@@ -12,57 +12,6 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// Get services for specific provider
-ServicesApi.get('/', async (req, res) => {
-    try {
-        const userId = req.query.user_id;
-        
-        if (!userId || isNaN(userId)) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Valid user ID is required' 
-            });
-        }
-
-        const [services] = await pool.execute(`
-            SELECT s.*, c.categoryname 
-            FROM add_services s
-            JOIN category c ON s.category_id = c.id
-            WHERE s.user_id = ?
-            ORDER BY s.id DESC
-        `, [userId]);
-
-        const formattedServices = services.map(service => ({
-            id: service.id,
-            serviceTitle: service.service_title,
-            categoryId: service.category_id,
-            description: service.description,
-            duration: service.duration_minutes,
-            regularPrice: service.regular_price,
-            memberPrice: service.member_price,
-            availableDays: service.available_days ? service.available_days.split(',') : [],
-            timeSlots: [
-                service.slot_1_time,
-                service.slot_2_time,
-                service.slot_3_time
-            ].filter(slot => slot),
-            location: service.location || 'Not specified'
-        }));
-
-        res.status(200).json({ 
-            success: true, 
-            data: formattedServices 
-        });
-
-    } catch (err) {
-        console.error('Database Error:', err);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to fetch services',
-            error: err.message 
-        });
-    }
-});
 
 // Update Service Record API 
 ServicesApi.put('/:id', async (req, res) => {
@@ -79,30 +28,14 @@ ServicesApi.put('/:id', async (req, res) => {
             slot_1_time, 
             slot_2_time, 
             slot_3_time, 
-            location,
-            user_id
+            location 
         } = req.body;
-
-        console.log('Update request received:', req.body);
 
         // Validate required fields
         if (!service_title || !category_id || !description || !duration_minutes || !regular_price) {
             return res.status(400).json({ 
                 success: false, 
                 message: 'Missing required fields' 
-            });
-        }
-
-        // Verify service belongs to user
-        const [service] = await pool.execute(
-            `SELECT id FROM add_services WHERE id = ? AND user_id = ?`,
-            [serviceId, user_id]
-        );
-
-        if (service.length === 0) {
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Service not found or access denied' 
             });
         }
 
@@ -118,8 +51,7 @@ ServicesApi.put('/:id', async (req, res) => {
                  slot_1_time = ?, 
                  slot_2_time = ?, 
                  slot_3_time = ?, 
-                 location = ?,
-                 updated_at = CURRENT_TIMESTAMP
+                 location = ?
              WHERE id = ?`,
             [
                 service_title,
@@ -147,6 +79,72 @@ ServicesApi.put('/:id', async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: 'Failed to update service',
+            error: err.message 
+        });
+    }
+});
+
+// Get services for specific provider
+ServicesApi.get('/', async (req, res) => {
+    try {
+        const userId = req.query.user_id;
+        
+        if (!userId || isNaN(userId)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Valid user ID is required' 
+            });
+        }
+
+        const [services] = await pool.execute(`
+            SELECT s.*, c.categoryname 
+            FROM add_services s
+            JOIN category c ON s.category_id = c.id
+            WHERE s.user_id = ?
+            ORDER BY s.id DESC
+        `, [userId]);
+
+        if (services.length === 0) {
+            return res.status(200).json({ 
+                success: true, 
+                data: [],
+                message: 'No services found for this user' 
+            });
+        }
+
+const formattedServices = services.map(service => ({
+    id: service.id,
+    serviceTitle: service.service_title,
+    serviceCategory: service.categoryname,
+    categoryId: service.category_id,         
+    regularPrice: service.regular_price,   
+    member_price: service.member_price,      
+
+    serviceDescription: service.description,
+    serviceDuration: service.duration_minutes,
+    
+    serviceFee: service.regular_price,   
+    discountedFee: service.member_price, 
+
+    availableDays: service.available_days ? service.available_days.split(',') : [],
+    timeSlots: [
+        service.slot_1_time,
+        service.slot_2_time,
+        service.slot_3_time
+    ].filter(slot => slot),
+    location: service.location || 'Not specified'
+}));
+
+        res.status(200).json({ 
+            success: true, 
+            data: formattedServices 
+        });
+
+    } catch (err) {
+        console.error('Database Error:', err);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch services',
             error: err.message 
         });
     }

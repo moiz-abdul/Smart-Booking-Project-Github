@@ -19,10 +19,19 @@ const CustomerDashboard = () => {
                         <button className="nav-item" onClick={() => navigate('/CustomerDashboard/CancelBookings')}>Cancel Bookings</button>
                         <button className="nav-item" onClick={() => navigate('/CustomerDashboard/CompletedBookings')}>Completed Bookings</button>
                         <button className="nav-item" onClick={() => navigate('/CustomerDashboard/Subscriptions')}>Subscriptions</button>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <button className="nav-item" onClick={() => navigate('/')}>Browse Categories</button>
                     </nav>
                 </div>
                 <div className="content-area">
-                    {/* Outlet shows the active nested page here */}
+                  
                     <Outlet />
                 </div>
             </div>

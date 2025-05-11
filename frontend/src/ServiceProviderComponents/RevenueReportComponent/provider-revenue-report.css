@@ -1,38 +1,224 @@
-.revenue-report {
-    padding: 20px;
-    background: #fff;
+/* Modern variables for consistent styling */
+:root {
+  --primary-color: #ff9900;
+  --primary-hover: #3a5cd8;
+  --text-color: #333;
+  --text-light: #6b7280;
+  --light-gray: #f3f4f6;
+  --border-color: #e5e7eb;
+  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --success-color: #10b981;
+  --error-color: #ef4444;
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+}
+
+/* Container for the entire component */
+.revenue-report-container {
+  width: 160%;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Main card styling */
+.revenue-card {
+  width: 90%;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+/* Card header with title and total */
+.card-header {
+  padding: 24px 30px;
+  background: linear-gradient(135deg, var(--primary-color), #6d8dff);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.total-revenue {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 10px 16px;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.total-revenue span {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.total-revenue h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Filters section styling */
+.filters-section {
+  padding: 20px 30px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 20px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: #f9fafb;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  flex: 1;
+}
+
+.filter-group label {
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.filter-group input {
+  padding: 10px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.filter-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
+}
+
+.search-button {
+  padding: 10px 18px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  min-width: 140px;
+  height: 42px;
+}
+
+.search-button:hover {
+  background-color: var(--primary-hover);
+}
+
+.search-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Error message styling */
+.error-message {
+  margin: 15px 30px;
+  padding: 10px 15px;
+  background-color: #fef2f2;
+  color: var(--error-color);
+  border-left: 4px solid var(--error-color);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Table container with responsive scroll */
+.table-container {
+  padding: 20px 30px;
+  overflow-x: auto;
+}
+
+/* Table styling */
+.revenue-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.revenue-table th {
+  padding: 12px 16px;
+  background-color: var(--light-gray);
+  font-weight: 600;
+  color: var(--text-color);
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.revenue-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-light);
+}
+
+.revenue-table tr:last-child td {
+  border-bottom: none;
+}
+
+.revenue-table tr:hover td {
+  background-color: #f9fafb;
+}
+
+.amount {
+  font-weight: 600;
+  color: var(--success-color) !important;
+}
+
+.no-records {
+  text-align: center;
+  padding: 30px !important;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
-  .filters {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+  .total-revenue {
+    align-self: flex-start;
   }
   
-  .filters input {
-    padding: 5px;
-  }
-  
-  .filters button {
-    padding: 6px 12px;
-    background-color: #141fd7;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .revenue-table {
+  .filter-group {
     width: 100%;
-    border-collapse: collapse;
   }
   
-  .revenue-table th, .revenue-table td {
-    border: 1px solid #eee;
-    padding: 8px 10px;
-    text-align: left;
+  .search-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .revenue-card {
+    width: 100%;
   }
   
-  .error-message {
-    color: red;
-    margin-bottom: 10px;
+  .card-header, .filters-section, .table-container {
+    padding: 15px;
   }
+}
