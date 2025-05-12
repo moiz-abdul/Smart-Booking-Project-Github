@@ -260,10 +260,15 @@ ProviderDashboardBookingsDetailsApi.put('/:id/status', async (req, res) => {
       });
     }
 
-    const [result] = await pool.query(
-      'UPDATE bookingform SET is_status = ? WHERE id = ?',
-      [status, id]
-    );
+    let query = 'UPDATE bookingform SET is_status = ? WHERE id = ?';
+    let params = [status, id];
+
+    // If status is cancel, also set cancelled_by = 'provider'
+    if (status === 'cancel') {
+      query = 'UPDATE bookingform SET is_status = ?, cancelled_by = "provider" WHERE id = ?';
+    }
+
+    const [result] = await pool.query(query, params);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
@@ -276,6 +281,7 @@ ProviderDashboardBookingsDetailsApi.put('/:id/status', async (req, res) => {
       success: true,
       message: `Booking ${status}ed successfully`
     });
+
   } catch (error) {
     console.error('Error updating booking status:', error);
     res.status(500).json({

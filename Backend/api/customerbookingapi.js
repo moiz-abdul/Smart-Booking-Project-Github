@@ -227,7 +227,12 @@ CustomerBookingsApi.get('/notifications', async (req, res) => {
       SELECT b.is_status, b.service_id, b.created_at, s.provider_name, s.service_title
       FROM bookingform b
       JOIN add_services s ON s.id = b.service_id
-      WHERE b.user_id = ? AND b.is_status IN ('confirm', 'cancel', 'completed')
+        WHERE 
+      b.user_id = ?
+      AND b.is_status IN ('confirm', 'cancel', 'completed')
+      AND (
+        b.is_status != 'cancel' OR (b.is_status = 'cancel' AND b.cancelled_by = 'provider')
+      )
       ORDER BY b.created_at DESC
       LIMIT 3
     `, [user_id]);
@@ -292,9 +297,9 @@ CustomerBookingsApi.put('/:bookingId/cancel', async (req, res) => {
     }
 
     const [result] = await pool.execute(
-      'UPDATE bookingform SET is_status = "cancel" WHERE id = ? AND user_id = ?',
-      [req.params.bookingId, user_id]
-    );
+  'UPDATE bookingform SET is_status = "cancel", cancelled_by = "customer" WHERE id = ? AND user_id = ?',
+  [req.params.bookingId, user_id]
+);
     
     if (result.affectedRows === 0) {
       return res.status(404).json({ 

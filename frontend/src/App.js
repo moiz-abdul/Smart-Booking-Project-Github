@@ -89,12 +89,12 @@ function App() {
 
       {/* Service Provider Side Routing Links  */}
       <Routes>
-        <Route path='/provider/dashboard' element={<ServiceProviderLayout> <ServiceDashboard/> </ServiceProviderLayout>} />
-        <Route path='/provider/receivedbookings' element={<ServiceProviderLayout> <ProviderReceivedBookings/> </ServiceProviderLayout>} />
-        <Route path='/provider/cancelbookings' element={<ServiceProviderLayout> <ProviderCancelBookings/> </ServiceProviderLayout>} />
-        <Route path='/provider/confirmedbookings' element={<ServiceProviderLayout> <ProviderConfirmedBookings/> </ServiceProviderLayout>} />
-        <Route path='/provider/completedbookings' element={<ServiceProviderLayout> <ProviderCompletedBookings/> </ServiceProviderLayout>} />
-        <Route path='/provider/revenuereport' element={<ServiceProviderLayout> <ProviderRevenueReport/> </ServiceProviderLayout>} />
+        <Route path='/provider/dashboard' element={<CustomerProtectedRoute><ServiceProviderLayout> <ServiceDashboard/> </ServiceProviderLayout> </CustomerProtectedRoute>} />
+        <Route path='/provider/receivedbookings' element={<CustomerProtectedRoute><ServiceProviderLayout> <ProviderReceivedBookings/> </ServiceProviderLayout></CustomerProtectedRoute>} />
+        <Route path='/provider/cancelbookings' element={<CustomerProtectedRoute><ServiceProviderLayout> <ProviderCancelBookings/> </ServiceProviderLayout></CustomerProtectedRoute>} />
+        <Route path='/provider/confirmedbookings' element={<CustomerProtectedRoute><ServiceProviderLayout> <ProviderConfirmedBookings/> </ServiceProviderLayout></CustomerProtectedRoute>} />
+        <Route path='/provider/completedbookings' element={<CustomerProtectedRoute><ServiceProviderLayout> <ProviderCompletedBookings/> </ServiceProviderLayout></CustomerProtectedRoute>} />
+        <Route path='/provider/revenuereport' element={<CustomerProtectedRoute><ServiceProviderLayout> <ProviderRevenueReport/> </ServiceProviderLayout></CustomerProtectedRoute>} />
       </Routes>
 
       {/* Admin Side Routing Links */}

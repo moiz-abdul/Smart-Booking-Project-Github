@@ -94,7 +94,7 @@ const ProviderNavbar = () => {
   const onLogout = () => {
     localStorage.removeItem("userToken");
     localStorage.removeItem("userData");
-    navigate("/login");
+    navigate("/");
   };
 
   const toggleDropdown = (e) => {
