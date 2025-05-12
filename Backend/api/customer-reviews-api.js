@@ -56,31 +56,59 @@ CustomerReviewsAPI.post('/', async (req, res) => {
   }
 });
 
-// GET Reviews by Service ID
+// GET reviews by service ID with provider replies
 CustomerReviewsAPI.get('/:serviceId', async (req, res) => {
   const { serviceId } = req.params;
 
   try {
-    const [reviews] = await pool.query(`
+    // Get all customer reviews for the service
+    const [customerReviews] = await pool.query(`
       SELECT 
-        cr.id,
-        cr.review_text,
+        cr.id AS customer_review_id,
+        cr.booking_id,
+        cr.review_text AS customer_review_text,
         cr.rating,
-        cr.created_at,
-        u.username
+        cr.created_at AS customer_created_at,
+        u.username AS customer_name
       FROM customer_reviews cr
       JOIN users u ON cr.user_id = u.id
       WHERE cr.service_id = ?
       ORDER BY cr.created_at DESC
     `, [serviceId]);
 
+    // Get all provider replies tied to those booking IDs
+    const bookingIds = customerReviews.map(r => r.booking_id);
+    let providerReplies = [];
+
+    if (bookingIds.length > 0) {
+      const [providerData] = await pool.query(`
+        SELECT 
+          booking_id,
+          review_text AS provider_review_text,
+          created_at AS provider_created_at
+        FROM provider_reviews
+        WHERE booking_id IN (${bookingIds.map(() => '?').join(',')})
+      `, bookingIds);
+
+      providerReplies = providerData;
+    }
+
+    // Combine reviews into a single object with optional provider_reply
+    const reviewsWithReplies = customerReviews.map(cr => {
+      const providerReply = providerReplies.find(pr => pr.booking_id === cr.booking_id);
+      return {
+        ...cr,
+        provider_reply: providerReply || null
+      };
+    });
+
     res.status(200).json({
       success: true,
-      reviews
+      reviews: reviewsWithReplies
     });
 
   } catch (error) {
-    console.error('Error fetching customer reviews:', error);
+    console.error('Error fetching reviews:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch reviews'

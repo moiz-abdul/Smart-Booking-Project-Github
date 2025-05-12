@@ -1,8 +1,39 @@
 const express = require("express");
 const UpdateUserApi = express.Router();
-const RegisterUserModel = require("../models/userModel"); // Import MySQL model
+const mysql = require('mysql2/promise');
+
+const pool = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'smart_booking_system',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
+
+UpdateUserApi.put('/update-role', async (req, res) => {
+  const { user_id, role } = req.body;
+
+  if (!user_id || !role || !["customer", "provider"].includes(role)) {
+    return res.status(400).json({ success: false, message: 'Invalid role or user ID' });
+  }
+
+  try {
+    await pool.query(`UPDATE users SET role = ? WHERE id = ?`, [role, user_id]);
+    res.json({ success: true, message: 'User role updated successfully' });
+  } catch (error) {
+    console.error("Role update error:", error);
+    res.status(500).json({ success: false, message: 'Failed to update role' });
+  }
+});
+
+
+module.exports = UpdateUserApi;
+
 
 // Update user status
+{/* 
 UpdateUserApi.put('/:userId', async (req, res) => {
     try {
         // Ensure userId is properly received
@@ -41,4 +72,4 @@ UpdateUserApi.put('/:userId', async (req, res) => {
     }
 });
 
-module.exports = UpdateUserApi;
+*/}

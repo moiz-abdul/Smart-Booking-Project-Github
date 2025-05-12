@@ -202,36 +202,49 @@ fetchReviews();
           </div>
         </div>
 
-                    {/* CUSTOMER REVIEWS SECTION */}
-    <div className="card shadow-sm mt-5">
-      <div className="card-body">
-        <h4 className="card-title fw-bold mb-4">Customer Reviews</h4>
+                    
+    {/* REVIEWS SECTION */}
+<div className="card shadow-sm mt-5">
+  <div className="card-body">
+    <h4 className="card-title fw-bold mb-4">Customer Reviews</h4>
 
-        {reviews.length === 0 && (
-          <p className="text-muted">No customer reviews available for this service yet.</p>
-        )}
+    {reviews.length === 0 && (
+      <p className="text-muted">No customer reviews available for this service yet.</p>
+    )}
 
-        {reviews.map((review, index) => (
-          <div key={index} className="border rounded-2 p-3 mb-3 bg-light">
-            <div className="d-flex justify-content-between align-items-center mb-2">
-              <strong>{review.username}</strong>
-              <span className="text-muted small">
-                {new Date(review.created_at).toLocaleDateString()}
-              </span>
+    {reviews.map((review, index) => (
+      <div key={index} className="border rounded p-3 mb-4 bg-light">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <strong>{review.customer_name}</strong>
+          <span className="text-muted small">
+            {new Date(review.customer_created_at).toLocaleDateString()}
+          </span>
+        </div>
+
+        <div className="mb-2">
+          {Array.from({ length: review.rating }).map((_, i) => (
+            <span key={i} style={{ color: '#ffc107', fontSize: '16px' }}>★</span>
+          ))}
+          {Array.from({ length: 5 - review.rating }).map((_, i) => (
+            <span key={`empty-${i}`} style={{ color: '#e4e5e9', fontSize: '16px' }}>★</span>
+          ))}
+        </div>
+
+        <p className="mb-2">{review.customer_review_text}</p>
+
+        {review.provider_reply && (
+          <div className="mt-3 ps-3 border-start border-3 border-primary">
+            <div className="fw-bold text-muted mb-1">Provider's Reply</div>
+            <div className="text-secondary small mb-2">
+              {new Date(review.provider_reply.provider_created_at).toLocaleDateString()}
             </div>
-            <div className="mb-2">
-              {Array.from({ length: review.rating }).map((_, i) => (
-                <span key={i} style={{ color: '#ffc107', fontSize: '16px' }}>★</span>
-              ))}
-              {Array.from({ length: 5 - review.rating }).map((_, i) => (
-                <span key={`empty-${i}`} style={{ color: '#e4e5e9', fontSize: '16px' }}>★</span>
-              ))}
-            </div>
-            <p className="mb-0">{review.review_text}</p>
+            <p className="mb-0">{review.provider_reply.provider_review_text}</p>
           </div>
-        ))}
+        )}
       </div>
-    </div>
+    ))}
+  </div>
+</div>
       </div>
     </div>
   );
