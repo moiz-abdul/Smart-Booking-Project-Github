@@ -128,8 +128,8 @@
 
 .search-icon {
   color: #777;
-  margin-right: 0.5rem;
-  margin-top: 1.6rem;
+  margin-left: 0.5rem;
+  margin-top: 1.2rem;
   animation: spin 10s linear infinite; /* Subtle spin animation */
 }
 

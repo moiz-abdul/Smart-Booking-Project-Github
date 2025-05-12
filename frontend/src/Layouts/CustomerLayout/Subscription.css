@@ -1,51 +1,142 @@
 .subscriptions-page {
-    padding: 30px;
-  }
-  
-  .subscription-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  
-  .subscription-card {
-    background: #f5f5f5;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-  }
-  
-  .btn-group button {
-    margin-right: 10px;
-    padding: 6px 12px;
-  }
-  
-  .modal-overlay {
-    background-color: rgba(0, 0, 0, 0.6);
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    position: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .modal-card {
-    background: white;
-    padding: 20px;
-    border-radius: 6px;
-    width: 400px;
-  }
-  
-  .option {
-    margin-top: 10px;
-  }
-  
-  .note {
-    margin-top: 15px;
-    font-style: italic;
-    font-size: 0.9em;
-    color: #555;
-  }
+  min-height: 100vh;
+  padding: 40px 5%;
+  background: #f8f9fa;
+}
+
+.subscriptions-page h2 {
+  font-size: 2.5rem;
+  color: #ff9900;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.subscription-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.subscription-card {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.subscription-card:hover {
+  transform: translateY(-5px);
+}
+
+.subscription-card h3 {
+  color: #2d3436;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.subscription-card p {
+  margin: 12px 0;
+  color: #636e72;
+}
+
+.subscription-card strong {
+  color: #2d3436;
+}
+
+.btn-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.btn-group button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-group button:first-child {
+  background: #0984e3;
+  color: white;
+}
+
+.btn-group button:last-child {
+  background: #ff7675;
+  color: white;
+}
+
+.btn-group button:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.btn-group button:disabled {
+  background: #b2bec3;
+  cursor: not-allowed;
+}
+
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-card h3 {
+  color: #2d3436;
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+}
+
+.option {
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  cursor: pointer;
+}
+
+.option label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.option input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.note {
+  margin-top: 20px;
+  padding: 15px;
+  background: #ffeaa7;
+  border-radius: 8px;
+  font-style: italic;
+  color: #2d3436;
+}
