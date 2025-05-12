@@ -2,8 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+
+
+  
+
+  const renderTooltip = (props) => (
+    <Tooltip id="cvv-tooltip" {...props}>
+      Enter a 3-digit code found on the back of your card.
+    </Tooltip>
+  );
 
 const PaymentForm = () => {
+  const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     booking_id: '',
@@ -269,18 +280,33 @@ const PaymentForm = () => {
 
         <div className="row mb-4">
           <div className="col-md-4">
-            <div className="mb-3">
-              <label className="form-label">CVV Code*</label>
-              <input
-                type="text"
-                className="form-control"
-                name="cvv_code"
-                value={formData.cvv_code}
-                onChange={handleChange}
-                placeholder="123"
-                required
-              />
-            </div>
+          <div className="mb-3">
+      <label className="form-label">CVV Code*</label>
+      <OverlayTrigger
+        placement="right"
+        show={showTooltip}
+        overlay={renderTooltip}
+      >
+        <input
+          type="text"
+          className="form-control"
+          name="cvv_code"
+          value={formData.cvv_code}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (/^\d{0,3}$/.test(value)) {
+              handleChange(e);
+            }
+            setShowTooltip(true);
+          }}
+          placeholder="123"
+          maxLength="3"
+          onFocus={() => setShowTooltip(true)}
+          onBlur={() => setShowTooltip(false)}
+          required
+        />
+      </OverlayTrigger>
+    </div>
           </div>
         </div>
 
