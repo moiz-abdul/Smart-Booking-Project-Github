@@ -89,60 +89,63 @@ const CompletedBookings = () => {
     }
   };
 
-  if (loading) return <div className="dashboard-loading">Loading confirmed bookings...</div>;
+  if (loading) return (
+    <div className="loading-container">
+      <div className="loading-spinner"></div>
+      <p>Loading completed bookings...</p>
+    </div>
+  );
+
   if (error) return (
-    <div className="dashboard-error">
+    <div className="error-container">
       <p>{error}</p>
-      <button onClick={() => window.location.reload()}>Try Again</button>
+      <button className="retry-btn" onClick={() => window.location.reload()}>Try Again</button>
     </div>
   );
 
   return (
-    <div className="customer-dashboard">
-      <h2>Your Completed Bookings</h2>
-      <div className="bookings-container">
+    <div className="completed-bookings-container">
+      <h1 className="page-title">Your Completed Bookings</h1>
+      <div className="bookings-grid">
         {bookings.length > 0 ? (
-          <ul className="booking-list">
-            {bookings.map(booking => (
-              <li key={booking.id} className="booking-item">
-                <div className="booking-header">
-                  <span className="booking-service">
-                    <strong>{booking.service_name}</strong> ({booking.service_category})
-                  </span>
-                </div>
+          bookings.map(booking => (
+            <div key={booking.id} className="booking-card">
+              <div className="booking-header">
+                <h2 className="service-name">{booking.service_name}</h2>
+                <span className="service-category">{booking.service_category}</span>
+              </div>
 
-                <div className="booking-details">
-                  <div className="booking-row">
-                    <span className="booking-label">Day:</span>
-                    <span className="booking-value">{booking.selected_available_day}</span>
-                  </div>
-                  <div className="booking-row">
-                    <span className="booking-label">Time:</span>
-                    <span className="booking-value">{booking.selected_available_time_slot}</span>
-                  </div>
-                  <div className="booking-row">
-                    <span className="booking-label">Duration:</span>
-                    <span className="booking-value">{booking.duration_minutes} minutes</span>
-                  </div>
-                  <div className="booking-row">
-                    <span className="booking-label">Provider:</span>
-                    <span className="booking-value">{booking.provider_name}</span>
-                  </div>
+              <div className="booking-details-grid">
+                <div className="detail-item">
+                  <span className="label">Day:</span>
+                  <span className="value">{booking.selected_available_day}</span>
                 </div>
+                <div className="detail-item">
+                  <span className="label">Time:</span>
+                  <span className="value">{booking.selected_available_time_slot}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="label">Duration:</span>
+                  <span className="value">{booking.duration_minutes} minutes</span>
+                </div>
+                <div className="detail-item">
+                  <span className="label">Provider:</span>
+                  <span className="value">{booking.provider_name}</span>
+                </div>
+              </div>
 
-                <div className="booking-actions">
-                  <button 
-                    className="add-review-btn"
-                    onClick={() => handleAddReview(booking)}
-                  >
-                    Add Review
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+              <div className="booking-actions">
+                <button 
+                  className="add-review-btn"
+                  onClick={() => handleAddReview(booking)}
+                >
+                  Add Review
+                </button>
+              </div>
+            </div>
+          ))
         ) : (
-          <p className="no-bookings">No Completed bookings found</p>
+          <p className="no-bookings">No completed bookings found</p>
         )}
       </div>
 
