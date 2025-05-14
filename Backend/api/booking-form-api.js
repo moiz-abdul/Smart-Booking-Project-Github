@@ -87,11 +87,16 @@ BookingFormApi.post('/check-reserved-period', async (req, res) => {
   }
 });
 
-// check availability of the timslot already booked or not
 BookingFormApi.post('/check-availability', async (req, res) => {
   try {
     const { service_id, selected_day, selected_time_slot } = req.body;
 
+    console.log('Received availability check:', {
+      service_id,
+      selected_day,
+      selected_time_slot
+    });
+    
     if (!service_id || !selected_day || !selected_time_slot) {
       return res.status(400).json({
         success: false,
@@ -99,14 +104,14 @@ BookingFormApi.post('/check-availability', async (req, res) => {
       });
     }
 
-    // Check if the time slot is already booked
+    // Check if the time slot is already booked (only consider pending and confirmed bookings)
     const [existingBookings] = await pool.query(`
       SELECT COUNT(*) as count 
       FROM bookingform 
       WHERE service_id = ? 
         AND selected_available_day = ? 
         AND selected_available_time_slot = TIME(?)
-        AND is_status != 'cancel'
+        AND is_status IN ('pending', 'confirm')
     `, [service_id, selected_day, selected_time_slot]);
 
     const isAvailable = existingBookings[0].count === 0;
@@ -116,7 +121,7 @@ BookingFormApi.post('/check-availability', async (req, res) => {
       available: isAvailable,
       message: isAvailable 
         ? 'Time slot is available' 
-        : 'Time slot already booked'
+        : 'This time slot has already been booked by someone else.'
     });
 
   } catch (error) {

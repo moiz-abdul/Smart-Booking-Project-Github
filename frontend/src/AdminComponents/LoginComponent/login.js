@@ -1,5 +1,5 @@
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import "./superAdminlogin.css";
@@ -12,6 +12,27 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      response => response,
+      error => {
+        const status = error.response?.status;
+
+        if ((status === 401 || status === 403) && window.location.pathname.startsWith("/admin")) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          window.location.href = "/admin/login";
+        }
+
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor); 
+    };
+  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
