@@ -3,6 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./css/procurement.css";
 import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaMoneyBillWave, FaEnvelope, FaPhone, FaHome, FaInfoCircle } from "react-icons/fa";
 
+// Format time string to 12-hour format (e.g., 19:00 ➝ 7:00 PM)
+const formatTimeToAMPM = (timeString) => {
+  if (!timeString) return '';
+  const [hour, minute] = timeString.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hour);
+  date.setMinutes(minute);
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+};
+
 const ProcurementSection = () => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
@@ -142,15 +152,15 @@ fetchReviews();
 
               <div className="time-slots mb-4">
                 <h5 className="mb-3">Available Time Slots</h5>
-                <div className="d-flex flex-wrap gap-2">
+                    <div className="d-flex flex-wrap gap-2">
                   {slot_1_time && (
-                    <div className="time-slot-pill">{slot_1_time}</div>
+                    <div className="time-slot-pill">{formatTimeToAMPM(slot_1_time)}</div>
                   )}
                   {slot_2_time && (
-                    <div className="time-slot-pill">{slot_2_time}</div>
+                    <div className="time-slot-pill">{formatTimeToAMPM(slot_2_time)}</div>
                   )}
                   {slot_3_time && (
-                    <div className="time-slot-pill">{slot_3_time}</div>
+                    <div className="time-slot-pill">{formatTimeToAMPM(slot_3_time)}</div>
                   )}
                 </div>
               </div>

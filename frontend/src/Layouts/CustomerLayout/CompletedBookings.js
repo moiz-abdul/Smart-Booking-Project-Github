@@ -48,6 +48,15 @@ const CompletedBookings = () => {
     }
   }, [navigate]);
 
+  const formatTimeToAMPM = (timeStr) => {
+  if (!timeStr) return '';
+  const [hour, minute] = timeStr.split(':');
+  const date = new Date();
+  date.setHours(parseInt(hour));
+  date.setMinutes(parseInt(minute));
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+};
+
   const fetchConfirmedBookings = async (userId) => {
     try {
       setLoading(true);
@@ -117,9 +126,9 @@ const CompletedBookings = () => {
                     <span className="booking-value">{booking.selected_available_day}</span>
                   </div>
                   <div className="booking-row">
-                    <span className="booking-label">Time:</span>
-                    <span className="booking-value">{booking.selected_available_time_slot}</span>
-                  </div>
+  <span className="booking-label">Time:</span>
+  <span className="booking-value">{formatTimeToAMPM(booking.selected_available_time_slot)}</span>
+</div>
                   <div className="booking-row">
                     <span className="booking-label">Duration:</span>
                     <span className="booking-value">{booking.duration_minutes} minutes</span>

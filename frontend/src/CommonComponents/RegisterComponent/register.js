@@ -100,11 +100,12 @@ export default function RoleBaseRegister() {
     };
 
     const handleGoBack = () => {
-        if (window.history.length > 2) {
+        localStorage.removeItem('booking_service_id');  // ✅ Clear it
+            if (window.history.length > 2) {
             navigate(-2);
-        } else {
-            navigate('/'); // Fallback to home page
-        }
+            } else {
+            navigate('/');
+            }
     };
 
     const togglePasswordVisibility = () => {
