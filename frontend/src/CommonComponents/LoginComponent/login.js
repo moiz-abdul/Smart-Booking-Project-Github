@@ -71,12 +71,13 @@ export default function RoleBasedLogin() {
     };
 
     const handleGoBack = () => {
-        if (window.history.length > 2) {
-            navigate(-2);
-        } else {
-            navigate('/');
-        }
-    };
+        localStorage.removeItem('booking_service_id');  
+                if (window.history.length > 2) {
+                navigate(-2);
+                } else {
+                navigate('/');
+                }
+            };
 
     return (
         <div className="register-containerlogin">

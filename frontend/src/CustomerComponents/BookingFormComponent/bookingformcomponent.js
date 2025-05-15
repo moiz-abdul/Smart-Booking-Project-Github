@@ -278,6 +278,7 @@ const checkAvailability = async () => {
         );
 
         if (bookingResponse.data.success) {
+          localStorage.removeItem('booking_service_id');
           navigate('/CustomerDashboard/Dashboard');
           return;
         }
@@ -291,6 +292,7 @@ const checkAvailability = async () => {
 
       if (response.data.success) {
         localStorage.setItem('booking_id', response.data.booking_id);
+        localStorage.removeItem('booking_service_id'); 
         navigate('/payment');
       } else {
         throw new Error(response.data.message || 'Booking failed');
@@ -376,7 +378,10 @@ const checkAvailability = async () => {
         <h4 className="alert-heading">Error</h4>
         <p>{error}</p>
         <div className="d-flex justify-content-between mt-3">
-          <button className="btn btn-secondary" onClick={() => navigate(-2)}>
+          <button className="btn btn-secondary" onClick={() => {
+  localStorage.removeItem('booking_service_id');  
+  navigate(-2);
+}}>
             Go Back
           </button>
           <button className="btn btn-primary" onClick={() => {
