@@ -770,7 +770,9 @@
   color: #333;
   animation: buttonAppear 0.8s ease backwards; /* Button appear animation */
 }
-
+.category-btn:hover {
+  background-color: #e67e00; /* Button appear animation */
+}
 @keyframes buttonAppear {
   from {
     transform: scale(0.8);
@@ -780,6 +782,46 @@
     transform: scale(1);
     opacity: 1;
   }
+}
+/* Add this to your existing CSS */
+.category-btn.selected-category {
+  background-color: #FFA500; /* Bright orange/yellow */
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+  transform: translateY(-5px);
+}
+
+.category-btn.selected-category:hover {
+  background-color: #e67e00; /* Slightly darker orange on hover */
+}
+
+.category-btn.selected-category .category-icon {
+  color: white;
+  transform: scale(1.2);
+}
+
+/* Update the existing category-btn styles to ensure proper transitions */
+.category-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+  animation: buttonAppear 0.8s ease backwards;
+  /* Add these for smoother transitions */
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Keep your existing hover state but adjust for selected state */
+.category-btn:hover:not(.selected-category) {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  background-color: #f8f9fa;
 }
 
 .category-btn:nth-child(1) { animation-delay: 0.2s; }

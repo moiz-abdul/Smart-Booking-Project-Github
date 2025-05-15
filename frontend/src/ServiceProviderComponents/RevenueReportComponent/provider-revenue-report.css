@@ -15,7 +15,7 @@
 
 /* Container for the entire component */
 .revenue-report-container {
-  width: 160%;
+  width: 100%;
   padding: 20px;
   display: flex;
   justify-content: center;

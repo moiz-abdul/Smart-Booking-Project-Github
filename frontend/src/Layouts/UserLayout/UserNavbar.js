@@ -18,7 +18,7 @@ const UserNavbar = ({ activeTab, setActiveTab }) =>
       
       <div className="nav-buttons">
       <Link style={{ textDecoration: "none", marginRight: "10px" }} to="/login">
-        <button className="login-btn" onClick={() => navigate('/customerlogin')}>
+        <button className="login-btn" onClick={() => navigate('/login')}>
           <FaSignInAlt /> Login
         </button>
         </Link>

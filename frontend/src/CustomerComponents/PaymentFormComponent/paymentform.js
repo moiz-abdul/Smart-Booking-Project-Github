@@ -17,14 +17,15 @@ const PaymentForm = () => {
     amount_paid: 0
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({}); // Changed from error to errors object
   const [processingPayment, setProcessingPayment] = useState(false);
 
   // Reusable function to get user data
   const getUserData = () => {
     const storedUserData = localStorage.getItem('userData');
     if (!storedUserData) {
-      throw new Error('User not logged in');
+      setErrors({general: 'User not logged in'});
+      return null;
     }
     return JSON.parse(storedUserData);
   };
@@ -35,11 +36,14 @@ const PaymentForm = () => {
         // Get booking_id from localStorage
         const bookingId = localStorage.getItem('booking_id');
         if (!bookingId) {
-          throw new Error('Booking information not found');
+          setErrors({general: 'Booking information not found'});
+          return;
         }
 
         // Get user data
         const userData = getUserData();
+        if (!userData) return;
+        
         const userId = userData.id;
 
         // Fetch booking details to get payment type and service_id
@@ -48,7 +52,8 @@ const PaymentForm = () => {
         );
 
         if (!bookingResponse.data.success) {
-          throw new Error('Failed to load booking details');
+          setErrors({general: 'Failed to load booking details'});
+          return;
         }
 
         const bookingData = bookingResponse.data.data;
@@ -60,7 +65,8 @@ const PaymentForm = () => {
         );
 
         if (!serviceResponse.data.success) {
-          throw new Error('Failed to load service details');
+          setErrors({general: 'Failed to load service details'});
+          return;
         }
 
         const serviceData = serviceResponse.data.data;
@@ -71,7 +77,7 @@ const PaymentForm = () => {
           user_id: userId,
           is_subscribe: isSubscribe,
           service_id: bookingData.service_id,
-          amount_paid: Number(amount), // Ensure this is a number
+          amount_paid: Number(amount),
           cardholder_name: '',
           card_number: '',
           expiry_date: '',
@@ -80,7 +86,7 @@ const PaymentForm = () => {
 
       } catch (err) {
         console.error('Payment Error:', err);
-        setError(err.message);
+        setErrors({general: err.message});
       } finally {
         setLoading(false);
       }
@@ -91,6 +97,15 @@ const PaymentForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setErrors({...errors, [name]: ''}); // Clear error when user types
+   
+  
+    // Cardholder name - alphabets and spaces only
+    if (name === 'cardholder_name') {
+      if (/[^a-zA-Z\s]/.test(value)) return; // Don't update if non-alphabet characters
+      setFormData(prev => ({ ...prev, [name]: value }));
+      return;
+    }
 
     // Format expiry date automatically
     if (name === 'expiry_date') {
@@ -101,6 +116,12 @@ const PaymentForm = () => {
       }
       if (formattedValue.length > 5) return;
       setFormData(prev => ({ ...prev, [name]: formattedValue }));
+      return;
+    }
+    if (name === 'cvv_code') {
+      const digitsOnly = value.replace(/\D/g, '');
+      if (digitsOnly.length > 4) return;
+      setFormData(prev => ({ ...prev, [name]: digitsOnly }));
       return;
     }
 
@@ -121,29 +142,49 @@ const PaymentForm = () => {
   };
 
   const validateForm = () => {
+    const newErrors = {};
     if (!formData.cardholder_name.trim()) {
-      throw new Error('Cardholder name is required');
+      newErrors.cardholder_name = 'Cardholder name is required';
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.cardholder_name)) {
+      newErrors.cardholder_name = 'Only alphabets and spaces allowed';
     }
 
     const cardDigits = formData.card_number.replace(/\s/g, '');
     if (cardDigits.length !== 16 || !/^\d+$/.test(cardDigits)) {
-      throw new Error('Please enter a valid 16-digit card number');
+      newErrors.card_number = 'Please enter a valid 16-digit card number';
     }
 
     if (!formData.expiry_date.match(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/)) {
-      throw new Error('Please enter a valid expiry date (MM/YY)');
+      newErrors.expiry_date = 'Please enter a valid expiry date (MM/YY)';
+    } else {
+      // Additional expiry date validation
+      const [month, year] = formData.expiry_date.split('/');
+      const currentYear = new Date().getFullYear() % 100;
+      const currentMonth = new Date().getMonth() + 1;
+      
+      if (parseInt(year) < currentYear || 
+          (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+        newErrors.expiry_date = 'Card has expired';
+      }
     }
 
     if (!formData.cvv_code.match(/^\d{3,4}$/)) {
-      throw new Error('Please enter a valid CVV (3 or 4 digits)');
+      newErrors.cvv_code = 'Please enter a valid CVV (3 or 4 digits)';
     }
+
+    return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setProcessingPayment(true);
-      validateForm();
+      
+      const formErrors = validateForm();
+      if (Object.keys(formErrors).length > 0) {
+        setErrors(formErrors);
+        return;
+      }
 
       const response = await axios.post(
         'http://localhost:5000/api/paymentform/process',
@@ -163,7 +204,9 @@ const PaymentForm = () => {
       }
     } catch (err) {
       console.error('Payment error:', err);
-      setError(err.response?.data?.message || err.message);
+      setErrors({
+        general: err.response?.data?.message || 'Payment processing failed. Please try again.'
+      });
     } finally {
       setProcessingPayment(false);
     }
@@ -180,28 +223,28 @@ const PaymentForm = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="container py-5">
-        <div className="alert alert-danger">
-          <h4 className="alert-heading">Payment Error</h4>
-          <p>{error}</p>
-          <div className="d-flex justify-content-between mt-3">
-            <button className="btn btn-secondary" onClick={() => navigate(-1)}>
-              Back to Booking
-            </button>
-            <button className="btn btn-primary" onClick={() => window.location.reload()}>
-              Try Again
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container py-4">
       <h2 className="mb-4">Complete Your Payment</h2>
+
+      {/* General error display */}
+      {errors.general && (
+        <div className="alert alert-danger mb-4">
+          {errors.general}
+          <div className="d-flex justify-content-between mt-3">
+            {errors.general.includes('Booking') || errors.general.includes('User') ? (
+              <>
+                <button className="btn btn-secondary" onClick={() => navigate('/')}>
+                  Back to Home
+                </button>
+                <button className="btn btn-primary" onClick={() => window.location.reload()}>
+                  Try Again
+                </button>
+              </>
+            ) : null}
+          </div>
+        </div>
+      )}
 
       <div className="card mb-4">
         <div className="card-body">
@@ -216,7 +259,7 @@ const PaymentForm = () => {
       <form onSubmit={handleSubmit}>
         <input type="hidden" name="booking_id" value={formData.booking_id} />
         <input type="hidden" name="user_id" value={formData.user_id} />
-        <input type="hidden" name="is_subscribe" value={formData.is_subscribe.toString()} /> {/* Fixed */}
+        <input type="hidden" name="is_subscribe" value={formData.is_subscribe.toString()} />
         <input type="hidden" name="service_id" value={formData.service_id} />
         <input type="hidden" name="amount_paid" value={formData.amount_paid} />
 
@@ -226,12 +269,15 @@ const PaymentForm = () => {
               <label className="form-label">Cardholder Name*</label>
               <input
                 type="text"
-                className="form-control"
+                className={`form-control ${errors.cardholder_name ? 'is-invalid' : ''}`}
                 name="cardholder_name"
                 value={formData.cardholder_name}
                 onChange={handleChange}
                 required
               />
+              {errors.cardholder_name && (
+                <div className="invalid-feedback">{errors.cardholder_name}</div>
+              )}
             </div>
           </div>
         </div>
@@ -242,13 +288,16 @@ const PaymentForm = () => {
               <label className="form-label">Card Number*</label>
               <input
                 type="text"
-                className="form-control"
+                className={`form-control ${errors.card_number ? 'is-invalid' : ''}`}
                 name="card_number"
                 value={formData.card_number}
                 onChange={handleChange}
                 placeholder="1234 5678 9012 3456"
                 required
               />
+              {errors.card_number && (
+                <div className="invalid-feedback">{errors.card_number}</div>
+              )}
             </div>
           </div>
           <div className="col-md-4">
@@ -256,13 +305,16 @@ const PaymentForm = () => {
               <label className="form-label">Expiry Date (MM/YY)*</label>
               <input
                 type="text"
-                className="form-control"
+                className={`form-control ${errors.expiry_date ? 'is-invalid' : ''}`}
                 name="expiry_date"
                 value={formData.expiry_date}
                 onChange={handleChange}
                 placeholder="MM/YY"
                 required
               />
+              {errors.expiry_date && (
+                <div className="invalid-feedback">{errors.expiry_date}</div>
+              )}
             </div>
           </div>
         </div>
@@ -273,13 +325,16 @@ const PaymentForm = () => {
               <label className="form-label">CVV Code*</label>
               <input
                 type="text"
-                className="form-control"
+                className={`form-control ${errors.cvv_code ? 'is-invalid' : ''}`}
                 name="cvv_code"
                 value={formData.cvv_code}
                 onChange={handleChange}
                 placeholder="123"
                 required
               />
+              {errors.cvv_code && (
+                <div className="invalid-feedback">{errors.cvv_code}</div>
+              )}
             </div>
           </div>
         </div>

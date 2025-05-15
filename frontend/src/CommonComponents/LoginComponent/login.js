@@ -27,46 +27,62 @@ export default function RoleBasedLogin() {
             setIsSubmitting(false);
             return;
         }
-
         try {
             const loginResponse = await axios.post("http://localhost:5000/api/auth/login", {
                 username,
                 password,
                 role
             });
-
+        
             if (loginResponse.data.success) {
                 // Store token and user data
                 localStorage.setItem("userToken", loginResponse.data.token);
                 localStorage.setItem("userData", JSON.stringify(loginResponse.data.user));
-
+        
                 // Set default axios headers
                 axios.defaults.headers.common['Authorization'] = `Bearer ${loginResponse.data.token}`;
-
+        
                 // Check if there's a pending booking
                 const bookingServiceId = localStorage.getItem('booking_service_id');
-
-                // Redirect based on role and booking status
-                const userRole = loginResponse.data.user.role;
-                if (userRole === "customer") {
-                    if (bookingServiceId) {
-                        navigate(`/booking-form`);
-                    } else {
-                        navigate("/CustomerDashboard/Dashboard");
+        
+                // Set a timeout before redirecting to ensure any UI updates are visible
+                setTimeout(() => {
+                    // Redirect based on role and booking status
+                    const userRole = loginResponse.data.user.role;
+                    if (userRole === "customer") {
+                        if (bookingServiceId) {
+                            navigate(`/booking-form`);
+                        } else {
+                            navigate("/CustomerDashboard/Dashboard");
+                        }
+                    } else if (userRole === "provider") {
+                        navigate("/provider/dashboard");
                     }
-                } else if (userRole === "provider") {
-                    navigate("/provider/dashboard");
-                }
+                    
+                    // Reset the submission state after redirect
+                    setIsSubmitting(false);
+                }, 1000); // Small delay before redirect on success
             }
         } catch (err) {
             if (err.response && err.response.status === 401) {
+                // Show error message
                 setErrorMessage("Invalid Username and Password!");
+        
+                // Clear error message and reset submission state after 3.5 seconds
+                setTimeout(() => {
+                    setErrorMessage("");
+                    setIsSubmitting(false);
+                }, 3500); // Increased to 3.5 seconds for better visibility
             } else {
                 console.error("Error During Login:", err.response || err);
                 setErrorMessage("An unexpected error occurred. Please try again.");
+        
+                // Clear error message and reset submission state after 3.5 seconds
+                setTimeout(() => {
+                    setErrorMessage("");
+                    setIsSubmitting(false);
+                }, 3500); // Increased to 3.5 seconds for better visibility
             }
-        } finally {
-            setIsSubmitting(false);
         }
     };
 

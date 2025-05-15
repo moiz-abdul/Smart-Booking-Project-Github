@@ -191,21 +191,28 @@ const CusDashboard = () => {
   }
 
   return (
-    <div className="customer-dashboard">
+    <div className="customer-dashboard2">
 
 {reminders.length > 0 && (
-        <div className="reminders-section">
-          <h3>Reminders</h3>
-          <ul className="reminder-list">
-            {reminders.map((reminder, index) => (
-              <li key={index} className="reminder-item alert alert-info">
-                <strong>
-                  You have a Reminder of Booking service <em>{reminder.service_title}</em> of your selected timeslot {formatTime(reminder.start_time)} - {formatTime(reminder.end_time)}.
-                </strong>
-              </li>
-            ))}
-          </ul>
-        </div>
+       <div className="customer-reminders-container">
+       <h3 className="customer-reminders-title">
+         <i className="fas fa-bell"></i> Reminders
+       </h3>
+       <ul className="customer-reminders-list">
+         {reminders.map((reminder, index) => (
+           <li key={index} className="customer-reminder-item">
+             <p className="customer-reminder-text">
+               You have a reminder for booking service{' '}
+               <span className="customer-reminder-service">{reminder.service_title}</span>{' '}
+               for timeslot{' '}
+               <span className="customer-reminder-time">
+                 {formatTime(reminder.start_time)} - {formatTime(reminder.end_time)}
+               </span>.
+             </p>
+           </li>
+         ))}
+       </ul>
+     </div>
       )}
       
       <h2>Your Pending Bookings</h2>
