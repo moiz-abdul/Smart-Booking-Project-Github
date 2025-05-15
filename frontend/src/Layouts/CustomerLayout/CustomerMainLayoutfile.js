@@ -27,7 +27,7 @@ const CustomerDashboard = () => {
                         <br></br>
                         <br></br>
                         <br></br>
-                        <button className="nav-item" onClick={() => navigate('/')}>Browse Categories</button>
+                        <button className="nav-item" onClick={() => navigate('/')}>Browse Services</button>
                     </nav>
                 </div>
                 <div className="content-area">

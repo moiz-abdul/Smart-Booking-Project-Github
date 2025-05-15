@@ -36,6 +36,24 @@ const AdminReservedPeriods = () => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  
+  const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this reserved period?")) return;
+
+  try {
+    const res = await axios.delete(`http://localhost:5000/api/adminside/reserved-periods/${id}`);
+    if (res.data.success) {
+      setMessage("Reserved period deleted successfully.");
+      fetchReservedPeriods(); // Refresh table
+    } else {
+      setError("Failed to delete reserved period.");
+    }
+  } catch (err) {
+    console.error("Delete error:", err);
+    setError("Server error occurred during deletion.");
+  }
+};
+
   // Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -109,28 +127,37 @@ const AdminReservedPeriods = () => {
       <div className="table-responsive">
         <table className="table table-bordered table-hover">
           <thead className="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Day</th>
-              <th>Start Time</th>
-              <th>End Time</th>
-              <th>Reason</th>
-              <th>Created At</th>
-            </tr>
-          </thead>
+              <tr>
+       {/**         <th>ID</th>  */}
+                <th>Day</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Reason</th>
+                <th>Created At</th>
+                <th>Action</th>
+              </tr>
+            </thead>
           <tbody>
             {reservedPeriods.length === 0 ? (
               <tr><td colSpan="6" className="text-center">No reserved periods</td></tr>
             ) : (
               reservedPeriods.map(rp => (
                 <tr key={rp.id}>
-                  <td>{rp.id}</td>
-                  <td>{rp.day}</td>
-                  <td>{formatTime(rp.start_time)}</td>
-                  <td>{formatTime(rp.end_time)}</td>
-                  <td>{rp.reason || '—'}</td>
-                  <td>{new Date(rp.created_at).toLocaleString()}</td>
-                </tr>
+   {/**  <td>{rp.id}</td> */}
+  <td>{rp.day}</td>
+  <td>{formatTime(rp.start_time)}</td>
+  <td>{formatTime(rp.end_time)}</td>
+  <td>{rp.reason || '—'}</td>
+  <td>{new Date(rp.created_at).toLocaleString()}</td>
+  <td>
+    <button
+      className="btn btn-danger btn-sm"
+      onClick={() => handleDelete(rp.id)}
+    >
+      Delete
+    </button>
+  </td>
+</tr>
               ))
             )}
           </tbody>
