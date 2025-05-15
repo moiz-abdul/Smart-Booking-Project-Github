@@ -184,45 +184,51 @@ const BookingForm = () => {
     }
   };
 
-  const checkAvailability = async () => {
-    try {
-      setCheckingAvailability(true);
-      const response = await axios.post(
-        'http://localhost:5000/api/bookform/check-availability',
-        {
-          service_id: formData.service_id,
-          selected_day: formData.selected_available_day,
-          selected_time_slot: formData.selected_available_time_slot
-        }
-      );
+const checkAvailability = async () => {
+  try {
+    setCheckingAvailability(true);
+    // Ensure consistent time format (HH:MM:SS)
+    const formattedTimeSlot = formData.selected_available_time_slot.includes(':') 
+      ? formData.selected_available_time_slot 
+      : `${formData.selected_available_time_slot}:00`;
 
-      if (!response.data.available) {
-        throw new Error('This day and time slot has already been booked. Please choose another.');
+    const response = await axios.post(
+      'http://localhost:5000/api/bookform/check-availability',
+      {
+        service_id: formData.service_id,
+        selected_day: formData.selected_available_day.trim(),
+        selected_time_slot: formattedTimeSlot
       }
-      return true;
-    } catch (err) {
-      setError(err.message);
-      return false;
-    } finally {
-      setCheckingAvailability(false);
+    );
+
+    if (!response.data.available) {
+      throw new Error('This time slot has already been booked by someone else.');
     }
-  };
+    return true;
+  } catch (err) {
+    setError(err.message);
+    return false;
+  } finally {
+    setCheckingAvailability(false);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      // Validate required fields
+  try {
+    // Validate required fields
     if (!formData.customer_name || !formData.selected_available_day ||
       !formData.selected_available_time_slot || 
       (!hasActiveMembership && !formData.payment_type)) {
-    throw new Error('Please fill all required fields');
-  }
+      throw new Error('Please fill all required fields');
+    }
 
-        // Frist Check reserved period
+    // First check reserved period
     const isReserved = await checkReservedTime();
     if (!isReserved) return;
 
-    // Then Second Check availability
+    // Then check availability
+    setCheckingAvailability(true);
     const isAvailable = await checkAvailability();
     if (!isAvailable) return;
 
@@ -290,10 +296,17 @@ const BookingForm = () => {
         throw new Error(response.data.message || 'Booking failed');
       }
     } catch (err) {
-      console.error('Booking error:', err);
+    console.error('Booking error:', err);
+    // More specific error handling
+    if (err.message.includes('already been booked')) {
+      setError('This time slot is currently unavailable. Please choose another time.');
+    } else {
       setError(err.response?.data?.message || err.message);
     }
-  };
+  } finally {
+    setCheckingAvailability(false);
+  }
+};
 
   // Render membership type selection
   const renderMembershipTypeSelection = () => {

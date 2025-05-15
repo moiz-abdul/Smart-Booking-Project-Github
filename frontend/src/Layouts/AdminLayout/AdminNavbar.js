@@ -7,8 +7,8 @@ const AdminNavbar = () => {
     const handleLogout = () => {
         // Your logout logic here, e.g., clear tokens, redirect, etc.
         console.log("User logged out");
-        localStorage.removeItem("userToken");
-        localStorage.removeItem("userData");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
         navigate('/admin/login');  // This will now work as navigate is defined
     };
 

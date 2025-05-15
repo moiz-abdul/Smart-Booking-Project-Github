@@ -194,7 +194,7 @@ const PaymentForm = () => {
       if (response.data.success) {
         localStorage.removeItem('booking_id');
         localStorage.removeItem('booking_service_id');
-        navigate('/CustomerDashboard', {
+        navigate('/CustomerDashboard/Dashboard/', {
           state: {
             paymentId: response.data.payment_id,
             amount: formData.amount_paid,

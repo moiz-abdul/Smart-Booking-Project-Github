@@ -12,7 +12,7 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// All subscriptions for customer (latest membership per service) API 
+// All subscriptions for customer (first valid per service)
 SubscriptionApi.get('/subscribeusers', async (req, res) => {
   const { user_id } = req.query;
 
@@ -23,11 +23,16 @@ SubscriptionApi.get('/subscribeusers', async (req, res) => {
 
     const [subscriptions] = await pool.query(`
       SELECT * FROM bookingform
-      WHERE user_id = ? AND payment_type = 'Membership'
-      ORDER BY service_id, created_at DESC
+      WHERE 
+        user_id = ? 
+        AND payment_type = 'Membership'
+        AND membership_start_time IS NOT NULL
+        AND membership_end_time IS NOT NULL
+        AND monthly_membership_fee IS NOT NULL
+      ORDER BY service_id, id ASC
     `, [user_id]);
 
-    // Group by service_id to keep only latest
+    // Map to pick first valid per service
     const uniqueServices = new Map();
 
     for (let sub of subscriptions) {

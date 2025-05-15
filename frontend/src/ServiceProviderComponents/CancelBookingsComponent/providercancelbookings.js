@@ -113,7 +113,7 @@ const ProviderCancelBookings = () => {
                     <span className="booking-value">{booking.customer_phone}</span>
                   </div>
                   <div className="booking-row">
-                    <span className="booking-label">Date:</span>
+                    <span className="booking-label">Day:</span>
                     <span className="booking-value">
                       {booking.selected_available_day}
                     </span>

@@ -178,5 +178,25 @@ AdminSideApis.post('/reserved-periods', async (req, res) => {
   }
 });
 
+// DELETE Reserved Period by ID
+AdminSideApis.delete('/reserved-periods/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [result] = await pool.query(
+      `DELETE FROM reserved_periods WHERE id = ?`,
+      [id]
+    );
+
+    if (result.affectedRows > 0) {
+      return res.json({ success: true, message: "Reserved period deleted" });
+    } else {
+      return res.status(404).json({ success: false, message: "Reserved period not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting reserved period:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
 
 module.exports = AdminSideApis;
