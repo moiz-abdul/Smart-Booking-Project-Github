@@ -187,22 +187,25 @@ const BookingForm = () => {
 const checkAvailability = async () => {
   try {
     setCheckingAvailability(true);
-    // Ensure consistent time format (HH:MM:SS)
-    const formattedTimeSlot = formData.selected_available_time_slot.includes(':') 
-      ? formData.selected_available_time_slot 
-      : `${formData.selected_available_time_slot}:00`;
+    
+    // Convert time to HH:MM format (backend will normalize to HH:MM:SS)
+    const formatTime = (time) => {
+      if (!time) return '00:00';
+      const parts = time.split(':');
+      return `${parts[0].padStart(2,'0')}:${(parts[1]||'00').padStart(2,'0')}`;
+    };
 
     const response = await axios.post(
       'http://localhost:5000/api/bookform/check-availability',
       {
         service_id: formData.service_id,
         selected_day: formData.selected_available_day.trim(),
-        selected_time_slot: formattedTimeSlot
+        selected_time_slot: formatTime(formData.selected_available_time_slot)
       }
     );
 
     if (!response.data.available) {
-      throw new Error('This time slot has already been booked by someone else.');
+      throw new Error('Time slot already been booked by someone else. Please choose something else');
     }
     return true;
   } catch (err) {
