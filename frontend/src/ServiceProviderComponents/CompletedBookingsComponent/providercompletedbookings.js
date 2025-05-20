@@ -128,6 +128,7 @@ const ProviderCompletedBookings = () => {
                   </div>
                 </div>
 
+{/*
                 <div className="booking-actions">
                   <button 
                     className="add-review-btn"
@@ -136,6 +137,26 @@ const ProviderCompletedBookings = () => {
                     Add Review
                   </button>
                 </div>
+* */}
+
+              <div className="booking-actions">
+                {booking.has_provider_review === 0 ? (
+                  <button 
+                    className="add-review-btn"
+                    onClick={() => openReviewModal(booking)}
+                  >
+                    Add Review
+                  </button>
+                ) : (
+                  <div className="submitted-review">
+                    <h5>Your Review</h5>
+                    <div className="review-row">
+                      <strong>Review:</strong> {booking.provider_review_text}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               </li>
             ))}
           </ul>

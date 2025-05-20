@@ -199,3 +199,38 @@
     width: 100%;
   }
 }
+
+.submitted-review {
+  margin-top: 12px;
+  background-color: #f1f1f1;
+  padding: 12px;
+  border-radius: 6px;
+  width: fit-content;
+  text-align: left;
+}
+
+.review-header {
+  margin-bottom: 8px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.review-row {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.review-label {
+  font-weight: bold;
+  color: #444;
+}
+
+.review-value {
+  color: #222;
+}
+
+.rating-stars {
+  color: #f3b600; /* Gold color for active stars */
+  font-size: 1.2rem;
+}

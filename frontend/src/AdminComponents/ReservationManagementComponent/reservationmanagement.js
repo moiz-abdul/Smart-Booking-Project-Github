@@ -3,6 +3,19 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaFileExport, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 
+
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/admin/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
 const AdminReservationManagement = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +36,13 @@ const AdminReservationManagement = () => {
     });
   };
 
+ //  TOKEN HEADER AND DATA FETCH
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+
     axios.get('http://localhost:5000/api/adminside/adminreservationmanagement')
       .then(res => {
         if (res.data.success) {

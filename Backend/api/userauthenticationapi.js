@@ -49,7 +49,7 @@ UserAuthenticationAPI.post("/login", async (req, res) => {
                 role: user.role 
             }, 
             JWT_SECRET, 
-            { expiresIn: "1h" }
+            { expiresIn: "15m" }
         );
 
         return res.status(200).json({

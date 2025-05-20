@@ -140,12 +140,40 @@ const CompletedBookings = () => {
                 </div>
 
                 <div className="booking-actions">
+
+                  {booking.has_review === 0 ? (
+                      <button 
+                        className="add-review-btn"
+                        onClick={() => handleAddReview(booking)}
+                      >
+                        Add Review
+                      </button>
+                    ) : (
+                      <div className="submitted-review">
+                            <h5 className="review-header">Your Review</h5>
+
+                            <div className="review-row">
+                              <span className="review-label"><strong>Rating:</strong></span>&nbsp;
+                              <span className="review-value">
+                                {'★'.repeat(booking.rating)}{'☆'.repeat(5 - booking.rating)}
+                              </span>
+                            </div>
+
+                            <div className="review-row">
+                              <span className="review-label"><strong>Review:</strong></span>&nbsp;
+                              <span className="review-value">"{booking.review_text}"</span>
+                            </div>
+                          </div>
+                    )}
+{/*  OLD CODE Of ADD REVIEWS BUTTON 
                   <button 
                     className="add-review-btn"
                     onClick={() => handleAddReview(booking)}
                   >
                     Add Review
                   </button>
+
+                  * */}
                 </div>
               </li>
             ))}

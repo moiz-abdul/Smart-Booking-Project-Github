@@ -2,6 +2,23 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './ViewUsers.css';
 
+
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      // Clear localStorage and redirect to login on token expiration or unauthorized
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/admin/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
 const UsersPerPage = 10;
 
 const AdminUserManagement = () => {
@@ -10,7 +27,13 @@ const AdminUserManagement = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Setup axios token header on mount
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+
     fetchUsers();
   }, []);
 
