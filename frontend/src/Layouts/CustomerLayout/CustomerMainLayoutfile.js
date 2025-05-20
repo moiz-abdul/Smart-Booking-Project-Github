@@ -19,15 +19,8 @@ const CustomerDashboard = () => {
                         <button className="nav-item" onClick={() => navigate('/CustomerDashboard/CancelBookings')}>Cancel Bookings</button>
                         <button className="nav-item" onClick={() => navigate('/CustomerDashboard/CompletedBookings')}>Completed Bookings</button>
                         <button className="nav-item" onClick={() => navigate('/CustomerDashboard/Subscriptions')}>Subscriptions</button>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <br></br>
-                        <button className="nav-item" onClick={() => navigate('/')}>Browse Services</button>
+                        
+                        <button className="nav-item browse-button" onClick={() => navigate('/')}>Browse Services</button>
                     </nav>
                 </div>
                 <div className="content-area">

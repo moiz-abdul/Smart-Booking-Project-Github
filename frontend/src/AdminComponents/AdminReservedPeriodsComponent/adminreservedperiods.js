@@ -91,7 +91,7 @@ const AdminReservedPeriods = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="mb-4">Manage Reserved Periods</h2>
+     <h2 className="mb-4 text-start">Manage Reserved Periods</h2>
 
       <form className="border p-3 mb-4" onSubmit={handleSubmit}>
         <div className="row g-3">
@@ -126,7 +126,7 @@ const AdminReservedPeriods = () => {
 
       <div className="table-responsive">
         <table className="table table-bordered table-hover">
-          <thead className="table-dark">
+          <thead className="table table-light table-hover align-middle">
               <tr>
        {/**         <th>ID</th>  */}
                 <th>Day</th>

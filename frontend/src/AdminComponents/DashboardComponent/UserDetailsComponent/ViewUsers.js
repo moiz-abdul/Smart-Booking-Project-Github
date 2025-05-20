@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import './ViewUsers.css';
 
 const UsersPerPage = 10;
 
@@ -72,67 +72,102 @@ const AdminUserManagement = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Admin User Management</h2>
+    <div className="admin-user-management">
+      <div className="header-section">
+        <div className="title-container">
+        <span className="header-icon admin-icon">👨‍💼</span>
+          <h2 className="page-title">Admin User Management</h2>
+        </div>
+      </div>
 
-      {loading && <div>Loading users...</div>}
-      {error && <div className="alert alert-danger">{error}</div>}
+      {loading && <div className="loading-spinner"><div className="spinner"></div></div>}
+      {error && <div className="error-message">
+        <span className="error-icon">⚠️</span>
+        <span className="error-text">{error}</span>
+      </div>}
 
       {!loading && !error && (
         <>
-          <div className="table-responsive">
-            <table className="table table-bordered table-striped">
-              <thead className="table-dark">
-                <tr>
-                  <th>#</th>
-                  <th>Username</th>
-                  <th>Email (Masked)</th>
-                  <th>Phone (Masked)</th>
-                  <th>Current Role</th>
-                  <th>Assign Permission</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentUsers.length === 0 ? (
+          <div className="table-card">
+            <div className="card-body">
+              <table className="table">
+                <thead>
                   <tr>
-                    <td colSpan="6" className="text-center">No users found.</td>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Email (Masked)</th>
+                    <th>Phone (Masked)</th>
+                    <th>Current Role</th>
+                    <th>Assign Permission</th>
                   </tr>
-                ) : (
-                  currentUsers.map((user, index) => (
-                    <tr key={user.id}>
-                      <td>{indexOfFirstUser + index + 1}</td>
-                      <td>{user.username}</td>
-                      <td>{maskEmail(user.email)}</td>
-                      <td>{maskPhone(user.phone)}</td>
-                      <td>{user.role}</td>
-                      <td>
-                        <select
-                          value={user.role}
-                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                          className="form-select"
-                        > <option value="customer">Select Option</option>
-                          <option value="customer">Customer</option>
-                          <option value="provider">Provider</option>
-                        </select>
+                </thead>
+                <tbody>
+                  {currentUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="no-users text-center">
+                        <div className="empty-state">
+                          <div className="empty-icon">👤</div>
+                          <h3 className="empty-title">No users found</h3>
+                        </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    currentUsers.map((user, index) => (
+                      <tr key={user.id}>
+                        <td>{indexOfFirstUser + index + 1}</td>
+                        <td>
+                          <div className="user-info">
+                            <div className="avatar">
+                              {user.username.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="user-details">
+                              <span className="user-name">{user.username}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="user-email">{maskEmail(user.email)}</td>
+                        <td>{maskPhone(user.phone)}</td>
+                        <td>
+                          <span className={`role-badge ${user.role}`}>
+                            <span className="role-icon">
+                              {user.role === 'admin' ? '👑' : 
+                               user.role === 'provider' ? '🛠️' : '👤'}
+                            </span>
+                            {user.role}
+                          </span>
+                        </td>
+                        <td>
+                          <select
+                            value={user.role}
+                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                            className="form-select"
+                          >
+                            <option value="customer">Select Option</option>
+                            <option value="customer">Customer</option>
+                            <option value="provider">Provider</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {totalPages > 1 && (
-            <div className="pagination justify-content-center">
-              <ul className="pagination">
+            <div className="pagination-container">
+              <div className="pagination">
                 {Array.from({ length: totalPages }, (_, i) => (
-                  <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                    <button className="page-link" onClick={() => handlePageChange(i + 1)}>
-                      {i + 1}
-                    </button>
-                  </li>
+                  <button
+                    key={i}
+                    className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
         </>

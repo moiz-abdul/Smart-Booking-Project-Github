@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FiBell, FiCalendar, FiClock, FiUser, FiMail, FiPhone, FiWatch, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 
 // Set up axios interceptor
 axios.interceptors.response.use(
@@ -26,20 +27,21 @@ const CusDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("userToken");
     const userData = localStorage.getItem("userData");
-    
+
     if (!token || !userData) {
       navigate("/login");
       return;
     }
-    
+
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    
+
     try {
       const parsedUserData = JSON.parse(userData);
       const userId = parsedUserData.id;
-      
+
       if (userId) {
         fetchBookings(userId);
+        fetchReminders(userId);
       } else {
         throw new Error("User ID not found in user data");
       }
@@ -49,25 +51,6 @@ const CusDashboard = () => {
       setLoading(false);
     }
   }, [navigate]);
-
-
-  useEffect(() => {
-    const token = localStorage.getItem("userToken");
-    const userData = localStorage.getItem("userData");
-
-    if (!token || !userData) {
-      navigate("/login");
-      return;
-    }
-
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    const parsedUserData = JSON.parse(userData);
-
-    if (parsedUserData.id) {
-      fetchReminders(parsedUserData.id); // New
-      fetchBookings(parsedUserData.id);  // Existing
-    }
-  }, []);
 
   const fetchReminders = async (userId) => {
     try {
@@ -87,20 +70,18 @@ const CusDashboard = () => {
     if (!timeStr) return '';
     const [hour, minute] = timeStr.split(':');
     let h = +hour;
-    const suffix = h >= 12 ? 'PM' : 'AM';
+    
     h = h % 12 || 12;
-    return `${h}:${minute} ${suffix}`;
+    return `${h}:${minute} `;
   };
-
-
 
   const fetchBookings = async (userId) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await axios.get(`http://localhost:5000/api/customerbookingdetails/pending`, {
-        params: { 
+        params: {
           user_id: userId,
           status: 'pending'
         }
@@ -117,7 +98,7 @@ const CusDashboard = () => {
         response: err.response?.data,
         config: err.config
       });
-      
+
       let errorMsg = 'Failed to load bookings';
       if (err.response) {
         errorMsg = err.response.data?.message || `Server error: ${err.response.status}`;
@@ -126,7 +107,7 @@ const CusDashboard = () => {
       } else {
         errorMsg = err.message;
       }
-      
+
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -134,99 +115,141 @@ const CusDashboard = () => {
   };
 
   const renderBookingItem = (booking) => (
-    <li key={booking.id} className="booking-item">
-      <div className="booking-header">
-        <span className="booking-service">
-          <strong>Service Name: {booking.service_name}</strong> <br></br>
-          <strong><div>Service Category: ({booking.service_category})</div></strong>
-        </span>
+    <div key={booking.id} className="booking-card">
+      <div className="booking-card-header">
+        <div className="service-info">
+          <h3>{booking.service_name}</h3>
+          <span className="service-category">{booking.service_category}</span>
+        </div>
+        <div className={`status-badge ${booking.is_status.toLowerCase()}`}>
+          {booking.is_status === 'confirmed' ? <FiCheckCircle /> : <FiAlertCircle />}
+          {booking.is_status}
+        </div>
       </div>
 
-      <div className="booking-details">
-        <div className="booking-row">
-          <strong><span className="booking-label">Customer Name: </span></strong>
-          <span className="booking-value">{booking.customer_name}</span>
+      <div className="booking-details-grid">
+        <div className="detail-item">
+          <FiUser className="detail-icon" />
+          <div>
+            <label>Customer</label>
+            <p>{booking.customer_name}</p>
+          </div>
         </div>
-        <div className="booking-row">
-          <strong><span className="booking-label">Email: </span> </strong>
-          <span className="booking-value">{booking.customer_email}</span>
+        
+        <div className="detail-item">
+          <FiMail className="detail-icon" />
+          <div>
+            <label>Email</label>
+            <p>{booking.customer_email}</p>
+          </div>
         </div>
-        <div className="booking-row">
-          <strong><span className="booking-label">Phone: </span></strong>
-          <span className="booking-value">{booking.customer_phone}</span>
+        
+        <div className="detail-item">
+          <FiPhone className="detail-icon" />
+          <div>
+            <label>Phone</label>
+            <p>{booking.customer_phone}</p>
+          </div>
         </div>
-        <div className="booking-row">
-          <strong><span className="booking-label">Duration: </span></strong>
-          <span className="booking-value">{booking.duration_minutes} minutes</span>
+        
+        <div className="detail-item">
+          <FiWatch className="detail-icon" />
+          <div>
+            <label>Duration</label>
+            <p>{booking.duration_minutes} minutes</p>
+          </div>
         </div>
-        <div className="booking-row">
-          <strong><span className="booking-label">Day: </span></strong>
-          <span className="booking-value">{booking.selected_available_day}</span>
+        
+        <div className="detail-item">
+          <FiCalendar className="detail-icon" />
+          <div>
+            <label>Day</label>
+            <p>{booking.selected_available_day}</p>
+          </div>
         </div>
-        <div className="booking-row">
-          <strong><span className="booking-label">Time Slot: </span></strong>
-          <span className="booking-value">{booking.selected_available_time_slot}</span>
-        </div>
-        <div className="booking-row">
-          <strong><span className="booking-label">Status: </span></strong>
-          <span className={`booking-value status-${booking.is_status.toLowerCase()}`}>
-            {booking.is_status}
-          </span>
+        
+        <div className="detail-item">
+          <FiClock className="detail-icon" />
+          <div>
+            <label>Time Slot</label>
+            <p>{formatTime(booking.selected_available_time_slot)}</p>
+          </div>
         </div>
       </div>
-    </li>
+    </div>
   );
 
   if (loading) {
-    return <div className="dashboard-loading">Loading your bookings...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading your dashboard...</p>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="dashboard-error">
-        <p>{error}</p>
-        <button onClick={() => window.location.reload()}>Try Again</button>
+      <div className="error-container">
+        <div className="error-message">
+          <h3>Something went wrong</h3>
+          <p>{error}</p>
+          <button className="retry-button" onClick={() => window.location.reload()}>
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="customer-dashboard2">
-
-{reminders.length > 0 && (
-       <div className="customer-reminders-container">
-       <h3 className="customer-reminders-title">
-         <i className="fas fa-bell"></i> Reminders
-       </h3>
-       <ul className="customer-reminders-list">
-         {reminders.map((reminder, index) => (
-           <li key={index} className="customer-reminder-item">
-             <p className="customer-reminder-text">
-               You have a reminder for booking service{' '}
-               <span className="customer-reminder-service">{reminder.service_title}</span>{' '}
-               for timeslot{' '}
-               <span className="customer-reminder-time">
-                 {formatTime(reminder.start_time)} - {formatTime(reminder.end_time)}
-               </span>.
-             </p>
-           </li>
-         ))}
-       </ul>
-     </div>
-      )}
+    <div className="modern-dashboard">
       
-      <h2>Your Pending Bookings</h2>
-      <div className="bookings-container">
-        {bookings.length > 0 ? (
-          <ul className="booking-list">
-            {bookings.map(renderBookingItem)}
-          </ul>
-        ) : (
-          <p className="no-bookings">No pending bookings found.</p>
+
+      <div className="dashboard-content">
+        {reminders.length > 0 && (
+          <section className="reminders-section">
+            <div className="section-header">
+              <FiBell className="section-icon" />
+              <h2>Upcoming Reminders</h2>
+            </div>
+            <div className="reminders-grid">
+              {reminders.map((reminder, index) => (
+                <div key={index} className="reminder-card">
+                  <div className="reminder-content">
+                    <h3>{reminder.service_title}</h3>
+                    <p>
+                      <FiClock /> {formatTime(reminder.start_time)} - {formatTime(reminder.end_time)}
+                    </p>
+                  </div>
+                  <div className="reminder-actions">
+                    <button className="view-button">View Details</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
+
+        <section className="bookings-section">
+          <div className="section-header">
+            <div className="customer-dashboard h2" />
+            <h2>Your Pending Bookings</h2>
+          </div>
+          
+          {bookings.length > 0 ? (
+            <div className="bookings-grid">
+              {bookings.map(renderBookingItem)}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <img src="/illustration-empty.svg" alt="No bookings" />
+              <h3>No pending bookings</h3>
+              <p>You don't have any pending bookings at the moment</p>
+            </div>
+          )}
+        </section>
       </div>
-
-
     </div>
   );
 };

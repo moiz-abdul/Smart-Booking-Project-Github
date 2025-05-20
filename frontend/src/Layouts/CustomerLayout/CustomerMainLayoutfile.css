@@ -24,10 +24,12 @@
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0 1rem;
+  height: 100%;
 }
 
+.browse-button {
+  margin-top: auto;
+}
 .nav-item {
   display: flex;
   align-items: center;

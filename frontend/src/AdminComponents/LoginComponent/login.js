@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import "./superAdminlogin.css";
+// Make sure this path is correct relative to your component file
 import loginBackground from '../../Assets/images/loginbackground.png';
 
 export default function AdminLogin() {
@@ -14,6 +15,9 @@ export default function AdminLogin() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Add console log to verify the image path is correct
+    console.log("Background image path:", loginBackground);
+    
     const interceptor = axios.interceptors.response.use(
       response => response,
       error => {
@@ -79,6 +83,9 @@ export default function AdminLogin() {
         className="register-background"
         style={{
           backgroundImage: `url(${loginBackground})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 1 // Increased from 0.7 to make it more visible
         }}
       ></div>
 
@@ -161,8 +168,6 @@ export default function AdminLogin() {
                 'Login'
               )}
             </button>
-
-           
           </form>
         </div>
       </div>
