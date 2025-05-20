@@ -118,23 +118,25 @@ const formatTimeToAMPM = (timeStr) => {
     }
   };
   
-  const handleUpdateBooking = async (updatedData) => {
-    try {
-      const userData = JSON.parse(localStorage.getItem("userData"));
-      await axios.put(
-        `http://localhost:5000/api/customerbookingdetails/${selectedBooking.id}/update`,
-        {
-          selected_available_day: updatedData.day,
-          selected_available_time_slot: updatedData.timeSlot
-        },
-        { params: { user_id: userData.id } }
-      );
-      setShowUpdateModal(false);
-      fetchConfirmedBookings(userData.id);
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update booking');
-    }
-  };
+const handleUpdateBooking = async (updatedData) => {
+  try {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const response = await axios.put(
+      `http://localhost:5000/api/customerbookingdetails/${selectedBooking.id}/update`,
+      {
+        selected_available_day: updatedData.day,
+        selected_available_time_slot: updatedData.timeSlot
+      },
+      { params: { user_id: userData.id } }
+    );
+    
+   // console.log('Booking updated:', response.data.updatedTimes);
+    setShowUpdateModal(false);
+    fetchConfirmedBookings(userData.id);
+  } catch (err) {
+    alert(err.response?.data?.message || 'Failed to update booking');
+  }
+};
 
   if (loading) return <div className="dashboard-loading">Loading confirmed bookings...</div>;
   if (error) return (
