@@ -91,46 +91,33 @@ BookingFormApi.post('/check-availability', async (req, res) => {
   try {
     const { service_id, selected_day, selected_time_slot } = req.body;
 
-    console.log('Received availability check:', {
-      service_id,
-      selected_day,
-      selected_time_slot
-    });
-    
-    if (!service_id || !selected_day || !selected_time_slot) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required fields'
-      });
-    }
+    // Normalize time format to HH:MM:SS
+    const normalizeTime = (time) => {
+      if (!time) return '00:00:00';
+      const parts = time.toString().split(':');
+      while (parts.length < 3) parts.push('00');
+      return parts.slice(0, 3).join(':');
+    };
 
-    // Check if the time slot is already booked (only consider pending and confirmed bookings)
-    const [existingBookings] = await pool.query(`
-      SELECT COUNT(*) as count 
-      FROM bookingform 
+    const formattedTime = normalizeTime(selected_time_slot);
+
+    const [results] = await pool.query(`
+      SELECT id FROM bookingform 
       WHERE service_id = ? 
-        AND selected_available_day = ? 
-        AND selected_available_time_slot = TIME(?)
+        AND BINARY selected_available_day = ?
+        AND selected_available_time_slot = ?
         AND is_status IN ('pending', 'confirm')
-    `, [service_id, selected_day, selected_time_slot]);
-
-    const isAvailable = existingBookings[0].count === 0;
+    `, [service_id, selected_day.trim(), formattedTime]);
 
     res.json({
       success: true,
-      available: isAvailable,
-      message: isAvailable 
-        ? 'Time slot is available' 
-        : 'This time slot has already been booked by someone else.'
+      available: results.length === 0,
+      debug: { normalizedTime: formattedTime } // For verification
     });
 
   } catch (error) {
-    console.error('Availability check error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to check availability',
-      error: error.message
-    });
+    console.error('Availability check failed:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -210,14 +197,14 @@ BookingFormApi.post('/bookingdetails', async (req, res) => {
     }
     
     // First check availability again (in case of race condition)
-    const [existingBookings] = await connection.query(`
-      SELECT COUNT(*) as count 
-      FROM bookingform 
-      WHERE service_id = ? 
-        AND selected_available_day = ? 
-        AND selected_available_time_slot = TIME(?)
-        AND is_status != 'cancel'
-    `, [service_id, selected_available_day, selected_available_time_slot]);
+        const [existingBookings] = await connection.query(`
+  SELECT COUNT(*) as count 
+  FROM bookingform 
+  WHERE service_id = ? 
+    AND selected_available_day = ? 
+    AND selected_available_time_slot = TIME(?)
+    AND is_status IN ('pending', 'confirm')  -- Only block these statuses
+`, [service_id, selected_available_day, selected_available_time_slot]);
 
     if (existingBookings[0].count > 0) {
       return res.status(409).json({
