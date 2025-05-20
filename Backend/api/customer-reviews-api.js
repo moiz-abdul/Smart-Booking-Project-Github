@@ -12,6 +12,9 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+ 
+{/* OLD CODE OF POST API 
+
 CustomerReviewsAPI.post('/', async (req, res) => {
   try {
     const { service_id, booking_id, user_id, rating, review_text } = req.body;
@@ -55,6 +58,71 @@ CustomerReviewsAPI.post('/', async (req, res) => {
     });
   }
 });
+
+* */}
+
+CustomerReviewsAPI.post('/', async (req, res) => {
+  try {
+    const { service_id, booking_id, user_id, rating, review_text } = req.body;
+
+    //  Validate required fields
+    if (!service_id || !user_id || !rating || !booking_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Service ID, Booking ID, User ID, and Rating are required'
+      });
+    }
+
+    //  Validate rating range
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating must be between 1 and 5'
+      });
+    }
+
+    // Prevent duplicate review (1 per booking per user)
+    const [existing] = await pool.query(
+      `SELECT id FROM customer_reviews WHERE user_id = ? AND booking_id = ?`,
+      [user_id, booking_id]
+    );
+
+    if (existing.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already submitted a review for this booking."
+      });
+    }
+
+    // Insert new review
+    const [result] = await pool.query(
+      `INSERT INTO customer_reviews 
+      (service_id, booking_id, user_id, rating, review_text)
+      VALUES (?, ?, ?, ?, ?)`,
+      [service_id, booking_id, user_id, rating, review_text]
+    );
+
+    // Return success
+    res.status(201).json({
+      success: true,
+      message: 'Review submitted successfully',
+      data: {
+        id: result.insertId
+      }
+    });
+
+  } catch (error) {
+    console.error('Error submitting review:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to submit review',
+      error: error.message
+    });
+  }
+});
+
+
+
 
 // GET reviews by service ID with provider replies
 CustomerReviewsAPI.get('/:serviceId', async (req, res) => {

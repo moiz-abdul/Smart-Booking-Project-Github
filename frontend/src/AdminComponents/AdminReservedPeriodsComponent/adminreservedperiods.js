@@ -3,6 +3,19 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './adminreservedperiods.css';
 
+
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/admin/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
 const AdminReservedPeriods = () => {
   const [reservedPeriods, setReservedPeriods] = useState([]);
   const [formData, setFormData] = useState({
@@ -27,9 +40,13 @@ const AdminReservedPeriods = () => {
     }
   };
 
-  useEffect(() => {
-    fetchReservedPeriods();
-  }, []);
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  }
+  fetchReservedPeriods();
+}, []);
 
   // Handle form change
   const handleChange = (e) => {

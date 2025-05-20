@@ -160,7 +160,9 @@ ProviderDashboardBookingsDetailsApi.get('/cancel', async (req, res) => {
   }
 });
 
-// Get Completed bookings for provider's services
+{/*
+// Get Completed bookings for provider's services OLD API CODE 
+
 ProviderDashboardBookingsDetailsApi.get('/completed', async (req, res) => {
   try {
     const { user_id } = req.query;
@@ -208,7 +210,68 @@ ProviderDashboardBookingsDetailsApi.get('/completed', async (req, res) => {
     });
   }
 });
+* */}
 
+ProviderDashboardBookingsDetailsApi.get('/completed', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Provider user_id is required'
+      });
+    }
+
+    // Get all service IDs for the provider
+    const [services] = await pool.query(
+      'SELECT id FROM add_services WHERE user_id = ?',
+      [user_id]
+    );
+
+    if (services.length === 0) {
+      return res.json({ success: true, data: [] });
+    }
+
+    const serviceIds = services.map(s => s.id);
+
+    // Fetch completed bookings with review info
+    const [bookings] = await pool.query(`
+      SELECT 
+        b.*,
+
+        (
+          SELECT COUNT(*) 
+          FROM provider_reviews pr 
+          WHERE pr.booking_id = b.id
+        ) AS has_provider_review,
+
+        (
+          SELECT pr.review_text
+          FROM provider_reviews pr 
+          WHERE pr.booking_id = b.id
+          LIMIT 1
+        ) AS provider_review_text
+
+      FROM bookingform b
+      WHERE b.service_id IN (?)
+      AND b.is_status = 'completed'
+      ORDER BY b.selected_available_day DESC, b.start_time DESC
+    `, [serviceIds]);
+
+    res.json({
+      success: true,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error fetching completed bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch completed bookings',
+      error: error.message
+    });
+  }
+});
 
 // Provider Navbar Notification API 
 

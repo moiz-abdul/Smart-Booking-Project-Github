@@ -25,7 +25,7 @@ adminauthenticationAPI.post("/superadmin/login", async (req, res) => {
             role: "superadmin"
         };
 
-        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" });
                
         return res.status(200).json({ 
             success: true, 

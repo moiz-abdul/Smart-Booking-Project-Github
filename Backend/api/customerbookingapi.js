@@ -176,7 +176,8 @@ CustomerBookingsApi.get('/cancel', async (req, res) => {
   }
 });
 
-// Get confirmed bookings for customer
+// Get confirmed bookings for customer OLD ONE 
+{/*
 CustomerBookingsApi.get('/completed', async (req, res) => {
   try {
     const { user_id } = req.query;
@@ -203,6 +204,73 @@ CustomerBookingsApi.get('/completed', async (req, res) => {
       success: true,
       data: bookings
     });
+  } catch (error) {
+    console.error('Error fetching Completed bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch Completed bookings',
+      error: error.message
+    });
+  }
+});
+
+* */}
+
+
+// Get confirmed (completed) bookings for a customer, including review info
+CustomerBookingsApi.get('/completed', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    const [bookings] = await pool.query(`
+      SELECT 
+        b.*,
+        s.provider_name,
+
+        -- Check if the customer already left a review
+        (
+          SELECT COUNT(*) 
+          FROM customer_reviews cr 
+          WHERE cr.booking_id = b.id AND cr.user_id = b.user_id
+        ) AS has_review,
+
+        -- Get the rating if review exists
+        (
+          SELECT cr.rating 
+          FROM customer_reviews cr 
+          WHERE cr.booking_id = b.id AND cr.user_id = b.user_id
+          LIMIT 1
+        ) AS rating,
+
+        -- Get review text if review exists
+        (
+          SELECT cr.review_text 
+          FROM customer_reviews cr 
+          WHERE cr.booking_id = b.id AND cr.user_id = b.user_id
+          LIMIT 1
+        ) AS review_text
+
+      FROM bookingform b
+      JOIN add_services s ON b.service_id = s.id
+
+      WHERE b.user_id = ?
+      AND b.is_status = 'completed'
+
+      ORDER BY b.selected_available_day DESC
+    `, [user_id]);
+
+    res.json({
+      success: true,
+      data: bookings
+    });
+
   } catch (error) {
     console.error('Error fetching Completed bookings:', error);
     res.status(500).json({
