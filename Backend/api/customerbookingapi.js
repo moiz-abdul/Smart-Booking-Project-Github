@@ -285,25 +285,27 @@ CustomerBookingsApi.get('/completed', async (req, res) => {
 // Notifications For Customer Dashboard 
 CustomerBookingsApi.get('/notifications', async (req, res) => {
   try {
-    const { user_id } = req.query;
+    const { user_id, since } = req.query;
 
     if (!user_id) {
       return res.status(400).json({ success: false, message: 'User ID is required' });
     }
-
+    const lastReadTime = since || '1970-01-01';
+    
     const [rows] = await pool.query(`
       SELECT b.is_status, b.service_id, b.created_at, s.provider_name, s.service_title
       FROM bookingform b
       JOIN add_services s ON s.id = b.service_id
-        WHERE 
-      b.user_id = ?
-      AND b.is_status IN ('confirm', 'cancel', 'completed')
-      AND (
-        b.is_status != 'cancel' OR (b.is_status = 'cancel' AND b.cancelled_by = 'provider')
-      )
+      WHERE 
+        b.user_id = ?
+        AND b.is_status IN ('confirm', 'cancel', 'completed')
+        AND (
+          b.is_status != 'cancel' OR (b.is_status = 'cancel' AND b.cancelled_by = 'provider')
+        )
+        AND b.created_at > ?  /* Only fetch notifications newer than last read time */
       ORDER BY b.created_at DESC
       LIMIT 3
-    `, [user_id]);
+    `, [user_id, lastReadTime]);
 
     res.json({
       success: true,
