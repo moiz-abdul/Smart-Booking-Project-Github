@@ -15,32 +15,53 @@ const Header = () => {
   const [username, setUsername] = useState('Guest');
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Get user and fetch notifications on mount
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("userData"));
-if (user?.id) {
-  setUserId(user.id);
-  setUsername(user.username || 'Guest'); // Set username
-  fetchNotifications(user.id);
-}
-  }, []);
 
-  // Fetch latest notifications
-  const fetchNotifications = async (id) => {
-    try {
-      const { data } = await axios.get(`http://localhost:5000/api/customerbookingdetails/notifications`, {
-        params: { user_id: id }
-      });
+ // Fetch latest notifications
+// Fetch latest notifications (updated version)
+const fetchNotifications = async (id) => {
+  try {
+    // Get last read time from storage (default to ancient date if not set)
+    const lastRead = localStorage.getItem('lastNotificationsRead') || '1970-01-01T00:00:00Z';
 
-      if (data?.success) {
-        setNotifications(data.data);
-        setNotificationCount(data.data.length); //  set initial count
+    const { data } = await axios.get(
+      `http://localhost:5000/api/customerbookingdetails/notifications`,
+      {
+        params: { 
+          user_id: id,
+          since: lastRead // Send last read timestamp to backend
+        }
       }
-    } catch (err) {
-      console.error("Error fetching notifications:", err);
-    }
-  };
+    );
 
+    if (data?.success) {
+      setNotifications(data.data);
+      // Only count unread notifications (those newer than lastRead)
+      const unreadCount = data.data.filter(notif => 
+        new Date(notif.created_at) > new Date(lastRead)
+      ).length;
+      setNotificationCount(unreadCount);
+    }
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
+  }
+};
+
+// REPLACE the entire useEffect with this:
+useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("userData"));
+  if (user?.id) {
+    setUserId(user.id);
+    setUsername(user.username || 'Guest');
+    
+    // Initial fetch + start polling
+    fetchNotifications(user.id); // Uses the existing function
+    const interval = setInterval(() => fetchNotifications(user.id), 10000); // Poll every 10s
+    
+    return () => clearInterval(interval); // Cleanup
+  }
+}, []);
+
+ 
   // Hide dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -70,15 +91,19 @@ if (user?.id) {
   }, [dropdownOpen]);
 
   // Toggle dropdown and mark notifications as seen
-  const toggleNotifications = () => {
-    const willShow = !showNotifications;
-    setShowNotifications(willShow);
+// Toggle notifications dropdown (updated)
+const toggleNotifications = () => {
+  const willShow = !showNotifications;
+  setShowNotifications(willShow);
 
-    // Mark as read = reset counter
-    if (willShow) {
-      setNotificationCount(0);
-    }
-  };
+  if (willShow) {
+    // When dropdown opens:
+    // 1. Reset badge count
+    setNotificationCount(0);
+    // 2. Store current time as last read moment
+    localStorage.setItem('lastNotificationsRead', new Date().toISOString());
+  }
+};
 
   // Format notification message
   const formattedMessage = (item) => {

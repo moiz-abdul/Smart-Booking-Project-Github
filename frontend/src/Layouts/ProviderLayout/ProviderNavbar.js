@@ -27,18 +27,20 @@ const ProviderNavbar = () => {
   const notificationRef = useRef(null);
 
   // Fetch provider data and username
-  useEffect(() => {
-    const storedUserData = localStorage.getItem("userData");
-    if (storedUserData) {
-      const user = JSON.parse(storedUserData);
-      setUsername(user.username || "Guest");
-      setProfileData((prev) => ({
-        ...prev,
-        user_id: user.id || "",
-      }));
-      getProviderNotifications(user.id);
-    }
-  }, []);
+useEffect(() => {
+  const storedUserData = localStorage.getItem("userData");
+  if (storedUserData) {
+    const user = JSON.parse(storedUserData);
+    setUsername(user.username || "Guest");
+    setProfileData((prev) => ({ ...prev, user_id: user.id || "" }));
+
+    // Initial fetch + start polling
+    getProviderNotifications(user.id); // Uses existing function
+    const interval = setInterval(() => getProviderNotifications(user.id), 10000); // Poll every 10s
+    
+    return () => clearInterval(interval); // Cleanup
+  }
+}, []);
 
   // Check if profile exists
   useEffect(() => {
@@ -108,12 +110,20 @@ const ProviderNavbar = () => {
     setDropdownOpen(false);
   };
 
-  const toggleNotifications = (e) => {
-    e.stopPropagation();
-    const willShow = !showNotifications;
-    setShowNotifications(willShow);
-    if (willShow) setNotificationCount(0);
-  };
+// Toggle notifications dropdown (updated)
+const toggleNotifications = (e) => {
+  e.stopPropagation();
+  const willShow = !showNotifications;
+  setShowNotifications(willShow);
+
+  if (willShow) {
+    // When dropdown opens:
+    // 1. Reset badge count
+    setNotificationCount(0);
+    // 2. Store current time as last read moment
+    localStorage.setItem('lastProviderNotificationsRead', new Date().toISOString());
+  }
+};
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -145,23 +155,34 @@ const ProviderNavbar = () => {
     };
   }, [showNotifications]);
 
-  // 👉 Get Notifications from API
-  const getProviderNotifications = async (userId) => {
-    try {
-      const response = await axios.get(
-        "http://localhost:5000/api/providerbookingdetails/providernotification",
-        {
-          params: { user_id: userId },
+  // Get Notifications from API
+const getProviderNotifications = async (userId) => {
+  try {
+    // Get last read time from storage
+    const lastRead = localStorage.getItem('lastProviderNotificationsRead') || '1970-01-01T00:00:00Z';
+
+    const response = await axios.get(
+      "http://localhost:5000/api/providerbookingdetails/providernotification",
+      {
+        params: { 
+          user_id: userId,
+          since: lastRead // Send last read timestamp to backend
         }
-      );
-      if (response.data?.success) {
-        setNotifications(response.data.data);
-        setNotificationCount(response.data.data.length);
       }
-    } catch (err) {
-      console.error("Provider Notification Error:", err);
+    );
+
+    if (response.data?.success) {
+      setNotifications(response.data.data);
+      // Only count unread notifications
+      const unreadCount = response.data.data.filter(notif => 
+        new Date(notif.created_at) > new Date(lastRead)
+      ).length;
+      setNotificationCount(unreadCount);
     }
-  };
+  } catch (err) {
+    console.error("Provider Notification Error:", err);
+  }
+};
 
   const formatNotificationText = (item) => {
     const status = item.is_status.toLowerCase();
@@ -183,7 +204,7 @@ const ProviderNavbar = () => {
       <div className="container-fluid">
         <div className="navbar-collapse">
           <div className="navbar-buttons">
-            {/* 🔔 Notification Bell */}
+            {/* Notification Bell */}
             <div ref={notificationRef} className="notification-container">
               <div className="notification-button" onClick={toggleNotifications}>
                 <Bell size={20} color="black" />
@@ -209,7 +230,7 @@ const ProviderNavbar = () => {
               )}
             </div>
 
-            {/* 👋 Welcome Dropdown */}
+            {/*  Welcome Dropdown */}
             <div className="dropdownprovider">
               <button
                 className="dropdownbuttonprovider"
@@ -245,7 +266,7 @@ const ProviderNavbar = () => {
         </div>
       </div>
 
-      {/* ➕ Profile Modal */}
+      {/* Profile Modal */}
       {showProfileModal && (
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>

@@ -274,14 +274,10 @@ ProviderDashboardBookingsDetailsApi.get('/completed', async (req, res) => {
 });
 
 // Provider Navbar Notification API 
-
 ProviderDashboardBookingsDetailsApi.get('/providernotification', async (req, res) => {
   try {
-    const { user_id } = req.query;
-
-    if (!user_id) {
-      return res.status(400).json({ success: false, message: 'Provider user_id is required' });
-    }
+    const { user_id, since } = req.query;
+    const lastReadTime = since || '1970-01-01';
 
     const query = `
       SELECT b.customer_name, b.service_name, b.is_status, b.created_at
@@ -289,16 +285,13 @@ ProviderDashboardBookingsDetailsApi.get('/providernotification', async (req, res
       JOIN add_services s ON s.id = b.service_id
       WHERE s.user_id = ?
         AND b.is_status IN ('cancel', 'pending')
+        AND b.created_at > ?
       ORDER BY b.created_at DESC
       LIMIT 3
     `;
 
-    const [rows] = await pool.query(query, [user_id]);
-
-    res.json({
-      success: true,
-      data: rows
-    });
+    const [rows] = await pool.query(query, [user_id, lastReadTime]);
+    res.json({ success: true, data: rows });
   } catch (error) {
     console.error("Provider Notification Error:", error);
     res.status(500).json({
@@ -308,6 +301,8 @@ ProviderDashboardBookingsDetailsApi.get('/providernotification', async (req, res
     });
   }
 });
+
+
 
 
 // Update booking status
