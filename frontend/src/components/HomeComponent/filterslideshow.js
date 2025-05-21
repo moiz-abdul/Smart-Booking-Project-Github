@@ -479,7 +479,7 @@ const renderFilterSection = () => {
           {services && services.length > 0 ? (
             <>
               <button
-                className="slide-nav-btn prev-btn"
+                className="slide-nav-btn2 prev-btn"
                 onClick={prevSlide}
                 disabled={totalSlides <= 1}
               >
@@ -533,7 +533,7 @@ const renderFilterSection = () => {
               </div>
 
               <button
-                className="slide-nav-btn next-btn"
+                className="slide-nav-btn2 next-btn"
                 onClick={nextSlide}
                 disabled={totalSlides <= 1}
               >
@@ -752,31 +752,8 @@ const renderFilterSection = () => {
           margin-top: 10px;
           width: 100%;
         }
-        .slide-nav-btn {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          background: rgba(255,255,255,0.8);
-          border: 1px solid #ddd;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          z-index: 10;
-        }
-        .slide-nav-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        .prev-btn {
-          left: 0;
-        }
-        .next-btn {
-          right: 0;
-        }
+        
+       
         .slideshow-dots {
           display: flex;
           justify-content: center;

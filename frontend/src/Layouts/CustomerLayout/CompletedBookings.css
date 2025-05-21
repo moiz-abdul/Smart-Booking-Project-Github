@@ -1,5 +1,6 @@
 /* CompletedBookings.css */
 .customer-dashboard {
+  overflow-y: auto;
   max-width: 1200px;
   margin: 0 auto;
   max-height: 70vh !important; /* Use the full viewport height */
@@ -7,7 +8,6 @@
   padding: 0 2rem;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Prevent scrolling on the main container */
 }
 
 .customer-dashboard h2 {
@@ -24,7 +24,7 @@
 
 .bookings-container {
   flex: 1;
-  overflow-y: auto; /* Enable scrolling for this container */
+  
   padding: 1rem 0;
 }
 

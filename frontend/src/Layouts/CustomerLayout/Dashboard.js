@@ -243,7 +243,6 @@ const CusDashboard = () => {
             </div>
           ) : (
             <div className="empty-state">
-              <img src="/illustration-empty.svg" alt="No bookings" />
               <h3>No pending bookings</h3>
               <p>You don't have any pending bookings at the moment</p>
             </div>

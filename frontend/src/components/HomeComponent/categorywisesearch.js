@@ -166,7 +166,7 @@ const Home = () => {
           {filteredServices.length > 0 ? (
             <>
               <button
-                className="slide-nav-btn prev-btn"
+                className="slide-nav-btn2 prev-btn"
                 onClick={prevSlide}
                 disabled={totalSlides <= 1}
               >
@@ -221,7 +221,7 @@ const Home = () => {
               </div>
 
               <button
-                className="slide-nav-btn next-btn"
+                className="slide-nav-btn2 next-btn"
                 onClick={nextSlide}
                 disabled={totalSlides <= 1}
               >

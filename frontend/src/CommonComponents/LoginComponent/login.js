@@ -72,6 +72,7 @@ export default function RoleBasedLogin() {
                 setTimeout(() => {
                     setErrorMessage("");
                     setIsSubmitting(false);
+                    navigate('/login');
                 }, 3500); // Increased to 3.5 seconds for better visibility
             } else {
                 console.error("Error During Login:", err.response || err);
@@ -81,6 +82,7 @@ export default function RoleBasedLogin() {
                 setTimeout(() => {
                     setErrorMessage("");
                     setIsSubmitting(false);
+                    navigate('/login');
                 }, 3500); // Increased to 3.5 seconds for better visibility
             }
         }

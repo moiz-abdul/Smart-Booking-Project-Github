@@ -398,7 +398,7 @@ window.addEventListener('load', revealOnScroll);
             {SearchkeyfilteredServices.length > 0 ? (
               <>
                 <button
-                  className="slide-nav-btn prev-btn"
+                  className="slide-nav-btn2 prev-btn"
                   onClick={SearchkeyprevSlide}
                   disabled={SearchkeytotalSlides <= 1}
                 >
@@ -469,7 +469,7 @@ window.addEventListener('load', revealOnScroll);
                 <button
 
 
-                  className="slide-nav-btn next-btn"
+                  className="slide-nav-btn2 next-btn"
                   onClick={SearchkeynextSlide}
                   disabled={SearchkeytotalSlides <= 1}
                 >

@@ -1,14 +1,26 @@
 /* Modal layout */
 .update-modal {
-    max-width: 81vw;
+    max-width: 80%;
   /* changed from 100% to 95% to control overflow */
   margin: auto;
   border-radius:2px ;
  
   }
   
+  .modal-content {
+    
+    max-width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    animation: fadeInTop 0.3s ease-out;
+    display: flex
+;
+    flex-direction: column;
+}
   .update-modal-header {
-    width: 80vw;
+    width: 100%;
     background-color: #f8f9fa;
     padding: 5px 24px;
     border-bottom: 1px solid #dee2e6;
@@ -21,7 +33,7 @@
   }
   
   .update-modal-body {
-    width: 80vw;
+    width: 100%;
     padding: 15px;
     background-color: #ffffff;
   }
