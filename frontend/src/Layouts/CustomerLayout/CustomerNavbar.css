@@ -140,6 +140,7 @@
 }
 
 /* Logout button style */
+
 .logout-button {
     padding: 0.5rem 1rem;
     background-color: #ff9900;
@@ -154,4 +155,52 @@
 .logout-button:hover {
     background-color: #e0e0e0;
     
+}
+
+
+/* Dropdown button style */
+
+.dropdowncontainer {
+  position: relative;
+  margin-left: 16px;
+    border: 1px solid #b3b3b3;
+}
+
+.dropdownbutton {
+  background-color: #ffffff;
+  color: #333;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #040404;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  min-width: 160px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 9999;
+  padding: 8px 0;
+  text-align: left;
+  border-radius: 4px;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  width: 100%;
+  background: none;
+  color: #333;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
 }
