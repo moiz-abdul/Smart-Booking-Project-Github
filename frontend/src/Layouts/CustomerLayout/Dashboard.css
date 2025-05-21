@@ -66,18 +66,23 @@ body {
 
 /* Reminders Section */
 .reminders-grid {
+  
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  
+  
 }
 
 .reminder-card {
+  max-width: 250px;
+  margin-left: 0.2rem;
   background: white;
   border-radius: 12px;
-  padding: 1.5rem;
+  border-right: 4px solid #ff9900;
+  padding: 0.6rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-left: 4px solid var(--primary);
+  border-left: 4px solid  #ff9900;
   display: flex;
   flex-direction: column;
 }
@@ -88,12 +93,14 @@ body {
 }
 
 .reminder-content h3 {
+  margin-left: 0.5rem;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
   color: var(--dark);
 }
 
 .reminder-content p {
+  margin-left: 0.6rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -102,21 +109,12 @@ body {
 }
 
 .reminder-actions {
-  margin-top: 1rem;
+  margin-top: 1rem; 
   display: flex;
   justify-content: flex-end;
 }
 
-.view-button {
-  background: var(--primary-light);
-  color: var(--primary);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
+
 
 .view-button:hover {
   background: var(--primary);

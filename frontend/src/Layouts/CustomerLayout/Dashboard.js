@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FiBell, FiCalendar, FiClock, FiUser, FiMail, FiPhone, FiWatch, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import {  FiCalendar, FiClock, FiUser, FiMail, FiPhone, FiWatch, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 
 // Set up axios interceptor
 axios.interceptors.response.use(
@@ -70,9 +70,9 @@ const CusDashboard = () => {
     if (!timeStr) return '';
     const [hour, minute] = timeStr.split(':');
     let h = +hour;
-    
+    const suffix = h >= 12 ? 'PM' : 'AM';
     h = h % 12 || 12;
-    return `${h}:${minute} `;
+    return `${h}:${minute} ${suffix}`;
   };
 
   const fetchBookings = async (userId) => {
@@ -202,34 +202,26 @@ const CusDashboard = () => {
     );
   }
 
+  
   return (
     <div className="modern-dashboard">
       
 
       <div className="dashboard-content">
-        {reminders.length > 0 && (
-          <section className="reminders-section">
-            <div className="section-header">
-              <FiBell className="section-icon" />
-              <h2>Upcoming Reminders</h2>
-            </div>
-            <div className="reminders-grid">
-              {reminders.map((reminder, index) => (
-                <div key={index} className="reminder-card">
-                  <div className="reminder-content">
-                    <h3>{reminder.service_title}</h3>
-                    <p>
-                      <FiClock /> {formatTime(reminder.start_time)} - {formatTime(reminder.end_time)}
-                    </p>
-                  </div>
-                  <div className="reminder-actions">
-                    <button className="view-button">View Details</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+      {reminders.length > 0 && (
+        <div className="reminders-section">
+          <h3>Reminders</h3>
+          <ul className="reminder-list">
+            {reminders.map((reminder, index) => (
+              <li key={index} className="reminder-item alert alert-info">
+                <strong>
+                  You have a Reminder of Booking service <em>{reminder.service_title}</em> of your selected timeslot {formatTime(reminder.start_time)} - {formatTime(reminder.end_time)}.
+                </strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
         <section className="bookings-section">
           <div className="section-header">

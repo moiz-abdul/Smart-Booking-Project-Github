@@ -5,30 +5,33 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import "./userlogin.css";
 import loginBackground from '../../Assets/images/loginbackground.png';
 
+// Create a separate axios instance for user login to avoid global interceptors
+const userLoginAxios = axios.create();
+
 export default function RoleBasedLogin() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmittinguserlogin, setIsSubmittinguserlogin] = useState(false);
     const navigate = useNavigate();
-
+ 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
     const submitForm = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true);
+        setIsSubmittinguserlogin(true);
         
         if (!role) {
             setErrorMessage("Please select a role");
-            setIsSubmitting(false);
+            setIsSubmittinguserlogin(false);
             return;
         }
         try {
-            const loginResponse = await axios.post("http://localhost:5000/api/auth/login", {
+            const loginResponse = await userLoginAxios.post("http://localhost:5000/api/auth/login", {
                 username,
                 password,
                 role
@@ -60,33 +63,33 @@ export default function RoleBasedLogin() {
                     }
                     
                     // Reset the submission state after redirect
-                    setIsSubmitting(false);
+                    setIsSubmittinguserlogin(false);
                 }, 1000); // Small delay before redirect on success
             }
         } catch (err) {
             if (err.response && err.response.status === 401) {
                 // Show error message
                 setErrorMessage("Invalid Username and Password!");
-        
-                // Clear error message and reset submission state after 3.5 seconds
+                // Reset submission state immediately
+                setIsSubmittinguserlogin(false);
+                
+                // Clear error message after 3.5 seconds
                 setTimeout(() => {
                     setErrorMessage("");
-                    setIsSubmitting(false);
-                    navigate('/login');
-                }, 3500); // Increased to 3.5 seconds for better visibility
+                }, 3500);
             } else {
                 console.error("Error During Login:", err.response || err);
                 setErrorMessage("An unexpected error occurred. Please try again.");
-        
-                // Clear error message and reset submission state after 3.5 seconds
+                // Reset submission state immediately
+                setIsSubmittinguserlogin(false);
+                
+                // Clear error message after 3.5 seconds
                 setTimeout(() => {
                     setErrorMessage("");
-                    setIsSubmitting(false);
-                    navigate('/login');
-                }, 3500); // Increased to 3.5 seconds for better visibility
+                }, 3500);
             }
         }
-    };
+    }; 
 
     const handleGoBack = () => {
         localStorage.removeItem('booking_service_id');  
@@ -206,9 +209,9 @@ export default function RoleBasedLogin() {
                         <button 
                             type="submit" 
                             className="btn btn-primary w-100 mt-3 login-button"
-                            disabled={isSubmitting}
+                            disabled={isSubmittinguserlogin}
                         >
-                            {isSubmitting ? (
+                            {isSubmittinguserlogin ? (
                                 <>
                                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                     Logging in...
