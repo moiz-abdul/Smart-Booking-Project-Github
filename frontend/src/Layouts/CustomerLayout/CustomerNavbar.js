@@ -5,20 +5,24 @@ import axios from 'axios';
 import './CustomerNavbar.css';
 
 const Header = () => {
+  
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
-  const [notificationCount, setNotificationCount] = useState(0); // ✅ track visible notification badge count
+  const [notificationCount, setNotificationCount] = useState(0); // track visible notification badge count
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef(null);
   const [userId, setUserId] = useState(null);
+  const [username, setUsername] = useState('Guest');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Get user and fetch notifications on mount
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userData"));
-    if (user?.id) {
-      setUserId(user.id);
-      fetchNotifications(user.id);
-    }
+if (user?.id) {
+  setUserId(user.id);
+  setUsername(user.username || 'Guest'); // Set username
+  fetchNotifications(user.id);
+}
   }, []);
 
   // Fetch latest notifications
@@ -30,7 +34,7 @@ const Header = () => {
 
       if (data?.success) {
         setNotifications(data.data);
-        setNotificationCount(data.data.length); // ✅ set initial count
+        setNotificationCount(data.data.length); //  set initial count
       }
     } catch (err) {
       console.error("Error fetching notifications:", err);
@@ -52,12 +56,25 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showNotifications]);
 
-  // ✅ Toggle dropdown and mark notifications as seen
+  // Close dropdown if clicked outside for Navbar 
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setDropdownOpen(false);
+    };
+    if (dropdownOpen) {
+      document.addEventListener("click", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
+  // Toggle dropdown and mark notifications as seen
   const toggleNotifications = () => {
     const willShow = !showNotifications;
     setShowNotifications(willShow);
 
-    // ✅ Mark as read = reset counter
+    // Mark as read = reset counter
     if (willShow) {
       setNotificationCount(0);
     }
@@ -96,7 +113,7 @@ const Header = () => {
         <div className="notification-container" ref={notificationRef}>
           <div className="notification-button" onClick={toggleNotifications}>
             <Bell size={20} />
-            {/* ✅ Show count badge only if > 0 */}
+            {/* Show count badge only if > 0 */}
             {notificationCount > 0 && (
               <span className="notification-badge">{notificationCount}</span>
             )}
@@ -119,9 +136,27 @@ const Header = () => {
           )}
         </div>
 
-        <button className="logout-button" onClick={handleLogout}>
-          Logout
-        </button>
+        {/* Welcome Dropdown */}
+<div className="dropdowncontainer">
+  <button
+    className="dropdownbutton"
+    type="button"
+    onClick={(e) => {
+      e.stopPropagation();
+      setDropdownOpen(!dropdownOpen);
+    }}
+  >
+    Hi Welcome, {username}
+  </button>
+
+  {dropdownOpen && (
+    <div className="dropdown-menu">
+      <button className="dropdown-item" onClick={handleLogout}>
+        Logout
+      </button>
+    </div>
+  )}
+</div>
       </div>
     </header>
   );

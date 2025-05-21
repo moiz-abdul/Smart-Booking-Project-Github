@@ -100,9 +100,10 @@ const ProviderReceivedBookings  = () => {
             {bookings.map(booking => (
               <li key={booking.id} className="booking-item">
                 <div className="booking-header">
-                  <span className="booking-service">
-                    <strong>{booking.service_name}</strong> ({booking.service_category})
-                  </span>
+                  <div className="booking-service">
+                    <strong>Service Name: {booking.service_name}</strong> 
+                    <div> Service Category: ({booking.service_category})</div>
+                  </div>
                 </div>
 
                 <div className="booking-details">
