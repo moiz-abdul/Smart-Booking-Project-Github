@@ -549,7 +549,7 @@ window.addEventListener('load', revealOnScroll);
             <div className="feature-card">
               <FaFilter className="feature-icon" />
               <h3>Search by Filters</h3>
-              <p>Narrow down options using filters like location, availability, ratings, and more</p>
+              <p>Narrow down options using filters like Days, Time slots availability and rating </p>
             </div>
 
 
@@ -598,13 +598,7 @@ window.addEventListener('load', revealOnScroll);
     <div className="feature-card">
       <FaCalendarAlt className="feature-icon" />
       <h3>Appointment Management</h3>
-      <p>Easily manage your schedule, availability, and client appointments</p>
-    </div>
-    
-    <div className="feature-card">
-      <FaCreditCard className="feature-icon" />
-      <h3>Payment Processing</h3>
-      <p>Securely accept payments and manage your earnings in one place</p>
+      <p>Add, Delete or Modify Your Services easily. Manage your schedule, availability, and client appointments</p>
     </div>
     
     <div className="feature-card">
@@ -615,8 +609,8 @@ window.addEventListener('load', revealOnScroll);
     
     <div className="feature-card">
       <FaBell className="feature-icon" />
-      <h3>Client Notifications</h3>
-      <p>Automated reminders and notifications to reduce no-shows</p>
+      <h3>Notifications & Reminders</h3>
+      <p>Automated reminders to manage Booking Service and Client notifications to reduce no-shows</p>
     </div>
     
     <div className="feature-card">
@@ -628,14 +622,21 @@ window.addEventListener('load', revealOnScroll);
     <div className="feature-card">
       <FaCalendarCheck className="feature-icon" />
       <h3>Booking Customization</h3>
-      <p>Set your service durations, buffer times, and booking rules</p>
+      <p>Set your Service Durations, Available Days and Timeslots, and Booking rules</p>
     </div>
     
     <div className="feature-card">
       <FaFilter className="feature-icon" />
       <h3>Client Management</h3>
-      <p>Track client history, preferences, and special requirements</p>
+      <p>Track client history, preferences and special requirements</p>
     </div>
+
+    <div className="feature-card">
+      <FaFilter className="feature-icon" />
+      <h3>Revenue Report</h3>
+      <p>View and track earnings easily</p>
+    </div>
+
   </div>
 </section>
        
