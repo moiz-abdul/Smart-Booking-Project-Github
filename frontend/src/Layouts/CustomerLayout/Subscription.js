@@ -80,16 +80,26 @@ const CustomerSubscriptions = () => {
             <p><strong>Start:</strong> {new Date(item.membership_start_time).toLocaleDateString()}</p>
             <p><strong>End:</strong> {new Date(item.membership_end_time).toLocaleDateString()}</p>
 
-            <div className="btn-group">
-              <button
-                onClick={() => openRenewModal(item)}
-                disabled={!isExpired(item.membership_end_time)}
-              >
-                Renew
-              </button>
-              <button onClick={() => handleCancel(item.id)}>
-                Cancel
-              </button>
+                <div className="btn-group">
+              {item.payment_type === 'Pay Per Booking' ? (
+                <button
+                  onClick={() => openRenewModal(item)}
+                >
+                  Renew
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => openRenewModal(item)}
+                    disabled={!isExpired(item.membership_end_time)}
+                  >
+                    Renew
+                  </button>
+                  <button onClick={() => handleCancel(item.id)}>
+                    Cancel
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ))}

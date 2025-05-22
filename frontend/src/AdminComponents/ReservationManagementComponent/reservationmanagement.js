@@ -139,15 +139,15 @@ const AdminReservationManagement = () => {
                 <thead className="table-light">
                   <tr>
                     <th style={{ width: '3%' }}>#</th>
-                    <th style={{ width: '12%' }}>Customer</th>
-                    <th style={{ width: '12%' }}>Service</th>
-                    <th style={{ width: '6%' }}>Category</th>
+                    <th style={{ width: '12%' }}>Customer Name</th>
+                    <th style={{ width: '12%' }}>Service Name</th>
+                    <th style={{ width: '6%' }}>Service Category</th>
                     <th style={{ width: '7%' }}>Day</th>
                     <th style={{ width: '8%' }}>Time Slot</th>
-                    <th style={{ width: '17%' }}>Start-End</th>
-                    <th style={{ width: '8%' }}>Payment</th>
-                    <th style={{ width: '7%' }}>Price</th>
-                    <th style={{ width: '7%' }}>Member Price</th>
+                    <th style={{ width: '17%' }}>Start-End Time</th>
+                    <th style={{ width: '8%' }}>Payment Type</th>
+                    <th style={{ width: '7%' }}>Original Price</th>
+                    <th style={{ width: '7%' }}>Membership Price</th>
                     <th style={{ width: '8%' }}>Status</th>
                     <th style={{ width: '10%' }}>Booked At</th>
                   </tr>

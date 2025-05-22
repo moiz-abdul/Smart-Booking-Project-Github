@@ -65,7 +65,7 @@ const UpdateBookingModal = ({ show, onClose, onSubmit, booking, service }) => {
       const data = await res.json();
   
       if (data.success && data.is_reserved) {
-        alert(`Booking time blocked by admin: For ${data.reason} on ${selectedDay} from ${selectedTimeSlot} – ${endTime}`);
+        alert(`Booking time blocked by admin: For ${data.reason} `);
         return false;
       }
   

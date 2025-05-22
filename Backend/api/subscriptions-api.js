@@ -12,6 +12,7 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+
 // All subscriptions for customer (first valid per service)
 SubscriptionApi.get('/subscribeusers', async (req, res) => {
   const { user_id } = req.query;
@@ -25,16 +26,31 @@ SubscriptionApi.get('/subscribeusers', async (req, res) => {
       SELECT * FROM bookingform
       WHERE 
         user_id = ? 
-        AND payment_type = 'Membership'
         AND membership_start_time IS NOT NULL
         AND membership_end_time IS NOT NULL
         AND monthly_membership_fee IS NOT NULL
       ORDER BY service_id, id ASC
     `, [user_id]);
 
+    const today = new Date();
+
+    for (const sub of subscriptions) {
+      const endDate = new Date(sub.membership_end_time);
+      if (
+        sub.payment_type === 'Membership' &&
+        endDate < today // Expired
+      ) {
+        // Auto convert to Pay Per Booking
+        await pool.query(
+          `UPDATE bookingform SET payment_type = 'Pay Per Booking' WHERE id = ?`,
+          [sub.id]
+        );
+        sub.payment_type = 'Pay Per Booking'; // Also update local copy
+      }
+    }
+
     // Map to pick first valid per service
     const uniqueServices = new Map();
-
     for (let sub of subscriptions) {
       if (!uniqueServices.has(sub.service_id)) {
         uniqueServices.set(sub.service_id, sub);
@@ -77,6 +93,7 @@ SubscriptionApi.put('/renewsubscription', async (req, res) => {
     await pool.query(`
       UPDATE bookingform
       SET 
+        payment_type = 'Membership',
         membership_type = ?,
         membership_start_time = ?,
         membership_end_time = ?

@@ -155,9 +155,10 @@ const handleUpdateBooking = async (updatedData) => {
             {bookings.map(booking => (
               <li key={booking.id} className="booking-item">
                 <div className="booking-header">
-                  <span className="booking-service">
-                    <strong>{booking.service_name}</strong> ({booking.service_category})
-                  </span>
+                  <div className="booking-service">
+                    <strong>Service Name : {booking.service_name}</strong> <br></br>
+                    Service Category : ({booking.service_category})
+                  </div>
                 </div>
 
                 <div className="booking-details">
