@@ -70,9 +70,9 @@ const CusDashboard = () => {
     if (!timeStr) return '';
     const [hour, minute] = timeStr.split(':');
     let h = +hour;
-    const suffix = h >= 12 ? 'PM' : 'AM';
+
     h = h % 12 || 12;
-    return `${h}:${minute} ${suffix}`;
+    return `${h}:${minute} `;
   };
 
   const fetchBookings = async (userId) => {
@@ -172,7 +172,7 @@ const CusDashboard = () => {
           <FiClock className="detail-icon" />
           <div>
             <label>Time Slot</label>
-            <p>{formatTime(booking.selected_available_time_slot)}</p>
+            <p>{formatTime(booking.start_time)} - {formatTime(booking.end_time)}</p>
           </div>
         </div>
       </div>
