@@ -23,6 +23,48 @@ export default function RoleBaseRegister() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
+    // Email validation function
+    const validateEmail = async (email) => {
+        // Basic null check
+        if (!email || typeof email !== 'string') return false;
+        
+        // Trim and lowercase the email
+        email = email.trim().toLowerCase();
+        
+        // Enhanced regex pattern (RFC 5322 compliant)
+        const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        
+        if (!emailRegex.test(email)) {
+            return false;
+        }
+        
+        // Check for disposable email domains
+        const disposableDomains = [
+            'mailinator.com', 'tempmail.com', 'guerrillamail.com', 
+            '10minutemail.com', 'throwawaymail.com', 'fakeinbox.com'
+            // Add more disposable domains as needed
+        ];
+        
+        const domain = email.split('@')[1];
+        
+        if (disposableDomains.includes(domain)) {
+            return false;
+        }
+        
+        // Validate common providers (optional)
+        const allowedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com'];
+        if (allowedDomains.length > 0 && !allowedDomains.includes(domain)) {
+            return false;
+        }
+        
+      
+        // Additional checks
+        if (email.length > 254) return false; // RFC 5321 limit
+        if (email.split('@')[0].length > 64) return false; // Local part limit
+        
+        return true;
+    };
+
     // Password strength checker
     const checkPasswordStrength = (password) => {
         let score = 0;
@@ -66,6 +108,13 @@ export default function RoleBaseRegister() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+
+        // Email validation
+        if (!validateEmail(email)) {
+            setErrorMessage("Please enter a valid email address with a supported domain (e.g., gmail.com, yahoo.com, hotmail.com).");
+            setIsSubmitting(false);
+            return;
+        }
 
         // Password matching check
         if (password !== confirmPassword) {
@@ -335,7 +384,7 @@ export default function RoleBaseRegister() {
                         <button 
                             type="submit" 
                             className="btn btn-primary w-100 mt-3 register-button"
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || passwordStrength.score <= 2}
                         >
                             {isSubmitting ? (
                                 <>
