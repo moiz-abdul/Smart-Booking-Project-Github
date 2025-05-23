@@ -133,6 +133,10 @@ const ProviderReceivedBookings  = () => {
                     <span className="booking-label">Payment:</span>
                     <span className="booking-value">{booking.payment_type}</span>
                   </div>
+                  <div className="booking-row">
+                <span className="booking-label">Special Request:</span>
+                <span className="booking-value">{booking.special_instructions ? booking.special_instructions : "—"}</span>
+                </div>
                 </div>
 
                 <div className="booking-actions">
