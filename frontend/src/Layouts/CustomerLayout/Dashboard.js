@@ -70,9 +70,10 @@ const CusDashboard = () => {
     if (!timeStr) return '';
     const [hour, minute] = timeStr.split(':');
     let h = +hour;
-
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    
     h = h % 12 || 12;
-    return `${h}:${minute} `;
+    return `${h}:${minute} ${ampm}`;
   };
 
   const fetchBookings = async (userId) => {

@@ -1,3 +1,6 @@
+html, body, #root {
+  height: 100%;
+}
 
 /* Add these styles to your existing CSS file */
 .booking-actions {

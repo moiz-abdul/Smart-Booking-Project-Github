@@ -60,8 +60,8 @@
   padding: 25px;
   background-color: #fff;
   overflow-y: auto;
-  height: 100vh;
-  /* Add fixed positioning for header if needed */
+  height: 100%;
+  min-height: 100vh;
   position: relative;
 }
 
@@ -79,7 +79,7 @@
 /* Dashboard Content - Add margin-top to account for sticky reminders */
 .dashboard-content {
   padding: 20px;
-  min-height: calc(100% - 60px); /* Adjust based on your header height */
+ height: 100vh;
 }
 
 /* Bookings Container */

@@ -3,7 +3,7 @@
 import ServiceFiltersAndSlideshow from './filterslideshow'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { FaCalendarAlt, FaBell, FaCalendarCheck, FaFilter, FaTags, FaUserMd, FaSearch, FaCreditCard, FaRegStar, FaSignInAlt, FaUserPlus, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
+import { FaCalendarAlt, FaBell, FaCalendarCheck, FaFilter, FaTags,FaChartLine, FaUserMd, FaSearch, FaCreditCard, FaRegStar, FaSignInAlt, FaUserPlus, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { MdCategory, MdNotifications, MdPadding } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import Categorywisesearch from './categorywisesearch'
@@ -632,7 +632,7 @@ window.addEventListener('load', revealOnScroll);
     </div>
 
     <div className="feature-card">
-      <FaFilter className="feature-icon" />
+      <FaChartLine className="feature-icon" />
       <h3>Revenue Report</h3>
       <p>View and track earnings easily</p>
     </div>

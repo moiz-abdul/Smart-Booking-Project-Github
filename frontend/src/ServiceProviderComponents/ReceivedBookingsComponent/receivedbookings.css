@@ -3,10 +3,8 @@
   border-radius: var(--border-radius);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   padding: 30px;
-  width: 90%;
-  max-width: 92%;
-  min-width: 1050px;
-  margin-top: 30px;
+  width: 92%;
+  margin: 30px auto 0 auto;
 }
 .booking-actions {
     display: flex;
