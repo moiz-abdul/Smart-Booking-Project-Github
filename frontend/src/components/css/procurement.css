@@ -1,0 +1,40 @@
+.procurement-section {
+  font-family: 'Inter', sans-serif;
+}
+
+.card {
+  border-radius: 12px;
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.time-slot-pill {
+  background-color: #f0f7ff;
+  color: #0d6efd;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.btn-primary {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.btn-outline-secondary {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.shadow-sm {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}

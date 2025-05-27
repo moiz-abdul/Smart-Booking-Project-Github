@@ -1,0 +1,34 @@
+
+.Provider-confirmedbooking-dashboard-container{
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 90%;
+  max-width: 92%;
+  min-width: 1050px;
+  margin-top: 30px;
+}
+.booking-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .complete-btn{
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .complete-btn{
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .complete-btn:hover {
+    background-color: #218838;
+  }
+  
